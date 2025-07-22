@@ -1,0 +1,42 @@
+import InputButton from "./InputButton";
+
+type FloorSelectorProps = {
+  floorIds?: number[];
+  selectedFloorId?: number;
+  onFloorSelected: (floorId: number) => void;
+};
+
+const FloorSelector = ({
+  floorIds,
+  selectedFloorId,
+  onFloorSelected,
+}: FloorSelectorProps) => {
+  console.log(floorIds);
+  return (
+    <div
+      className="maputnik-modal"
+      style={{
+        position: "absolute",
+        top: "50%",
+        right: "10px",
+        padding: 5,
+        minWidth: "unset",
+        display: "flex",
+        gap: 5,
+      }}
+    >
+      {floorIds?.map((floorId) => (
+        <InputButton
+          style={{ background: floorId == selectedFloorId ? "white" : "unset" }}
+          onClick={() => {
+            onFloorSelected(floorId);
+          }}
+        >
+          {floorId}
+        </InputButton>
+      ))}
+    </div>
+  );
+};
+
+export default FloorSelector;
