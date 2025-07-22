@@ -147,9 +147,40 @@ function stripAccessTokens(mapStyle: StyleSpecification) {
   delete changedMetadata['maputnik:openmaptiles_access_token'];
   delete changedMetadata['maputnik:thunderforest_access_token'];
   delete changedMetadata['maputnik:stadia_access_token'];
+
+  // Remove x_accessToken and access_token/api_key query params from each source
+  const changedSources = Object.fromEntries(
+    Object.entries(mapStyle.sources || {}).map(([sourceName, source]) => {
+      if (source && typeof source === 'object') {
+        // Remove x_accessToken
+        const { x_accessToken, ...rest } = source as any;
+        // Remove access_token and api_key from url if present
+        let newUrl = rest.url;
+        if (typeof newUrl === 'string') {
+          try {
+            const urlObj = new URL(newUrl, 'http://dummy'); // base for relative URLs
+            urlObj.searchParams.delete('access_token');
+            urlObj.searchParams.delete('api_key');
+            // Remove trailing ? if no params left
+            newUrl = urlObj.pathname + (urlObj.search ? urlObj.search : '');
+            // If original url had protocol, keep it
+            if (/^https?:\/\//.test(rest.url)) {
+              newUrl = urlObj.origin + newUrl;
+            }
+          } catch (e) {
+            // If URL parsing fails, leave as is
+          }
+        }
+        return [sourceName, { ...rest, url: newUrl }];
+      }
+      return [sourceName, source];
+    })
+  );
+
   return {
     ...mapStyle,
-    metadata: changedMetadata
+    metadata: changedMetadata,
+    sources: changedSources,
   };
 }
 
