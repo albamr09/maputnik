@@ -11,7 +11,6 @@ const FloorSelector = ({
   selectedFloorId,
   onFloorSelected,
 }: FloorSelectorProps) => {
-  console.log(floorIds);
   return (
     <div
       className="maputnik-modal"

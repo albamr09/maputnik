@@ -1039,6 +1039,7 @@ export default class App extends React.Component<any, AppState> {
         onLayerVisibilityToggle={this.onLayerVisibilityToggle}
         onLayerIdChange={this.onLayerIdChange}
         errors={this.state.errors}
+        selectedFloorId={this.state.selectedFloorId}
       />
     ) : undefined;
 

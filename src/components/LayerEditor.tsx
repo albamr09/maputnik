@@ -83,6 +83,7 @@ type LayerEditorInternalProps = {
   isLastLayer?: boolean;
   layerIndex: number;
   errors?: any[];
+  selectedFloorId?: number;
 } & WithTranslation;
 
 type LayerEditorState = {
@@ -263,6 +264,7 @@ class LayerEditorInternal extends React.Component<
                     (this.props.layer as any)["source-layer"]
                   ]
                 }
+                selectedFloorId={this.props.selectedFloorId}
                 onChange={(f) => this.changeProperty(null, "filter", f)}
               />
             </div>
