@@ -360,6 +360,43 @@ export default class App extends React.Component<any, AppState> {
     window.removeEventListener("keydown", this.handleKeyPress);
   }
 
+  componentDidUpdate(_prevProps: any, prevState: AppState) {
+    const prevFloorId = prevState.selectedFloorId;
+    const newFloorId = this.state.selectedFloorId;
+
+    if (prevFloorId !== newFloorId) {
+      this.updateLayersForNewFloorId(newFloorId);
+    }
+  }
+
+  updateLayersForNewFloorId = (floorId?: number) => {
+    if (floorId == null) return;
+
+    const changedLayers = this.state.mapStyle.layers.map((layer) => {
+      if (!("filter" in layer)) {
+        return layer;
+      }
+
+      const existingFilter = layer.filter as ExpressionSpecification;
+
+      if (!hasFloorFilter(existingFilter)) {
+        return layer;
+      }
+
+      const newFilter = addFloorFilter(
+        removeFloorFilter(existingFilter),
+        floorId,
+      );
+
+      return {
+        ...layer,
+        filter: newFilter,
+      };
+    });
+
+    this.onLayersChange(changedLayers);
+  };
+
   saveStyle(snapshotStyle: StyleSpecification & { id: string }) {
     this.styleStore.save(snapshotStyle);
   }
@@ -649,6 +686,7 @@ export default class App extends React.Component<any, AppState> {
     let changedFilter = [...layer.filter] as
       | ExpressionSpecification
       | LegacyFilterSpecification;
+    const metadata = { ...(layer.metadata || {}) };
 
     if (!hasFloorFilter(changedFilter) && this.state.selectedFloorId) {
       changedFilter = addFloorFilter(changedFilter, this.state.selectedFloorId);
@@ -656,7 +694,14 @@ export default class App extends React.Component<any, AppState> {
       changedFilter = removeFloorFilter(changedFilter);
     }
 
+    // Update values
     layer.filter = changedFilter;
+    if (Object.keys(metadata).length > 0) {
+      layer.metadata = metadata;
+    } else {
+      delete layer.metadata;
+    }
+
     changedLayers[index] = layer;
     this.onLayersChange(changedLayers);
   };

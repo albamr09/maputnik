@@ -11,6 +11,7 @@ import type { LayerSpecification } from "maplibre-gl";
 import generateUniqueId from "../libs/document-uid";
 import { findClosestCommonPrefix, layerPrefix } from "../libs/layer";
 import { WithTranslation, withTranslation } from "react-i18next";
+import { hasFloorFilter } from "../libs/floor-filter";
 
 type LayerListContainerProps = {
   layers: LayerSpecification[];
@@ -269,6 +270,8 @@ class LayerListContainerInternal extends React.Component<
             layerIndex={idx}
             layerType={layer.type}
             visibility={(layer.layout || {}).visibility}
+            // @ts-ignore
+            floorFilterApplied={hasFloorFilter(layer.filter)}
             isSelected={idx === this.props.selectedLayerIndex}
             onLayerSelect={this.props.onLayerSelect}
             onLayerDestroy={this.props.onLayerDestroy?.bind(this)}

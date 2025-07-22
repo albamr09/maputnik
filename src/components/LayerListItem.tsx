@@ -81,10 +81,6 @@ class IconAction extends React.Component<IconActionProps> {
   }
 }
 
-type LayerListItemState = {
-  floorFilterApplied?: boolean;
-};
-
 type LayerListItemProps = {
   id?: string;
   layerIndex: number;
@@ -92,6 +88,7 @@ type LayerListItemProps = {
   layerType: string;
   isSelected?: boolean;
   visibility?: string;
+  floorFilterApplied?: boolean;
   className?: string;
   onLayerSelect(...args: unknown[]): unknown;
   onLayerCopy?(...args: unknown[]): unknown;
@@ -100,30 +97,21 @@ type LayerListItemProps = {
   onLayerFloorFilterToggle?(...args: unknown[]): unknown;
 };
 
-class LayerListItem extends React.Component<
-  LayerListItemProps,
-  LayerListItemState
-> {
+class LayerListItem extends React.Component<LayerListItemProps> {
   static defaultProps = {
     isSelected: false,
     visibility: "visible",
+    floorFilterApplied: false,
     onLayerCopy: () => {},
     onLayerDestroy: () => {},
     onLayerVisibilityToggle: () => {},
     onLayerFloorFilterToggle: () => {},
   };
 
-  constructor(props: LayerListItemProps) {
-    super(props);
-    this.state = {
-      floorFilterApplied: false,
-    };
-  }
-
   render() {
     const visibilityAction =
       this.props.visibility === "visible" ? "show" : "hide";
-    const floorFilterAction = this.state.floorFilterApplied
+    const floorFilterAction = this.props.floorFilterApplied
       ? "floor-filter-remove"
       : "floor-filter-add";
 
@@ -159,9 +147,6 @@ class LayerListItem extends React.Component<
             action={floorFilterAction}
             classBlockName="floor-filter"
             onClick={(_e) => {
-              this.setState({
-                floorFilterApplied: !this.state.floorFilterApplied,
-              });
               this.props.onLayerFloorFilterToggle!(this.props.layerIndex);
             }}
           />
