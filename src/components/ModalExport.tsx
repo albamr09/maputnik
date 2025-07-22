@@ -1,57 +1,54 @@
-import React from 'react'
-import Slugify from 'slugify'
-import {saveAs} from 'file-saver'
-import {version} from 'maplibre-gl/package.json'
-import {format} from '@maplibre/maplibre-gl-style-spec'
-import type {StyleSpecification} from 'maplibre-gl'
-import {MdMap, MdSave} from 'react-icons/md'
-import {WithTranslation, withTranslation} from 'react-i18next';
+import React from "react";
+import Slugify from "slugify";
+import { saveAs } from "file-saver";
+import { version } from "maplibre-gl/package.json";
+import { format } from "@maplibre/maplibre-gl-style-spec";
+import type { StyleSpecification } from "maplibre-gl";
+import { MdMap, MdSave } from "react-icons/md";
+import { WithTranslation, withTranslation } from "react-i18next";
 
-import FieldString from './FieldString'
-import InputButton from './InputButton'
-import Modal from './Modal'
-import style from '../libs/style'
-import fieldSpecAdditional from '../libs/field-spec-additional'
-
+import FieldString from "./FieldString";
+import InputButton from "./InputButton";
+import Modal from "./Modal";
+import style from "../libs/style";
+import fieldSpecAdditional from "../libs/field-spec-additional";
 
 const MAPLIBRE_GL_VERSION = version;
-const showSaveFilePickerAvailable = typeof window.showSaveFilePicker === "function";
-
+const showSaveFilePickerAvailable =
+  typeof window.showSaveFilePicker === "function";
 
 type ModalExportInternalProps = {
-  mapStyle: StyleSpecification & { id: string }
-  onStyleChanged(...args: unknown[]): unknown
-  isOpen: boolean
-  onOpenToggle(...args: unknown[]): unknown
-  onSetFileHandle(fileHandle: FileSystemFileHandle | null): unknown
-  fileHandle: FileSystemFileHandle | null
+  mapStyle: StyleSpecification & { id: string };
+  onStyleChanged(...args: unknown[]): unknown;
+  isOpen: boolean;
+  onOpenToggle(...args: unknown[]): unknown;
+  onSetFileHandle(fileHandle: FileSystemFileHandle | null): unknown;
+  fileHandle: FileSystemFileHandle | null;
 } & WithTranslation;
 
-
 class ModalExportInternal extends React.Component<ModalExportInternalProps> {
-
-  tokenizedStyle() {
+  cleanStyle() {
     return format(
-      style.stripAccessTokens(
-        style.replaceAccessTokens(this.props.mapStyle)
-      )
+      style.stripFloorFilter(
+        style.stripAccessTokens(style.replaceAccessTokens(this.props.mapStyle)),
+      ),
     );
   }
 
   exportName() {
     if (this.props.mapStyle.name) {
       return Slugify(this.props.mapStyle.name, {
-        replacement: '_',
+        replacement: "_",
         remove: /[*\-+~.()'"!:]/g,
-        lower: true
+        lower: true,
       });
     } else {
-      return this.props.mapStyle.id
+      return this.props.mapStyle.id;
     }
   }
 
   createHtml() {
-    const tokenStyle = this.tokenizedStyle();
+    const cleanedStyle = this.cleanStyle();
     const htmlTitle = this.props.mapStyle.name || this.props.t("Map");
     const html = `<!DOCTYPE html>
 <html>
@@ -71,7 +68,7 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
   <script>
       const map = new maplibregl.Map({
          container: 'map',
-         style: ${tokenStyle},
+         style: ${cleanedStyle},
       });
       map.addControl(new maplibregl.NavigationControl());
   </script>
@@ -79,18 +76,20 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
 </html>
 `;
 
-    const blob = new Blob([html], {type: "text/html;charset=utf-8"});
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const exportName = this.exportName();
     saveAs(blob, exportName + ".html");
   }
 
   async saveStyle() {
-    const tokenStyle = this.tokenizedStyle();
+    const cleanedStyle = this.cleanStyle();
 
     // it is not guaranteed that the File System Access API is available on all
     // browsers. If the function is not available, a fallback behavior is used.
     if (!showSaveFilePickerAvailable) {
-      const blob = new Blob([tokenStyle], {type: "application/json;charset=utf-8"});
+      const blob = new Blob([cleanedStyle], {
+        type: "application/json;charset=utf-8",
+      });
       const exportName = this.exportName();
       saveAs(blob, exportName + ".json");
       return;
@@ -99,25 +98,25 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
     let fileHandle = this.props.fileHandle;
     if (fileHandle == null) {
       fileHandle = await this.createFileHandle();
-      this.props.onSetFileHandle(fileHandle)
+      this.props.onSetFileHandle(fileHandle);
       if (fileHandle == null) return;
     }
 
     const writable = await fileHandle.createWritable();
-    await writable.write(tokenStyle);
+    await writable.write(cleanedStyle);
     await writable.close();
     this.props.onOpenToggle();
   }
 
   async saveStyleAs() {
-    const tokenStyle = this.tokenizedStyle();
+    const cleanedStyle = this.cleanStyle();
 
     const fileHandle = await this.createFileHandle();
-    this.props.onSetFileHandle(fileHandle)
+    this.props.onSetFileHandle(fileHandle);
     if (fileHandle == null) return;
 
     const writable = await fileHandle.createWritable();
-    await writable.write(tokenStyle);
+    await writable.write(cleanedStyle);
     await writable.close();
     this.props.onOpenToggle();
   }
@@ -127,14 +126,16 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
       types: [
         {
           description: "json",
-          accept: {"application/json": [".json"]},
+          accept: { "application/json": [".json"] },
         },
       ],
       suggestedName: this.exportName(),
     };
 
-    const fileHandle = await window.showSaveFilePicker(pickerOpts) as FileSystemFileHandle;
-    this.props.onSetFileHandle(fileHandle)
+    const fileHandle = (await window.showSaveFilePicker(
+      pickerOpts,
+    )) as FileSystemFileHandle;
+    this.props.onSetFileHandle(fileHandle);
     return fileHandle;
   }
 
@@ -142,72 +143,90 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
     const changedStyle = {
       ...this.props.mapStyle,
       metadata: {
-        ...this.props.mapStyle.metadata as any,
-        [property]: value
-      }
-    }
-    this.props.onStyleChanged(changedStyle)
+        ...(this.props.mapStyle.metadata as any),
+        [property]: value,
+      },
+    };
+    this.props.onStyleChanged(changedStyle);
   }
-
 
   render() {
     const t = this.props.t;
     const fsa = fieldSpecAdditional(t);
-    return <Modal
-      data-wd-key="modal:export"
-      isOpen={this.props.isOpen}
-      onOpenToggle={this.props.onOpenToggle}
-      title={t('Save Style')}
-      className="maputnik-export-modal"
-    >
+    return (
+      <Modal
+        data-wd-key="modal:export"
+        isOpen={this.props.isOpen}
+        onOpenToggle={this.props.onOpenToggle}
+        title={t("Save Style")}
+        className="maputnik-export-modal"
+      >
+        <section className="maputnik-modal-section">
+          <h1>{t("Save Style")}</h1>
+          <p>{t("Save the JSON style to your computer.")}</p>
 
-      <section className="maputnik-modal-section">
-        <h1>{t("Save Style")}</h1>
-        <p>
-          {t("Save the JSON style to your computer.")}
-        </p>
+          <div>
+            <FieldString
+              label={fsa.maputnik.maptiler_access_token.label}
+              fieldSpec={fsa.maputnik.maptiler_access_token}
+              value={
+                (this.props.mapStyle.metadata || ({} as any))[
+                  "maputnik:openmaptiles_access_token"
+                ]
+              }
+              onChange={this.changeMetadataProperty.bind(
+                this,
+                "maputnik:openmaptiles_access_token",
+              )}
+            />
+            <FieldString
+              label={fsa.maputnik.thunderforest_access_token.label}
+              fieldSpec={fsa.maputnik.thunderforest_access_token}
+              value={
+                (this.props.mapStyle.metadata || ({} as any))[
+                  "maputnik:thunderforest_access_token"
+                ]
+              }
+              onChange={this.changeMetadataProperty.bind(
+                this,
+                "maputnik:thunderforest_access_token",
+              )}
+            />
+            <FieldString
+              label={fsa.maputnik.stadia_access_token.label}
+              fieldSpec={fsa.maputnik.stadia_access_token}
+              value={
+                (this.props.mapStyle.metadata || ({} as any))[
+                  "maputnik:stadia_access_token"
+                ]
+              }
+              onChange={this.changeMetadataProperty.bind(
+                this,
+                "maputnik:stadia_access_token",
+              )}
+            />
+          </div>
 
-        <div>
-          <FieldString
-            label={fsa.maputnik.maptiler_access_token.label}
-            fieldSpec={fsa.maputnik.maptiler_access_token}
-            value={(this.props.mapStyle.metadata || {} as any)['maputnik:openmaptiles_access_token']}
-            onChange={this.changeMetadataProperty.bind(this, "maputnik:openmaptiles_access_token")}
-          />
-          <FieldString
-            label={fsa.maputnik.thunderforest_access_token.label}
-            fieldSpec={fsa.maputnik.thunderforest_access_token}
-            value={(this.props.mapStyle.metadata || {} as any)['maputnik:thunderforest_access_token']}
-            onChange={this.changeMetadataProperty.bind(this, "maputnik:thunderforest_access_token")}
-          />
-          <FieldString
-            label={fsa.maputnik.stadia_access_token.label}
-            fieldSpec={fsa.maputnik.stadia_access_token}
-            value={(this.props.mapStyle.metadata || {} as any)['maputnik:stadia_access_token']}
-            onChange={this.changeMetadataProperty.bind(this, "maputnik:stadia_access_token")}
-          />
-        </div>
-
-        <div className="maputnik-modal-export-buttons">
-          <InputButton onClick={this.saveStyle.bind(this)}>
-            <MdSave/>
-            {t("Save")}
-          </InputButton>
-          {showSaveFilePickerAvailable && (
-            <InputButton onClick={this.saveStyleAs.bind(this)}>
-              <MdSave/>
-              {t("Save as")}
+          <div className="maputnik-modal-export-buttons">
+            <InputButton onClick={this.saveStyle.bind(this)}>
+              <MdSave />
+              {t("Save")}
             </InputButton>
-          )}
+            {showSaveFilePickerAvailable && (
+              <InputButton onClick={this.saveStyleAs.bind(this)}>
+                <MdSave />
+                {t("Save as")}
+              </InputButton>
+            )}
 
-          <InputButton onClick={this.createHtml.bind(this)}>
-            <MdMap/>
-            {t("Create HTML")}
-          </InputButton>
-        </div>
-      </section>
-
-    </Modal>
+            <InputButton onClick={this.createHtml.bind(this)}>
+              <MdMap />
+              {t("Create HTML")}
+            </InputButton>
+          </div>
+        </section>
+      </Modal>
+    );
   }
 }
 

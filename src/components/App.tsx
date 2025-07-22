@@ -363,7 +363,9 @@ export default class App extends React.Component<any, AppState> {
   componentDidUpdate(_prevProps: any, prevState: AppState) {
     const prevFloorId = prevState.selectedFloorId;
     const newFloorId = this.state.selectedFloorId;
+    // @ts-ignore
     const prevFloors = prevState.mapStyle?.metadata?.["maputnik:floors"];
+    // @ts-ignore
     const newFloors = this.state.mapStyle?.metadata?.["maputnik:floors"];
 
     if (prevFloorId !== newFloorId) {
