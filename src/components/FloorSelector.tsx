@@ -17,6 +17,7 @@ const FloorSelector = ({
       style={{
         position: "absolute",
         top: "50%",
+        transform: "translateY(-50%)",
         right: "10px",
         padding: 5,
         minWidth: "unset",
