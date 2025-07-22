@@ -27,7 +27,10 @@ const FloorSelector = ({
     >
       {floorIds?.map((floorId) => (
         <InputButton
-          style={{ background: floorId == selectedFloorId ? "white" : "unset" }}
+          style={{
+            background: floorId == selectedFloorId ? "white" : "unset",
+            color: floorId == selectedFloorId ? "black" : "unset",
+          }}
           onClick={() => {
             onFloorSelected(floorId);
           }}
