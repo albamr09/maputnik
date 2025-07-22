@@ -1104,6 +1104,7 @@ export default class App extends React.Component<any, AppState> {
     const floorSelector = (
       <FloorSelector
         selectedFloorId={this.state.selectedFloorId}
+        //@ts-ignore
         floorIds={this.state.mapStyle?.metadata?.["maputnik:floors"]}
         onFloorSelected={(floorId) =>
           this.setState({ selectedFloorId: floorId })

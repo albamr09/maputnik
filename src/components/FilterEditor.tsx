@@ -350,6 +350,7 @@ class FilterEditorInternal extends React.Component<
                 });
                 // TODO ALBA: change the filter of the layer to add/remove the floor
                 // TODO ALBA: remove filter when exporting
+                // TODO ALBA: remove floor metadata when exporting
               }}
             />
           </div>
