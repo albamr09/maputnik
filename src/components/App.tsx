@@ -363,9 +363,17 @@ export default class App extends React.Component<any, AppState> {
   componentDidUpdate(_prevProps: any, prevState: AppState) {
     const prevFloorId = prevState.selectedFloorId;
     const newFloorId = this.state.selectedFloorId;
+    const prevFloors = prevState.mapStyle?.metadata?.["maputnik:floors"];
+    const newFloors = this.state.mapStyle?.metadata?.["maputnik:floors"];
 
     if (prevFloorId !== newFloorId) {
       this.updateLayersForNewFloorId(newFloorId);
+    }
+
+    if (!prevFloors && newFloors) {
+      this.setState({
+        selectedFloorId: newFloors[0],
+      });
     }
   }
 
@@ -432,16 +440,6 @@ export default class App extends React.Component<any, AppState> {
       this.setState({
         mapState: "map",
       });
-    } else if (property == "maputnik:floors") {
-      if (value == undefined || value == null || value.length == 0) {
-        this.setState({
-          selectedFloorId: undefined,
-        });
-      } else if (this.state.selectedFloorId == undefined) {
-        this.setState({
-          selectedFloorId: value[0],
-        });
-      }
     }
 
     const changedStyle = {
