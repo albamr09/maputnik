@@ -82,7 +82,7 @@ function createStyleFromFilter(
   };
 }
 
-const FILTER_OPS = ["all", "any", "none"];
+export const FILTER_OPS = ["all", "any", "none"];
 
 // If we convert a filter that is an expression to an expression it'll remain the same in value
 function checkIfSimpleFilter(
@@ -125,7 +125,6 @@ type FilterEditorInternalProps = {
 } & WithTranslation;
 
 type FilterEditorState = {
-  filterBySelectedFloor: boolean;
   showDoc: boolean;
   displaySimpleFilter: boolean;
   valueIsSimpleFilter?: boolean;
@@ -143,7 +142,6 @@ class FilterEditorInternal extends React.Component<
     super(props);
     this.state = {
       showDoc: false,
-      filterBySelectedFloor: false,
       displaySimpleFilter: checkIfSimpleFilter(combiningFilter(props)),
     };
   }
@@ -341,18 +339,6 @@ class FilterEditorInternal extends React.Component<
               </svg>{" "}
               {t("Add filter")}
             </InputButton>
-            <FieldCheckbox
-              label={t("Filter by selected floor")}
-              value={this.state.filterBySelectedFloor}
-              onChange={() => {
-                this.setState({
-                  filterBySelectedFloor: !this.state.filterBySelectedFloor,
-                });
-                // TODO ALBA: change the filter of the layer to add/remove the floor
-                // TODO ALBA: remove filter when exporting
-                // TODO ALBA: remove floor metadata when exporting
-              }}
-            />
           </div>
           <div
             key="doc"

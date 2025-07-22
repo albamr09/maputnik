@@ -14,7 +14,12 @@ import {
   ValidationError,
   SourceSpecification,
 } from "maplibre-gl";
-import { latest, validateStyleMin } from "@maplibre/maplibre-gl-style-spec";
+import {
+  ExpressionSpecification,
+  latest,
+  LegacyFilterSpecification,
+  validateStyleMin,
+} from "@maplibre/maplibre-gl-style-spec";
 
 import MapMaplibreGl from "./MapMaplibreGl";
 import MapOpenLayers from "./MapOpenLayers";
@@ -52,6 +57,11 @@ import Debug from "../libs/debug";
 import { SortEnd } from "react-sortable-hoc";
 import { MapOptions } from "maplibre-gl";
 import FloorSelector from "./FloorSelector";
+import {
+  addFloorFilter,
+  hasFloorFilter,
+  removeFloorFilter,
+} from "../libs/floor-filter";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -629,6 +639,28 @@ export default class App extends React.Component<any, AppState> {
     this.onLayersChange(changedLayers);
   };
 
+  onLayerFloorFilterToggle = (index: number) => {
+    const layers = this.state.mapStyle.layers;
+    const changedLayers = layers.slice(0);
+
+    const layer = { ...changedLayers[index] };
+    if (!("filter" in layer)) return;
+    // @ts-ignore
+    let changedFilter = [...layer.filter] as
+      | ExpressionSpecification
+      | LegacyFilterSpecification;
+
+    if (!hasFloorFilter(changedFilter) && this.state.selectedFloorId) {
+      changedFilter = addFloorFilter(changedFilter, this.state.selectedFloorId);
+    } else {
+      changedFilter = removeFloorFilter(changedFilter);
+    }
+
+    layer.filter = changedFilter;
+    changedLayers[index] = layer;
+    this.onLayersChange(changedLayers);
+  };
+
   onLayerVisibilityToggle = (index: number) => {
     const layers = this.state.mapStyle.layers;
     const changedLayers = layers.slice(0);
@@ -1010,6 +1042,7 @@ export default class App extends React.Component<any, AppState> {
         onLayerDestroy={this.onLayerDestroy}
         onLayerCopy={this.onLayerCopy}
         onLayerVisibilityToggle={this.onLayerVisibilityToggle}
+        onLayerFloorFilterToggle={this.onLayerFloorFilterToggle}
         onLayersChange={this.onLayersChange}
         onLayerSelect={this.onLayerSelect}
         selectedLayerIndex={this.state.selectedLayerIndex}
