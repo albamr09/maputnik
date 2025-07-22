@@ -70,31 +70,40 @@ function replaceSourceAccessToken(mapStyle: StyleSpecification, sourceName: stri
   if(!source) return mapStyle
   if(!("url" in source) || !source.url) return mapStyle
 
-  let authSourceName = sourceName
-  if(sourceName === "thunderforest_transport" || sourceName === "thunderforest_outdoors") {
-    authSourceName = "thunderforest"
-  }
-  else if (("url" in source) && source.url?.match(/\.stadiamaps\.com/)) {
+  // Check for x_accessToken on the source
+  const accessToken = (source as any).x_accessToken;
+  let sourceUrl: string = source.url;
+  if (accessToken) {
+    // Append as query param (handle ? or &)
+    const sep = sourceUrl.includes('?') ? '&' : '?';
+    sourceUrl = `${sourceUrl}${sep}access_token=${encodeURIComponent(accessToken)}`;
+  } else {
+    // Fallback to old logic
+    let authSourceName = sourceName
+    if(sourceName === "thunderforest_transport" || sourceName === "thunderforest_outdoors") {
+      authSourceName = "thunderforest"
+    }
+    else if (("url" in source) && source.url?.match(/\.stadiamaps\.com/)) {
     // The code currently usually assumes openmaptiles == MapTiler,
     // so we need to check the source URL.
-    authSourceName = "stadia"
-  }
+      authSourceName = "stadia"
+    }
 
-  const accessToken = getAccessToken(authSourceName, mapStyle, opts)
+    const fallbackToken = getAccessToken(authSourceName, mapStyle, opts)
+    
+    if(!fallbackToken) {
+      // Early exit.
+      return mapStyle;
+    }
 
-  if(!accessToken) {
-    // Early exit.
-    return mapStyle;
-  }
-
-  let sourceUrl: string
-  if (authSourceName == "stadia") {
-    // Stadia Maps does not always require an API key,
-    // so there is no placeholder in our styles.
-    // We append it at the end of the URL when exporting if necessary.
-    sourceUrl = `${source.url}?api_key=${accessToken}`
-  } else {
-    sourceUrl = source.url.replace('{key}', accessToken)
+    if (authSourceName == "stadia") {
+      // Stadia Maps does not always require an API key,
+      // so there is no placeholder in our styles.
+      // We append it at the end of the URL when exporting if necessary.
+      sourceUrl = `${source.url}?api_key=${fallbackToken}`
+    } else {
+      sourceUrl = source.url.replace('{key}', fallbackToken)
+    }
   }
 
   const changedSources = {

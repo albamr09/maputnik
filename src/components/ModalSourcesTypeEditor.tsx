@@ -8,6 +8,7 @@ import FieldDynamicArray from './FieldDynamicArray'
 import FieldArray from './FieldArray'
 import FieldJson from './FieldJson'
 import FieldCheckbox from './FieldCheckbox'
+import FieldString from './FieldString'
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { TFunction } from 'i18next'
 
@@ -329,51 +330,31 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
       i18n: this.props.i18n,
       tReady: this.props.tReady,
     };
+    const accessTokenField = (
+      <FieldString
+        label={t('Access Token')}
+        fieldSpec={{doc: t('Optional access token to use for this data source.')}}
+        value={this.props.source.x_accessToken || ''}
+        onChange={v => this.props.onChange({
+          ...this.props.source,
+          x_accessToken: v
+        })}
+        data-wd-key="modal:sources.add.access_token"
+      />
+    );
     switch(this.props.mode) {
-    case 'geojson_url': return <GeoJSONSourceUrlEditor {...commonProps} />
-    case 'geojson_json': return <GeoJSONSourceFieldJsonEditor {...commonProps} />
-    case 'tilejson_vector': return <TileJSONSourceEditor {...commonProps} />
-    case 'tile_vector': return <TileURLSourceEditor {...commonProps} />
-    case 'tilejson_raster': return <TileJSONSourceEditor {...commonProps} />
-    case 'tile_raster': return <TileURLSourceEditor {...commonProps}>
-      <FieldNumber
-        label={t("Tile Size")}
-        fieldSpec={latest.source_raster.tileSize}
-        onChange={tileSize => this.props.onChange({
-          ...this.props.source,
-          tileSize: tileSize
-        })}
-        value={this.props.source.tileSize || latest.source_raster.tileSize.default}
-        data-wd-key="modal:sources.add.tile_size"
-      />
-    </TileURLSourceEditor>
-    case 'tilejson_raster-dem': return <TileJSONSourceEditor {...commonProps} />
-    case 'tilexyz_raster-dem': return <TileURLSourceEditor {...commonProps}>
-      <FieldNumber
-        label={t("Tile Size")}
-        fieldSpec={latest.source_raster_dem.tileSize}
-        onChange={tileSize => this.props.onChange({
-          ...this.props.source,
-          tileSize: tileSize
-        })}
-        value={this.props.source.tileSize || latest.source_raster_dem.tileSize.default}
-        data-wd-key="modal:sources.add.tile_size"
-      />
-      <FieldSelect
-        label={t("Encoding")}
-        fieldSpec={latest.source_raster_dem.encoding}
-        options={Object.keys(latest.source_raster_dem.encoding.values)}
-        onChange={encoding => this.props.onChange({
-          ...this.props.source,
-          encoding: encoding
-        })}
-        value={this.props.source.encoding || latest.source_raster_dem.encoding.default}
-      />
-    </TileURLSourceEditor>
-    case 'pmtiles_vector': return <PMTilesSourceEditor {...commonProps} />
-    case 'image': return <ImageSourceEditor {...commonProps} />
-    case 'video': return <VideoSourceEditor {...commonProps} />
-    default: return null
+    case 'geojson_url': return <div><GeoJSONSourceUrlEditor {...commonProps} />{accessTokenField}</div>
+    case 'geojson_json': return <div><GeoJSONSourceFieldJsonEditor {...commonProps} />{accessTokenField}</div>
+    case 'tilejson_vector': return <div><TileJSONSourceEditor {...commonProps} />{accessTokenField}</div>
+    case 'tile_vector': return <div><TileURLSourceEditor {...commonProps} />{accessTokenField}</div>
+    case 'tilejson_raster': return <div><TileJSONSourceEditor {...commonProps} />{accessTokenField}</div>
+    case 'tile_raster': return <div><TileURLSourceEditor {...commonProps}><FieldNumber label={t("Tile Size")} fieldSpec={latest.source_raster.tileSize} onChange={tileSize => this.props.onChange({...this.props.source, tileSize: tileSize})} value={this.props.source.tileSize || latest.source_raster.tileSize.default} data-wd-key="modal:sources.add.tile_size" /></TileURLSourceEditor>{accessTokenField}</div>
+    case 'tilejson_raster-dem': return <div><TileJSONSourceEditor {...commonProps} />{accessTokenField}</div>
+    case 'tilexyz_raster-dem': return <div><TileURLSourceEditor {...commonProps}><FieldNumber label={t("Tile Size")} fieldSpec={latest.source_raster_dem.tileSize} onChange={tileSize => this.props.onChange({...this.props.source, tileSize: tileSize})} value={this.props.source.tileSize || latest.source_raster_dem.tileSize.default} data-wd-key="modal:sources.add.tile_size" /><FieldSelect label={t("Encoding")} fieldSpec={latest.source_raster_dem.encoding} options={Object.keys(latest.source_raster_dem.encoding.values)} onChange={encoding => this.props.onChange({...this.props.source, encoding: encoding})} value={this.props.source.encoding || latest.source_raster_dem.encoding.default} /></TileURLSourceEditor>{accessTokenField}</div>
+    case 'pmtiles_vector': return <div><PMTilesSourceEditor {...commonProps} />{accessTokenField}</div>
+    case 'image': return <div><ImageSourceEditor {...commonProps} />{accessTokenField}</div>
+    case 'video': return <div><VideoSourceEditor {...commonProps} />{accessTokenField}</div>
+    default: return accessTokenField
     }
   }
 }
