@@ -22,7 +22,6 @@ import InputButton from "./InputButton";
 import Doc from "./Doc";
 import ExpressionProperty from "./_ExpressionProperty";
 import { WithTranslation, withTranslation } from "react-i18next";
-import FieldCheckbox from "./FieldCheckbox";
 
 function combiningFilter(
   props: FilterEditorInternalProps,
