@@ -173,7 +173,7 @@ const createExtrusionFilter = (
 
     if (
       effectiveExtrusion !== null &&
-      parseFloat(effectiveExtrusion as string) > 0
+      parseFloat(effectiveExtrusion as any) > 0
     ) {
       categoriesWithExtrusion.push(cleanCatName);
     }
