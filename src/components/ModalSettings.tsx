@@ -154,6 +154,11 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
 
           <FieldString
             label={t("Situm API Key")}
+            fieldSpec={{
+              doc: t(
+                "APIKey that is currently being used to access Situm's services",
+              ),
+            }}
             data-wd-key="modal:settings.maputnik:situm-apikey"
             value={metadata["maputnik:situm-apikey"]}
             onChange={onChangeMetadataProperty.bind(
@@ -198,6 +203,9 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
           <FieldString
             label={t("Situm Building ID")}
             data-wd-key="modal:settings.maputnik:situm-building-id"
+            fieldSpec={{
+              doc: t("Current Situm building ID"),
+            }}
             value={metadata["maputnik:situm-building-id"]}
             onChange={onChangeMetadataProperty.bind(
               this,
