@@ -401,13 +401,8 @@ export default class App extends React.Component<any, AppState> {
             .slice()
             .sort((a, b) => b.level - a.level)
             .map((floor) => floor.id);
-          console.log(building.location);
           this.setState({
             floorIds,
-            mapStyle: {
-              ...this.state.mapStyle,
-              center: [building.location.lng, building.location.lat],
-            },
           });
         })
         .catch((e) => {
@@ -1244,6 +1239,7 @@ export default class App extends React.Component<any, AppState> {
         />
         <ModalSources
           mapStyle={this.state.mapStyle}
+          situmSDK={this.state.situmSDK}
           onStyleChanged={this.onStyleChanged}
           isOpen={this.state.isOpen.sources}
           onOpenToggle={this.toggleModal.bind(this, "sources")}
