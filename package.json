@@ -29,6 +29,7 @@
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@prantlf/jsonlint": "^16.0.0",
+    "@situm/sdk-js": "^0.9.3",
     "array-move": "^4.0.0",
     "buffer": "^6.0.3",
     "classnames": "^2.5.1",

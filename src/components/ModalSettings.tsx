@@ -17,7 +17,6 @@ import FieldEnum from "./FieldEnum";
 import FieldColor from "./FieldColor";
 import Modal from "./Modal";
 import fieldSpecAdditional from "../libs/field-spec-additional";
-import FieldDynamicArray from "./FieldDynamicArray";
 
 type ModalSettingsInternalProps = {
   mapStyle: StyleSpecification;
@@ -154,6 +153,16 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
           />
 
           <FieldString
+            label={t("Situm API Key")}
+            data-wd-key="modal:settings.maputnik:situm-apikey"
+            value={metadata["maputnik:situm-apikey"]}
+            onChange={onChangeMetadataProperty.bind(
+              this,
+              "maputnik:situm-apikey",
+            )}
+          />
+
+          <FieldString
             label={fsa.maputnik.maptiler_access_token.label}
             fieldSpec={fsa.maputnik.maptiler_access_token}
             data-wd-key="modal:settings.maputnik:openmaptiles_access_token"
@@ -186,14 +195,15 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             )}
           />
 
-          <FieldDynamicArray
-            label={t("Floors")}
-            type="number"
-            value={metadata["maputnik:floors"]}
-            default={[0]}
-            onChange={onChangeMetadataProperty.bind(this, "maputnik:floors")}
+          <FieldString
+            label={t("Situm Building ID")}
+            data-wd-key="modal:settings.maputnik:situm-building-id"
+            value={metadata["maputnik:situm-building-id"]}
+            onChange={onChangeMetadataProperty.bind(
+              this,
+              "maputnik:situm-building-id",
+            )}
           />
-
           <FieldArray
             label={t("Center")}
             fieldSpec={latest.$root.center}

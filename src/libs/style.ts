@@ -165,6 +165,19 @@ function replaceAccessTokens(mapStyle: StyleSpecification, opts = {}) {
   return changedStyle;
 }
 
+function stripSitumMetadata(mapStyle: StyleSpecification) {
+  const changedMetadata = {
+    ...(mapStyle.metadata as any),
+  };
+  delete changedMetadata["maputnik:situm-apikey"];
+  delete changedMetadata["maputnik:situm-building-id"];
+
+  return {
+    ...mapStyle,
+    metadata: changedMetadata,
+  };
+}
+
 function stripFloorFilter(mapStyle: StyleSpecification) {
   const styleLayers = [...mapStyle.layers];
 
@@ -239,4 +252,5 @@ export default {
   replaceAccessTokens,
   stripAccessTokens,
   stripFloorFilter,
+  stripSitumMetadata,
 };

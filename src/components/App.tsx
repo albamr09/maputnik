@@ -62,6 +62,7 @@ import {
   hasFloorFilter,
   removeFloorFilter,
 } from "../libs/floor-filter";
+import SitumSDK from "@situm/sdk-js";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -156,6 +157,8 @@ type AppState = {
   };
   fileHandle: FileSystemFileHandle | null;
   selectedFloorId?: number;
+  floorIds: number[];
+  situmSDK: SitumSDK | null;
 };
 
 export default class App extends React.Component<any, AppState> {
@@ -325,6 +328,8 @@ export default class App extends React.Component<any, AppState> {
       },
       fileHandle: null,
       selectedFloorId: undefined,
+      floorIds: [],
+      situmSDK: null,
     };
 
     this.layerWatcher = new LayerWatcher({
@@ -361,21 +366,61 @@ export default class App extends React.Component<any, AppState> {
   }
 
   componentDidUpdate(_prevProps: any, prevState: AppState) {
-    const prevFloorId = prevState.selectedFloorId;
-    const newFloorId = this.state.selectedFloorId;
+    const prevSelectedFloorId = prevState.selectedFloorId;
+    const newSelectedFloorId = this.state.selectedFloorId;
+    const prevFloorIds = prevState.floorIds;
+    const newFloorIds = this.state.floorIds;
     // @ts-ignore
-    const prevFloors = prevState.mapStyle?.metadata?.["maputnik:floors"];
+    const prevApiKey = prevState.mapStyle?.metadata?.["maputnik:situm-apikey"];
     // @ts-ignore
-    const newFloors = this.state.mapStyle?.metadata?.["maputnik:floors"];
+    const newApiKey = this.state.mapStyle?.metadata?.["maputnik:situm-apikey"];
+    const prevBuildingID =
+      // @ts-ignore
+      prevState.mapStyle?.metadata?.["maputnik:situm-building-id"];
+    const newBuildingID =
+      // @ts-ignore
+      this.state.mapStyle?.metadata?.["maputnik:situm-building-id"];
 
-    if (prevFloorId !== newFloorId) {
-      this.updateLayersForNewFloorId(newFloorId);
+    if (prevSelectedFloorId !== newSelectedFloorId) {
+      this.updateLayersForNewFloorId(newSelectedFloorId);
     }
 
-    if (!prevFloors && newFloors) {
+    if (prevFloorIds?.length == 0 && newFloorIds?.length > 0) {
       this.setState({
-        selectedFloorId: newFloors[0],
+        selectedFloorId: newFloorIds[0],
       });
+    }
+
+    const setFloorIds = (situmSDK: SitumSDK, buildingID: number) => {
+      situmSDK.cartography.getBuildingById(buildingID).then((building) => {
+        const floorIds = building.floors
+          .slice()
+          .sort((a, b) => b.level - a.level)
+          .map((floor) => floor.id);
+        this.setState({ floorIds });
+      });
+    };
+
+    if (prevApiKey !== newApiKey) {
+      const situmSDK = new SitumSDK({
+        auth: {
+          apiKey: newApiKey,
+        },
+      });
+      this.setState({
+        situmSDK,
+      });
+
+      // For first load, this maybe should not be here
+      if (prevBuildingID !== newBuildingID && situmSDK) {
+        setFloorIds(situmSDK, newBuildingID);
+        return;
+      }
+    }
+
+    // For changes on building
+    if (prevBuildingID !== newBuildingID && this.state.situmSDK) {
+      setFloorIds(this.state.situmSDK, newBuildingID);
     }
   }
 
@@ -437,7 +482,7 @@ export default class App extends React.Component<any, AppState> {
     if (
       property === "maputnik:renderer" &&
       value !==
-        get(this.state.mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
+      get(this.state.mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
     ) {
       this.setState({
         mapState: "map",
@@ -1182,8 +1227,7 @@ export default class App extends React.Component<any, AppState> {
     const floorSelector = (
       <FloorSelector
         selectedFloorId={this.state.selectedFloorId}
-        //@ts-ignore
-        floorIds={this.state.mapStyle?.metadata?.["maputnik:floors"]}
+        floorIds={this.state.floorIds}
         onFloorSelected={(floorId) =>
           this.setState({ selectedFloorId: floorId })
         }

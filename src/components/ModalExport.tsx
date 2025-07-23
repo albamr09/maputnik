@@ -29,8 +29,12 @@ type ModalExportInternalProps = {
 class ModalExportInternal extends React.Component<ModalExportInternalProps> {
   cleanStyle() {
     return format(
-      style.stripFloorFilter(
-        style.stripAccessTokens(style.replaceAccessTokens(this.props.mapStyle)),
+      style.stripSitumMetadata(
+        style.stripFloorFilter(
+          style.stripAccessTokens(
+            style.replaceAccessTokens(this.props.mapStyle),
+          ),
+        ),
       ),
     );
   }
@@ -171,7 +175,7 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
               fieldSpec={fsa.maputnik.maptiler_access_token}
               value={
                 (this.props.mapStyle.metadata || ({} as any))[
-                  "maputnik:openmaptiles_access_token"
+                "maputnik:openmaptiles_access_token"
                 ]
               }
               onChange={this.changeMetadataProperty.bind(
@@ -184,7 +188,7 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
               fieldSpec={fsa.maputnik.thunderforest_access_token}
               value={
                 (this.props.mapStyle.metadata || ({} as any))[
-                  "maputnik:thunderforest_access_token"
+                "maputnik:thunderforest_access_token"
                 ]
               }
               onChange={this.changeMetadataProperty.bind(
@@ -197,7 +201,7 @@ class ModalExportInternal extends React.Component<ModalExportInternalProps> {
               fieldSpec={fsa.maputnik.stadia_access_token}
               value={
                 (this.props.mapStyle.metadata || ({} as any))[
-                  "maputnik:stadia_access_token"
+                "maputnik:stadia_access_token"
                 ]
               }
               onChange={this.changeMetadataProperty.bind(
