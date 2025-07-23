@@ -504,7 +504,7 @@ export default class App extends React.Component<any, AppState> {
     if (
       property === "maputnik:renderer" &&
       value !==
-      get(this.state.mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
+        get(this.state.mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
     ) {
       this.setState({
         mapState: "map",
@@ -1145,6 +1145,7 @@ export default class App extends React.Component<any, AppState> {
         onStyleOpen={this.onStyleChanged}
         onSetMapState={this.setMapState}
         onToggleModal={this.toggleModal.bind(this)}
+        selectedFloorId={this.state.selectedFloorId ?? 0}
       />
     );
 

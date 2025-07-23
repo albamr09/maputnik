@@ -107,7 +107,7 @@ const getCategoriesByOpacity = (
 
     // Round to 1 decimal place
     const roundedOpacity =
-      Math.round(parseFloat(effectiveOpacity as string) * 10) / 10;
+      Math.round(parseFloat(effectiveOpacity as any) * 10) / 10;
 
     if (roundedOpacity === opacityLevel) {
       categories.push(cleanCatName);
@@ -210,6 +210,7 @@ const createExtrusionLayer = (
   theme: Theme,
   defaultProps: CategoryProperties,
   opacityLevel: number,
+  selectedFloorId = 0,
 ): FillExtrusionLayerSpecification => {
   // Get categories that have this opacity
   const categoriesForOpacity = getCategoriesByOpacity(
@@ -231,7 +232,7 @@ const createExtrusionLayer = (
     opacityFilter,
     extrusionFilter,
     // Initialize floor id selection
-    ["==", ["get", "floor_id"], 0],
+    ["==", ["get", "floor_id"], selectedFloorId],
   ] as FilterSpecification;
 
   // Paint properties for extrusion
@@ -270,6 +271,7 @@ const createLayer = (
   layerType: "flat" | "stroke" | "line",
   theme: Theme,
   defaultProps: CategoryProperties,
+  selectedFloorId = 0,
 ): LayerSpecification => {
   let layerFilter: FilterSpecification;
 
@@ -285,11 +287,16 @@ const createLayer = (
         ["==", ["get", "extrusionHeight"], 0],
       ],
       // Initialize floor id selection
-      ["==", ["get", "floor_id"], 0],
+      ["==", ["get", "floor_id"], selectedFloorId],
     ];
   } else if (layerType === "line") {
     // For line: LineString geometries
-    layerFilter = ["all", ["==", ["geometry-type"], "LineString"]];
+    layerFilter = [
+      "all",
+      ["==", ["geometry-type"], "LineString"],
+      // Initialize floor id selection
+      ["==", ["get", "floor_id"], selectedFloorId],
+    ];
   } else {
     throw new Error(
       `layer_type '${layerType}' not supported in createLayer. Use createExtrusionLayer for extrusion.`,
@@ -375,14 +382,22 @@ const createLayer = (
 };
 
 // Main function to generate all layers
-export function generateMapLibreLayers(themeJson: Theme): LayerSpecification[] {
+export function generateMapLibreLayers(
+  themeJson: Theme,
+  selectedFloorId = 0,
+): LayerSpecification[] {
   const defaultProps = themeJson.default || {};
   const layers: LayerSpecification[] = [];
 
   // Generate flat, stroke and line layers (one each)
   const layerTypes: ("flat" | "stroke" | "line")[] = ["flat", "stroke", "line"];
   for (const layerType of layerTypes) {
-    const layer = createLayer(layerType, themeJson, defaultProps);
+    const layer = createLayer(
+      layerType,
+      themeJson,
+      defaultProps,
+      selectedFloorId,
+    );
     layers.push(layer);
   }
 
@@ -393,66 +408,14 @@ export function generateMapLibreLayers(themeJson: Theme): LayerSpecification[] {
   );
 
   for (const opacityLevel of opacityLevels) {
-    const layer = createExtrusionLayer(themeJson, defaultProps, opacityLevel);
+    const layer = createExtrusionLayer(
+      themeJson,
+      defaultProps,
+      opacityLevel,
+      selectedFloorId,
+    );
     layers.push(layer);
   }
 
   return layers;
 }
-
-export const processThemeFile = (
-  themeData: string,
-): {
-  layers: LayerSpecification[];
-  summary: string;
-} => {
-  try {
-    const theme: Theme = JSON.parse(themeData);
-    const layers = generateMapLibreLayers(theme);
-
-    const extrusionLayers = layers.filter(
-      (layer) => layer.type === "fill-extrusion",
-    ).length;
-    const opacityLevels = Array.from(
-      { length: 11 },
-      (_, i) => Math.round(i * 0.1 * 10) / 10,
-    );
-
-    const summary = `${layers.length} layers generated (${extrusionLayers} extrusion layers with opacities: ${opacityLevels.join(", ")})`;
-
-    return {
-      layers,
-      summary,
-    };
-  } catch (error) {
-    throw new Error(
-      `Error processing theme file: ${error instanceof Error ? error.message : "Unknown error"}`,
-    );
-  }
-};
-
-// Example theme for testing
-export const exampleTheme: Theme = {
-  default: {
-    fillColor: "#cccccc",
-    strokeColor: "#000000",
-    fillOpacity: 1.0,
-    strokeOpacity: 1.0,
-    extrusionHeight: 0,
-    strokeWidth: 1,
-  },
-  ".building": {
-    fillColor: "#ff0000",
-    extrusionHeight: 10,
-    fillOpacity: 0.8,
-  },
-  ".road": {
-    strokeColor: "#666666",
-    strokeWidth: 2,
-    strokeOpacity: 0.9,
-  },
-  ".water": {
-    fillColor: "#0066cc",
-    fillOpacity: 0.6,
-  },
-};

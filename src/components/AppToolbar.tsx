@@ -18,8 +18,7 @@ import maputnikLogo from "maputnik-design/logos/logo-color.svg?inline";
 import { withTranslation, WithTranslation } from "react-i18next";
 import { supportedLanguages } from "../i18n";
 import { GrCubes } from "react-icons/gr";
-import { exampleTheme, generateMapLibreLayers } from "../libs/geojson-theme";
-import InputButton from "./InputButton";
+import { generateMapLibreLayers } from "../libs/geojson-theme";
 import style from "../libs/style";
 
 // This is required because of <https://stackoverflow.com/a/49846426>, there isn't another way to detect support that I'm aware of.
@@ -105,6 +104,7 @@ export type MapState =
 
 type AppToolbarInternalProps = {
   mapStyle: object;
+  selectedFloorId: number;
   inspectModeEnabled: boolean;
   onStyleChanged(...args: unknown[]): unknown;
   // A new style has been uploaded
@@ -158,7 +158,10 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
     reader.onload = (e) => {
       try {
         const geojsonTheme = JSON.parse(e.target?.result as string);
-        const generatedLayers = generateMapLibreLayers(geojsonTheme);
+        const generatedLayers = generateMapLibreLayers(
+          geojsonTheme,
+          this.props.selectedFloorId,
+        );
         // @ts-ignore
         const filteredSitumLayers = (this.props.mapStyle?.layers || []).filter(
           // @ts-ignore
