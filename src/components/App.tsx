@@ -384,24 +384,42 @@ export default class App extends React.Component<any, AppState> {
     if (prevSelectedFloorId !== newSelectedFloorId) {
       this.updateLayersForNewFloorId(newSelectedFloorId);
     }
-
     if (prevFloorIds?.length == 0 && newFloorIds?.length > 0) {
       this.setState({
         selectedFloorId: newFloorIds[0],
       });
     }
 
-    const setFloorIds = (situmSDK: SitumSDK, buildingID: number) => {
-      situmSDK.cartography.getBuildingById(buildingID).then((building) => {
-        const floorIds = building.floors
-          .slice()
-          .sort((a, b) => b.level - a.level)
-          .map((floor) => floor.id);
-        this.setState({ floorIds });
-      });
+    const loadInformationFromBuilding = (
+      situmSDK: SitumSDK,
+      buildingID: number,
+    ) => {
+      situmSDK.cartography
+        .getBuildingById(buildingID)
+        .then((building) => {
+          const floorIds = building.floors
+            .slice()
+            .sort((a, b) => b.level - a.level)
+            .map((floor) => floor.id);
+          console.log(building.location);
+          this.setState({
+            floorIds,
+            mapStyle: {
+              ...this.state.mapStyle,
+              center: [building.location.lng, building.location.lat],
+            },
+          });
+        })
+        .catch((e) => {
+          console.error(`Could not set floors: ${e}`);
+        });
     };
 
-    if (prevApiKey !== newApiKey) {
+    if (
+      prevApiKey !== newApiKey &&
+      newApiKey &&
+      (newApiKey as string).trim().length > 0
+    ) {
       const situmSDK = new SitumSDK({
         auth: {
           apiKey: newApiKey,
@@ -412,15 +430,24 @@ export default class App extends React.Component<any, AppState> {
       });
 
       // For first load, this maybe should not be here
-      if (prevBuildingID !== newBuildingID && situmSDK) {
-        setFloorIds(situmSDK, newBuildingID);
+      if (prevBuildingID !== newBuildingID && situmSDK && newBuildingID) {
+        loadInformationFromBuilding(situmSDK, newBuildingID);
         return;
       }
     }
 
     // For changes on building
-    if (prevBuildingID !== newBuildingID && this.state.situmSDK) {
-      setFloorIds(this.state.situmSDK, newBuildingID);
+    if (
+      prevBuildingID !== newBuildingID &&
+      this.state.situmSDK &&
+      newBuildingID
+    ) {
+      loadInformationFromBuilding(this.state.situmSDK, newBuildingID);
+    } else if (
+      (!newBuildingID || (newBuildingID as string).trim().length == 0) &&
+      prevState.floorIds.length > 0
+    ) {
+      this.setState({ floorIds: [] });
     }
   }
 
