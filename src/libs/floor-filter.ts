@@ -4,18 +4,25 @@ import {
 } from "maplibre-gl";
 import { FILTER_OPS } from "../components/FilterEditor";
 
+const isExpressionFloorCondition = (expresion: any) => {
+  if (Array.isArray(expresion) && expresion.length >= 3) {
+    return (
+      Array.isArray(expresion[1]) &&
+      expresion[1].length == 2 &&
+      expresion[1][0] == "get" &&
+      expresion[1][1] == "floor_id"
+    );
+  }
+  return false;
+};
+
 // Helper function to check if filter contains floor condition
 export const hasFloorFilter = (
   filter: LegacyFilterSpecification | ExpressionSpecification,
 ): boolean => {
   if (!Array.isArray(filter)) return false;
 
-  return filter.some((item) => {
-    if (Array.isArray(item) && item.length >= 3) {
-      return item[1] === "floor_id";
-    }
-    return false;
-  });
+  return filter.some((item) => isExpressionFloorCondition(item));
 };
 
 // Helper function to add floor filter
@@ -25,7 +32,7 @@ export const addFloorFilter = (
 ): LegacyFilterSpecification | ExpressionSpecification => {
   if (!Array.isArray(filter)) return filter;
 
-  const floorCondition = ["==", "floor_id", selectedFloorId];
+  const floorCondition = ["==", ["get", "floor_id"], selectedFloorId];
 
   // If it's a simple filter like ["all"] or ["any"], add the floor condition
   if (filter.length === 1 && FILTER_OPS.includes(filter[0])) {
@@ -48,8 +55,8 @@ export const removeFloorFilter = (
   if (!Array.isArray(filter)) return filter;
 
   const newFilter = filter.filter((item) => {
-    if (Array.isArray(item) && item.length >= 3) {
-      return item[1] !== "floor_id" && item[1] !== "floorId";
+    if (isExpressionFloorCondition(item)) {
+      return false;
     }
     return true;
   });
