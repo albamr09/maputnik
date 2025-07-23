@@ -166,7 +166,6 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
         const filteredSitumLayers = (this.props.mapStyle?.layers || []).filter(
           // @ts-ignore
           (layer) => {
-            console.log(layer.id.includes("situm-geojson"), layer.id);
             return !layer.id.includes("situm-geojson");
           },
         );
