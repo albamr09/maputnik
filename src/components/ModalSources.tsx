@@ -83,7 +83,7 @@ function editorMode(source: SourceSpecification) {
 type ActiveModalSourcesTypeEditorProps = {
   sourceId: string;
   source: SourceSpecification;
-  situmSDK?: SitumSDK;
+  situmSDK?: SitumSDK | null;
   onDelete(...args: unknown[]): unknown;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
@@ -123,7 +123,7 @@ class ActiveModalSourcesTypeEditor extends React.Component<ActiveModalSourcesTyp
 }
 
 type AddSourceProps = {
-  situmSDK?: SitumSDK;
+  situmSDK?: SitumSDK | null;
   onAdd(...args: unknown[]): unknown;
 } & WithTranslation;
 
@@ -323,7 +323,7 @@ class AddSource extends React.Component<AddSourceProps, AddSourceState> {
 
 type ModalSourcesInternalProps = {
   mapStyle: StyleSpecification;
-  situmSDK?: SitumSDK;
+  situmSDK?: SitumSDK | null;
   isOpen: boolean;
   onOpenToggle(...args: unknown[]): unknown;
   onStyleChanged(...args: unknown[]): unknown;

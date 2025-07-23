@@ -8,7 +8,6 @@ import FieldDynamicArray from "./FieldDynamicArray";
 import FieldArray from "./FieldArray";
 import FieldJson from "./FieldJson";
 import FieldCheckbox from "./FieldCheckbox";
-import FieldString from "./FieldString";
 import { WithTranslation, withTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import SitumSDK from "@situm/sdk-js";
@@ -359,7 +358,7 @@ class PMTilesSourceEditor extends React.Component<PMTilesSourceEditorProps> {
 
 type ModalSourcesTypeEditorInternalProps = {
   mode: EditorMode;
-  situmSDK?: SitumSDK;
+  situmSDK?: SitumSDK | null;
   source: any;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
