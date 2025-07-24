@@ -59,15 +59,15 @@ const createCategoryExpression = (
       fallback,
     );
 
+    const isNumberValue = [
+      "fillOpacity",
+      "strokeOpacity",
+      "extrusionHeight",
+      "strokeWidth",
+    ].includes(propertyName);
+
     // Convert to float for numeric properties
-    if (
-      [
-        "fillOpacity",
-        "strokeOpacity",
-        "extrusionHeight",
-        "strokeWidth",
-      ].includes(propertyName)
-    ) {
+    if (isNumberValue) {
       value = parseFloat(value as string);
     }
 
@@ -185,7 +185,7 @@ const createExtrusionFilter = (
   conditions.push([
     "all",
     ["has", "extrusionHeight"],
-    [">", ["get", "extrusionHeight"], 0],
+    [">", ["to-number", ["get", "extrusionHeight"]], 0],
   ]);
 
   // Condition 2: Feature doesn't have extrusionHeight but its category has extrusion defined
@@ -246,7 +246,7 @@ const createExtrusionLayer = (
     "fill-extrusion-height": [
       "case",
       ["has", "extrusionHeight"],
-      ["get", "extrusionHeight"],
+      ["to-number", ["get", "extrusionHeight"]],
       createCategoryExpression(theme, defaultProps, "extrusionHeight", 0),
     ] as ExpressionSpecification,
     "fill-extrusion-opacity": opacityLevel,
@@ -317,7 +317,7 @@ const createLayer = (
       "fill-opacity": [
         "case",
         ["has", "fillOpacity"],
-        ["get", "fillOpacity"],
+        ["to-number", ["get", "fillOpacity"]],
         createCategoryExpression(theme, defaultProps, "fillOpacity", 1),
       ] as ExpressionSpecification,
     };
@@ -332,13 +332,13 @@ const createLayer = (
       "line-width": [
         "case",
         ["has", "strokeWidth"],
-        ["get", "strokeWidth"],
+        ["to-number", ["get", "strokeWidth"]],
         createCategoryExpression(theme, defaultProps, "strokeWidth", 1),
       ] as ExpressionSpecification,
       "line-opacity": [
         "case",
         ["has", "fillOpacity"],
-        ["get", "fillOpacity"],
+        ["to-number", ["get", "fillOpacity"]],
         createCategoryExpression(theme, defaultProps, "fillOpacity", 1),
       ] as ExpressionSpecification,
     };
@@ -353,13 +353,13 @@ const createLayer = (
       "line-width": [
         "case",
         ["has", "strokeWidth"],
-        ["get", "strokeWidth"],
+        ["to-number", ["get", "strokeWidth"]],
         createCategoryExpression(theme, defaultProps, "strokeWidth", 1),
       ] as ExpressionSpecification,
       "line-opacity": [
         "case",
         ["has", "strokeOpacity"],
-        ["get", "strokeOpacity"],
+        ["to-number", ["get", "strokeOpacity"]],
         createCategoryExpression(theme, defaultProps, "strokeOpacity", 1),
       ] as ExpressionSpecification,
     };
