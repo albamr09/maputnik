@@ -181,11 +181,11 @@ const createExtrusionFilter = (
 
   const conditions: any[] = [];
 
-  // Condition 1: Feature has extrusionHeight > 1 defined
+  // Condition 1: Feature has extrusionHeight > 0 defined
   conditions.push([
     "all",
     ["has", "extrusionHeight"],
-    [">", ["get", "extrusionHeight"], 1],
+    [">", ["get", "extrusionHeight"], 0],
   ]);
 
   // Condition 2: Feature doesn't have extrusionHeight but its category has extrusion defined

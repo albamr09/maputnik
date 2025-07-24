@@ -1,6 +1,7 @@
 @use "vars";
 
-@use 'sass:color';
+@use "sass:color";
+
 // TOOLBAR
 .maputnik-toolbar {
   position: fixed;
@@ -18,10 +19,11 @@
 
 .maputnik-toolbar-logo {
   text-decoration: none;
-  display: block;
-  flex: 0 0 190px;
+  display: flex;
+  gap: 5px;
   width: 200px;
   text-align: left;
+  align-items: center;
   background-color: vars.$color-black;
   padding: vars.$margin-2;
   height: vars.$toolbar-height;
@@ -83,26 +85,40 @@
   }
 }
 
+.maputnik-toolbar-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .maputnik-toolbar-name {
   text-transform: capitalize;
+  font-size: 20px;
+}
+
+.maputnik-toolbar-subtitle {
+  display: flex;
+  gap: 5px;
+  font-size: 10px;
+  color: #aaa;
 }
 
 .maputnik-toolbar-version {
-  font-size: 10px;
-  margin: 0 4px;
   white-space: nowrap;
 }
 
 .maputnik-toolbar-action {
   background: inherit;
   border-width: 0;
-  @extend .maputnik-toolbar-link !optional; /* stylelint-disable-line */
+  @extend .maputnik-toolbar-link !optional;
+  /* stylelint-disable-line */
 }
 
 .maputnik-toolbar-select {
   background: inherit;
   border-width: 0;
-  @extend .maputnik-toolbar-link !optional; /* stylelint-disable-line */
+  @extend .maputnik-toolbar-link !optional;
+  /* stylelint-disable-line */
 
   select {
     margin: 0 6px;

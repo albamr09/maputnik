@@ -1,15 +1,14 @@
 <img width="200" alt="Maputnik logo" src="https://cdn.jsdelivr.net/gh/maputnik/design/logos/logo-color.png" />
 
 # Maputnik
+
 [![GitHub CI status](https://github.com/maplibre/maputnik/workflows/ci/badge.svg)][github-action-ci]
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)][license]
 
 [github-action-ci]: https://github.com/maplibre/maputnik/actions?query=workflow%3Aci
-[license]:          https://tldrlegal.com/license/mit-license
+[license]: https://tldrlegal.com/license/mit-license
 
-A free and open visual editor for the [MapLibre GL styles](https://maplibre.org/maplibre-style-spec/)
-targeted at developers and map designers.
-
+This is a customized version of Maputnik, originally developed by the Maputnik contributors.
 
 ## Usage
 
@@ -39,6 +38,7 @@ We ensure building and developing Maputnik works with the [current active LTS No
 Check out our [Internationalization guide](./src/locales/README.md) for UI text related changes.
 
 ### Getting Involved
+
 Join the #maplibre or #maputnik slack channel at OSMUS: get an invite at https://slack.openstreetmap.us/ Read the the below guide in order to get familiar with how we do things around here.
 
 Install the deps, start the dev server and open the web browser on `http://localhost:8888/`.
@@ -73,16 +73,19 @@ npm run sort-styles
 ```
 
 ## Tests
+
 For E2E testing we use [Cypress](https://www.cypress.io/)
 
- [Cypress](https://www.cypress.io/) doesn't start a server so you'll need to start one manually by running `npm run start`.
+[Cypress](https://www.cypress.io/) doesn't start a server so you'll need to start one manually by running `npm run start`.
 
-Now open a terminal and run the following using *chrome*:
+Now open a terminal and run the following using _chrome_:
 
 ```
 npm run test
 ```
-or *firefox*:
+
+or _firefox_:
+
 ```
 npm run test -- --browser firefox
 ```
@@ -103,7 +106,6 @@ npm run cy:open
    - Commit any final changes to the changelog.
 2. Run [Create bump version PR](https://github.com/maplibre/maputnik/actions/workflows/create-bump-version-pr.yml) by manual workflow dispatch and set the version number in the input. This will create a PR that changes the changelog and `package.json` file to review and merge.
 3. Once merged, an automatic process will kick in and creates a GitHub release and uploads release assets.
-
 
 ## Sponsors
 
