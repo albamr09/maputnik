@@ -262,7 +262,7 @@ export default class App extends React.Component<any, AppState> {
     if (
       styleUrl &&
       window.confirm(
-        "Load style from URL: " + styleUrl + " and discard current changes?",
+        "Load style from URL: " + styleUrl + " and discard current changes?"
       )
     ) {
       this.styleStore = new StyleStore();
@@ -278,7 +278,7 @@ export default class App extends React.Component<any, AppState> {
           this.styleStore = new StyleStore();
         }
         this.styleStore.latestStyle((mapStyle) =>
-          this.onStyleChanged(mapStyle, { initialLoad: true }),
+          this.onStyleChanged(mapStyle, { initialLoad: true })
         );
 
         if (Debug.enabled()) {
@@ -392,7 +392,7 @@ export default class App extends React.Component<any, AppState> {
 
     const loadInformationFromBuilding = (
       situmSDK: SitumSDK,
-      buildingID: number,
+      buildingID: number
     ) => {
       situmSDK.cartography
         .getBuildingById(buildingID)
@@ -462,7 +462,7 @@ export default class App extends React.Component<any, AppState> {
 
       const newFilter = addFloorFilter(
         removeFloorFilter(existingFilter),
-        floorId,
+        floorId
       );
 
       return {
@@ -524,7 +524,7 @@ export default class App extends React.Component<any, AppState> {
 
   onStyleChanged = (
     newStyle: StyleSpecification & { id: string },
-    opts: OnStyleChangedOpts = {},
+    opts: OnStyleChangedOpts = {}
   ) => {
     opts = {
       save: true,
@@ -564,7 +564,7 @@ export default class App extends React.Component<any, AppState> {
       newStyle.layers.forEach((layer, index) => {
         if (layer.id === "" && foundLayers.has(layer.id)) {
           const error = new Error(
-            `layers[${index}]: duplicate layer id [empty_string], previously used`,
+            `layers[${index}]: duplicate layer id [empty_string], previously used`
           );
           layerErrors.push(error);
         }
@@ -575,7 +575,7 @@ export default class App extends React.Component<any, AppState> {
     const mappedErrors = layerErrors.concat(errors).map((error) => {
       // Special case: Duplicate layer id
       const dupMatch = error.message.match(
-        /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/,
+        /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/
       );
       if (dupMatch) {
         const [, index, message] = dupMatch;
@@ -594,7 +594,7 @@ export default class App extends React.Component<any, AppState> {
 
       // Special case: Invalid source
       const invalidSourceMatch = error.message.match(
-        /layers\[(\d+)\]: (source "(?:.*)" not found)/,
+        /layers\[(\d+)\]: (source "(?:.*)" not found)/
       );
       if (invalidSourceMatch) {
         const [, index, message] = invalidSourceMatch;
@@ -612,7 +612,7 @@ export default class App extends React.Component<any, AppState> {
       }
 
       const layerMatch = error.message.match(
-        /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/,
+        /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/
       );
       if (layerMatch) {
         const [, index, group, property, message] = layerMatch;
@@ -677,7 +677,7 @@ export default class App extends React.Component<any, AppState> {
       () => {
         this.fetchSources();
         this.setStateInUrl();
-      },
+      }
     );
   };
 
@@ -809,7 +809,7 @@ export default class App extends React.Component<any, AppState> {
       {
         mapState: newState,
       },
-      this.setStateInUrl,
+      this.setStateInUrl
     );
   };
 
@@ -832,7 +832,7 @@ export default class App extends React.Component<any, AppState> {
 
   openStyle = (
     styleObj: StyleSpecification & { id: string },
-    fileHandle: FileSystemFileHandle | null,
+    fileHandle: FileSystemFileHandle | null
   ) => {
     this.setState({ fileHandle: fileHandle });
     styleObj = this.setDefaultValues(styleObj);
@@ -871,7 +871,7 @@ export default class App extends React.Component<any, AppState> {
             {},
             {
               [key]: this.state.sources[key],
-            },
+            }
           );
 
           for (const layer of json.vector_layers) {
@@ -1081,7 +1081,7 @@ export default class App extends React.Component<any, AppState> {
         selectedLayerIndex: index,
         selectedLayerOriginalId: this.state.mapStyle.layers[index].id,
       },
-      this.setStateInUrl,
+      this.setStateInUrl
     );
   };
 
@@ -1093,7 +1093,7 @@ export default class App extends React.Component<any, AppState> {
           [modalName]: value,
         },
       },
-      this.setStateInUrl,
+      this.setStateInUrl
     );
   }
 
@@ -1107,7 +1107,7 @@ export default class App extends React.Component<any, AppState> {
 
   onChangeOpenlayersDebug = (
     key: keyof AppState["openlayersDebugOptions"],
-    value: boolean,
+    value: boolean
   ) => {
     this.setState({
       openlayersDebugOptions: {
@@ -1119,7 +1119,7 @@ export default class App extends React.Component<any, AppState> {
 
   onChangeMaplibreGlDebug = (
     key: keyof AppState["maplibreGlDebugOptions"],
-    value: any,
+    value: any
   ) => {
     this.setState({
       maplibreGlDebugOptions: {
