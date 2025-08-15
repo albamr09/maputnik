@@ -39,18 +39,18 @@ type IconActionProps = {
 class IconAction extends React.Component<IconActionProps> {
   renderIcon() {
     switch (this.props.action) {
-      case "floor-filter-remove":
-        return <MdOutlineFilterAlt />;
-      case "floor-filter-add":
-        return <MdOutlineFilterAltOff />;
-      case "duplicate":
-        return <MdContentCopy />;
-      case "show":
-        return <MdVisibility />;
-      case "hide":
-        return <MdVisibilityOff />;
-      case "delete":
-        return <MdDelete />;
+    case "floor-filter-remove":
+      return <MdOutlineFilterAlt />;
+    case "floor-filter-add":
+      return <MdOutlineFilterAltOff />;
+    case "duplicate":
+      return <MdContentCopy />;
+    case "show":
+      return <MdVisibility />;
+    case "hide":
+      return <MdVisibilityOff />;
+    case "delete":
+      return <MdDelete />;
     }
   }
 

@@ -9,6 +9,7 @@
     "build": "tsc && vite build",
     "i18n:refresh": "i18next 'src/**/*.{ts,tsx,js,jsx}'",
     "lint": "eslint",
+    "lint-fix": "eslint --fix",
     "test": "cypress run",
     "cy:open": "cypress open",
     "lint-css": "stylelint \"src/styles/*.scss\"",

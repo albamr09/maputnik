@@ -30,17 +30,17 @@ function getLayoutForType(type: LayerSpecification["type"], t: TFunction) {
   //@ts-ignore
   return layout[type]
     ? {
-        //@ts-ignore
-        ...layout[type],
-        //@ts-ignore
-        groups: layout[type].groups.map((group) => {
-          return {
-            ...group,
-            id: group.title.replace(/ /g, "_"),
-            title: t(group.title),
-          };
-        }),
-      }
+      //@ts-ignore
+      ...layout[type],
+      //@ts-ignore
+      groups: layout[type].groups.map((group) => {
+        return {
+          ...group,
+          id: group.title.replace(/ /g, "_"),
+          title: t(group.title),
+        };
+      }),
+    }
     : layout.invalid;
 }
 
@@ -185,112 +185,112 @@ class LayerEditorInternal extends React.Component<
     }
 
     switch (type) {
-      case "layer":
-        return (
-          <div>
-            <FieldId
-              value={this.props.layer.id}
-              wdKey="layer-editor.layer-id"
-              error={errorData.id}
-              onChange={(newId) =>
-                this.props.onLayerIdChange(
-                  this.props.layerIndex,
-                  this.props.layer.id,
-                  newId,
-                )
+    case "layer":
+      return (
+        <div>
+          <FieldId
+            value={this.props.layer.id}
+            wdKey="layer-editor.layer-id"
+            error={errorData.id}
+            onChange={(newId) =>
+              this.props.onLayerIdChange(
+                this.props.layerIndex,
+                this.props.layer.id,
+                newId,
+              )
+            }
+          />
+          <FieldType
+            disabled={true}
+            error={errorData.type}
+            value={this.props.layer.type}
+            onChange={(newType) =>
+              this.props.onLayerChanged(
+                this.props.layerIndex,
+                changeType(this.props.layer, newType),
+              )
+            }
+          />
+          {this.props.layer.type !== "background" && (
+            <FieldSource
+              error={errorData.source}
+              sourceIds={Object.keys(this.props.sources!)}
+              value={this.props.layer.source}
+              onChange={(v) => this.changeProperty(null, "source", v)}
+            />
+          )}
+          {["background", "raster", "hillshade", "heatmap"].indexOf(
+            this.props.layer.type,
+          ) < 0 && (
+            <FieldSourceLayer
+              error={errorData["source-layer"]}
+              sourceLayerIds={sourceLayerIds}
+              value={(this.props.layer as any)["source-layer"]}
+              onChange={(v) => this.changeProperty(null, "source-layer", v)}
+            />
+          )}
+          <FieldMinZoom
+            error={errorData.minzoom}
+            value={this.props.layer.minzoom}
+            onChange={(v) => this.changeProperty(null, "minzoom", v)}
+          />
+          <FieldMaxZoom
+            error={errorData.maxzoom}
+            value={this.props.layer.maxzoom}
+            onChange={(v) => this.changeProperty(null, "maxzoom", v)}
+          />
+          <FieldComment
+            error={errorData.comment}
+            value={comment}
+            onChange={(v) =>
+              this.changeProperty(
+                "metadata",
+                "maputnik:comment",
+                v == "" ? undefined : v,
+              )
+            }
+          />
+        </div>
+      );
+    case "filter":
+      return (
+        <div>
+          <div className="maputnik-filter-editor-wrapper">
+            <FilterEditor
+              errors={errorData}
+              filter={(this.props.layer as any).filter}
+              properties={
+                this.props.vectorLayers[
+                  (this.props.layer as any)["source-layer"]
+                ]
               }
-            />
-            <FieldType
-              disabled={true}
-              error={errorData.type}
-              value={this.props.layer.type}
-              onChange={(newType) =>
-                this.props.onLayerChanged(
-                  this.props.layerIndex,
-                  changeType(this.props.layer, newType),
-                )
-              }
-            />
-            {this.props.layer.type !== "background" && (
-              <FieldSource
-                error={errorData.source}
-                sourceIds={Object.keys(this.props.sources!)}
-                value={this.props.layer.source}
-                onChange={(v) => this.changeProperty(null, "source", v)}
-              />
-            )}
-            {["background", "raster", "hillshade", "heatmap"].indexOf(
-              this.props.layer.type,
-            ) < 0 && (
-              <FieldSourceLayer
-                error={errorData["source-layer"]}
-                sourceLayerIds={sourceLayerIds}
-                value={(this.props.layer as any)["source-layer"]}
-                onChange={(v) => this.changeProperty(null, "source-layer", v)}
-              />
-            )}
-            <FieldMinZoom
-              error={errorData.minzoom}
-              value={this.props.layer.minzoom}
-              onChange={(v) => this.changeProperty(null, "minzoom", v)}
-            />
-            <FieldMaxZoom
-              error={errorData.maxzoom}
-              value={this.props.layer.maxzoom}
-              onChange={(v) => this.changeProperty(null, "maxzoom", v)}
-            />
-            <FieldComment
-              error={errorData.comment}
-              value={comment}
-              onChange={(v) =>
-                this.changeProperty(
-                  "metadata",
-                  "maputnik:comment",
-                  v == "" ? undefined : v,
-                )
-              }
+              selectedFloorId={this.props.selectedFloorId}
+              onChange={(f) => this.changeProperty(null, "filter", f)}
             />
           </div>
-        );
-      case "filter":
-        return (
-          <div>
-            <div className="maputnik-filter-editor-wrapper">
-              <FilterEditor
-                errors={errorData}
-                filter={(this.props.layer as any).filter}
-                properties={
-                  this.props.vectorLayers[
-                    (this.props.layer as any)["source-layer"]
-                  ]
-                }
-                selectedFloorId={this.props.selectedFloorId}
-                onChange={(f) => this.changeProperty(null, "filter", f)}
-              />
-            </div>
-          </div>
-        );
-      case "properties":
-        return (
-          <PropertyGroup
-            errors={errorData}
-            layer={this.props.layer}
-            groupFields={fields!}
-            spec={this.props.spec}
-            onChange={this.changeProperty.bind(this)}
-          />
-        );
-      case "jsoneditor":
-        return (
-          <FieldJson
-            layer={this.props.layer}
-            onChange={(layer) => {
-              this.props.onLayerChanged(this.props.layerIndex, layer);
-            }}
-          />
-        );
-      default:
-        return <></>;
+        </div>
+      );
+    case "properties":
+      return (
+        <PropertyGroup
+          errors={errorData}
+          layer={this.props.layer}
+          groupFields={fields!}
+          spec={this.props.spec}
+          onChange={this.changeProperty.bind(this)}
+        />
+      );
+    case "jsoneditor":
+      return (
+        <FieldJson
+          layer={this.props.layer}
+          onChange={(layer) => {
+            this.props.onLayerChanged(this.props.layerIndex, layer);
+          }}
+        />
+      );
+    default:
+      return <></>;
     }
   }
 
