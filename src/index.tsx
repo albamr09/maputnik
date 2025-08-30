@@ -8,14 +8,21 @@ import './i18n';
 import App from './components/App';
 import { store } from './store';
 
-const root = createRoot(document.querySelector("#app"));
+const appContainer = document.querySelector("#app");
+if (!appContainer) {
+  throw new Error('App container element not found');
+}
+const root = createRoot(appContainer);
 root.render(
   <Provider store={store}>
-    <IconContext.Provider value={{className: 'react-icons'}}>
-      <App/>
+    <IconContext.Provider value={{ className: 'react-icons' }}>
+      <App />
     </IconContext.Provider>
   </Provider>
 );
 
 // Hide the loader.
-document.querySelector(".loading").style.display = "none";
+const loader = document.querySelector(".loading") as HTMLElement | null;
+if (loader) {
+  loader.style.display = "none";
+}
