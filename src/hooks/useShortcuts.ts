@@ -5,10 +5,10 @@ import {
   selectMapViewMode,
   setMapState,
   toggleModal,
-  addInfo,
-  clearInfos
+  // addInfo,
+  // clearInfos
 } from "../store/slices/uiCoreSlice";
-import { redoMessages, undoMessages } from "../libs/diffmessage";
+// import { redoMessages, undoMessages } from "../libs/diffmessage";
 import useStyleEdition from "./useStyleEdition";
 import { selectMapStyle } from "../store/slices/styleCoreSlice";
 
@@ -145,4 +145,3 @@ const useShortcuts = () => {
 };
 
 export default useShortcuts;
-

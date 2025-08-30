@@ -23,7 +23,8 @@ import {
   setSelectedLayerOriginalId,
 } from "../store/slices/styleCoreSlice";
 import {
-  addError, clearErrors,
+  addError,
+  clearErrors,
   selectIsModalOpen,
   selectMapViewMode,
   setMapState,
@@ -80,10 +81,13 @@ const useStyleEdition = () => {
     []
   );
 
-  const saveStyle = useCallback((snapshotStyle: ExtendedStyleSpecification) => {
-    // TODO ALBA: what does this do
-    //styleStoreRef.current?.save(snapshotStyle);
-  }, []);
+  const saveStyle = useCallback(
+    (_snapshotStyle: ExtendedStyleSpecification) => {
+      // TODO ALBA: what does this do
+      //styleStoreRef.current?.save(snapshotStyle);
+    },
+    []
+  );
 
   const updateRootSpec = useCallback(
     (spec: any, fieldName: string, newValues: any) => {
