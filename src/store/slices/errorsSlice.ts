@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { ErrorsState, MappedError } from '../types';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
+import { AppState } from "../index";
+import type { ErrorsState, MappedError } from "../types";
 
 const initialState: ErrorsState = {
   errors: [],
@@ -7,34 +9,39 @@ const initialState: ErrorsState = {
 };
 
 const errorsSlice = createSlice({
-  name: 'errors',
+  name: "errors",
   initialState,
   reducers: {
-    addError: (state, action: PayloadAction<MappedError>) => {
+    addError: (state: ErrorsState, action: PayloadAction<MappedError>) => {
       state.errors.push(action.payload);
     },
-    clearErrors: (state) => {
+    clearErrors: (state: ErrorsState) => {
       state.errors = [];
     },
-    addInfo: (state, action: PayloadAction<string>) => {
+    addInfo: (state: ErrorsState, action: PayloadAction<string>) => {
       state.infos.push(action.payload);
     },
-    clearInfos: (state) => {
+    clearInfos: (state: ErrorsState) => {
       state.infos = [];
     },
-    clearAllMessages: (state) => {
+    clearAllMessages: (state: ErrorsState) => {
       state.errors = [];
       state.infos = [];
     },
   },
 });
 
-export const {
-  addError,
-  clearErrors,
-  addInfo,
-  clearInfos,
-  clearAllMessages,
-} = errorsSlice.actions;
+export const selectErrorMessages = createSelector(
+  (state: AppState) => state.errors,
+  (slice: ErrorsState) => slice.errors
+);
+
+export const selectInfoMessages = createSelector(
+  (state: AppState) => state.errors,
+  (slice: ErrorsState) => slice.infos
+);
+
+export const { addError, clearErrors, addInfo, clearInfos, clearAllMessages } =
+  errorsSlice.actions;
 
 export default errorsSlice.reducer;

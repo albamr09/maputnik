@@ -1,5 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { DebugState, MaplibreGlDebugOptions, OpenLayersDebugOptions } from '../types';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AppState } from "../index";
+import { createSelector } from "reselect";
+import type {
+  DebugState,
+  MaplibreGlDebugOptions,
+  OpenLayersDebugOptions,
+} from "../types";
 
 const initialState: DebugState = {
   maplibreGlDebugOptions: {
@@ -13,22 +19,44 @@ const initialState: DebugState = {
 };
 
 const debugSlice = createSlice({
-  name: 'debug',
+  name: "debug",
   initialState,
   reducers: {
-    setMaplibreGlDebugOptions: (state, action: PayloadAction<Partial<MaplibreGlDebugOptions>>) => {
-      state.maplibreGlDebugOptions = { ...state.maplibreGlDebugOptions, ...action.payload };
+    setMaplibreGlDebugOptions: (
+      state: DebugState,
+      action: PayloadAction<Partial<MaplibreGlDebugOptions>>
+    ) => {
+      state.maplibreGlDebugOptions = {
+        ...state.maplibreGlDebugOptions,
+        ...action.payload,
+      };
       state.maplibreGlDebugOptions = state.maplibreGlDebugOptions;
     },
-    setOpenLayersDebugOptions: (state, action: PayloadAction<Partial<OpenLayersDebugOptions>>) => {
-      state.openLayersDebugOptions = { ...state.openLayersDebugOptions, ...action.payload };
+    setOpenLayersDebugOptions: (
+      state: DebugState,
+      action: PayloadAction<Partial<OpenLayersDebugOptions>>
+    ) => {
+      state.openLayersDebugOptions = {
+        ...state.openLayersDebugOptions,
+        ...action.payload,
+      };
     },
-    resetDebugOptions: (state) => {
+    resetDebugOptions: (state: DebugState) => {
       state.maplibreGlDebugOptions = initialState.maplibreGlDebugOptions;
       state.openLayersDebugOptions = initialState.openLayersDebugOptions;
     },
   },
 });
+
+export const selectMaplibreGlDebugOptions = createSelector(
+  (state: AppState) => state.debug,
+  (slice: DebugState) => slice.maplibreGlDebugOptions
+);
+
+export const selectOpenLayersDebugOptions = createSelector(
+  (state: AppState) => state.debug,
+  (slice: DebugState) => slice.openLayersDebugOptions
+);
 
 export const {
   setMaplibreGlDebugOptions,

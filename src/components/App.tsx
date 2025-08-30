@@ -50,65 +50,76 @@ import {
 } from "../libs/floor-filter";
 import SitumSDK from "@situm/sdk-js";
 
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   setSpec,
   setFileHandle,
-} from '../store/slices/styleSlice';
+  selectMapStyle,
+  selectDirtyMapStyle,
+  selectStyleSpec,
+  selectFileHandle,
+} from "../store/slices/styleSlice";
 import {
   setMapState,
   toggleModal,
   setSelectedFloorId,
   setFloorIds,
   setSitumSDK,
-} from '../store/slices/uiSlice';
+  selectMapViewMode,
+  selectIsModalOpen,
+  selectSelectedFloorId,
+  selectFloorIds,
+  selectSitumSDK,
+} from "../store/slices/uiSlice";
 import {
+  selectSelectedLayerIndex,
+  selectSelectedLayerOriginalId,
+  selectVectorLayers,
   setSelectedLayerIndex,
   setSelectedLayerOriginalId,
   setVectorLayers,
-} from '../store/slices/layersSlice';
+} from "../store/slices/layersSlice";
+import { selectMapView, setMapView } from "../store/slices/mapViewSlice";
 import {
-  setMapView,
-} from '../store/slices/mapViewSlice';
-import {
+  selectMaplibreGlDebugOptions,
+  selectOpenLayersDebugOptions,
   setMaplibreGlDebugOptions,
   setOpenLayersDebugOptions,
-} from '../store/slices/debugSlice';
+} from "../store/slices/debugSlice";
 import useStyleEdition from "../hooks/useStyleEdition";
 import AppToolbar from "./AppToolbar";
 import useShortcuts from "../hooks/useShortcuts";
+import {
+  selectErrorMessages,
+  selectInfoMessages,
+} from "../store/slices/errorsSlice";
+import { selectSources } from "../store/slices/sourcesSlice";
 
-// Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
+// Buffer must be defined globally for @maplibre/maplibre-gl-style-styleSpec validate() function to succeed.
 window.Buffer = buffer.Buffer;
 
 const App = () => {
   const dispatch = useAppDispatch();
 
-  // TODO ALBA: These should be selectors
-  const mapStyle = useAppSelector(state => state.style.mapStyle);
-  const dirtyMapStyle = useAppSelector(state => state.style.dirtyMapStyle);
-  const spec = useAppSelector(state => state.style.spec);
-  const fileHandle = useAppSelector(state => state.style.fileHandle);
+  const mapStyle = useAppSelector(selectMapStyle);
+  const dirtyMapStyle = useAppSelector(selectDirtyMapStyle);
+  const styleSpec = useAppSelector(selectStyleSpec);
+  const fileHandle = useAppSelector(selectFileHandle);
+  const mapViewMode = useAppSelector(selectMapViewMode);
+  const isOpen = useAppSelector(selectIsModalOpen);
+  const selectedFloorId = useAppSelector(selectSelectedFloorId);
+  const floorIds = useAppSelector(selectFloorIds);
+  const situmSDK = useAppSelector(selectSitumSDK);
 
-  const mapState = useAppSelector(state => state.ui.mapState);
-  const isOpen = useAppSelector(state => state.ui.isOpen);
-  const selectedFloorId = useAppSelector(state => state.ui.selectedFloorId);
-  const floorIds = useAppSelector(state => state.ui.floorIds);
-  const situmSDK = useAppSelector(state => state.ui.situmSDK);
-
-  const selectedLayerIndex = useAppSelector(state => state.layers.selectedLayerIndex);
-  const selectedLayerOriginalId = useAppSelector(state => state.layers.selectedLayerOriginalId);
-  const vectorLayers = useAppSelector(state => state.layers.vectorLayers);
-
-  const sources = useAppSelector(state => state.sources.sources);
-
-  const errors = useAppSelector(state => state.errors.errors);
-  const infos = useAppSelector(state => state.errors.infos);
-
-  const mapView = useAppSelector(state => state.mapView.mapView);
-
-  const maplibreGlDebugOptions = useAppSelector(state => state.debug.maplibreGlDebugOptions);
-  const openlayersDebugOptions = useAppSelector(state => state.debug.openLayersDebugOptions);
+  const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
+  const selectedLayerOriginalId = useAppSelector(selectSelectedLayerOriginalId);
+  const vectorLayers = useAppSelector(selectVectorLayers);
+  const sources = useAppSelector(selectSources);
+  const errors = useAppSelector(selectErrorMessages);
+  const infos = useAppSelector(selectInfoMessages);
+  const mapView = useAppSelector(selectMapView);
+  const maplibreGlDebugOptions = useAppSelector(selectMaplibreGlDebugOptions);
+  const openlayersDebugOptions = useAppSelector(selectOpenLayersDebugOptions);
 
   // Refs for stores and watchers
   // TODO ALBA: What are these for?
@@ -183,7 +194,7 @@ const App = () => {
       onVectorLayersChange: (v) => dispatch(setVectorLayers(v)),
     });
 
-    // Set initial spec
+    // Set initial styleSpec
     dispatch(setSpec(latest));
   }, [dispatch]);
 
@@ -201,194 +212,228 @@ const App = () => {
   }, [floorIds, selectedFloorId, dispatch]);
 
   // Helper functions
-  const updateLayersForNewFloorId = useCallback((floorId?: number) => {
-    if (floorId == null) return;
+  const updateLayersForNewFloorId = useCallback(
+    (floorId?: number) => {
+      if (floorId == null) return;
 
-    const changedLayers = mapStyle.layers.map((layer) => {
-      if (!("filter" in layer)) {
-        return layer;
+      const changedLayers = mapStyle.layers.map((layer) => {
+        if (!("filter" in layer)) {
+          return layer;
+        }
+
+        const existingFilter = layer.filter as ExpressionSpecification;
+
+        if (!hasFloorFilter(existingFilter)) {
+          return layer;
+        }
+
+        const newFilter = addFloorFilter(
+          removeFloorFilter(existingFilter),
+          floorId
+        );
+
+        return {
+          ...layer,
+          filter: newFilter,
+        };
+      });
+
+      onLayersChange(changedLayers);
+    },
+    [mapStyle.layers]
+  );
+
+  const onChangeMetadataProperty = useCallback(
+    (property: string, value: any) => {
+      // If we're changing renderer reset the map state.
+      if (
+        property === "maputnik:renderer" &&
+        value !== get(mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
+      ) {
+        dispatch(setMapState("map"));
       }
 
-      const existingFilter = layer.filter as ExpressionSpecification;
-
-      if (!hasFloorFilter(existingFilter)) {
-        return layer;
-      }
-
-      const newFilter = addFloorFilter(
-        removeFloorFilter(existingFilter),
-        floorId
-      );
-
-      return {
-        ...layer,
-        filter: newFilter,
-      };
-    });
-
-    onLayersChange(changedLayers);
-  }, [mapStyle.layers]);
-
-  const onChangeMetadataProperty = useCallback((property: string, value: any) => {
-    // If we're changing renderer reset the map state.
-    if (
-      property === "maputnik:renderer" &&
-      value !==
-      get(mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
-    ) {
-      dispatch(setMapState("map"));
-    }
-
-    const changedStyle = {
-      ...mapStyle,
-      metadata: {
-        ...(mapStyle as any).metadata,
-        [property]: value,
-      },
-    };
-
-    onStyleChanged(changedStyle);
-  }, [mapStyle, dispatch]);
-
-
-
-  const onLayerSelect = useCallback((index: number) => {
-    dispatch(setSelectedLayerIndex(index));
-    if (mapStyle.layers[index]) {
-      dispatch(setSelectedLayerOriginalId(mapStyle.layers[index].id));
-    }
-    setStateInUrl();
-  }, [dispatch, mapStyle.layers, setStateInUrl]);
-
-  const onMoveLayer = useCallback((move: SortEnd) => {
-    let { oldIndex, newIndex } = move;
-    let layers = mapStyle.layers;
-    oldIndex = clamp(oldIndex, 0, layers.length - 1);
-    newIndex = clamp(newIndex, 0, layers.length - 1);
-    if (oldIndex === newIndex) return;
-
-    if (oldIndex === selectedLayerIndex) {
-      dispatch(setSelectedLayerIndex(newIndex));
-    }
-
-    layers = layers.slice(0);
-    arrayMoveMutable(layers, oldIndex, newIndex);
-    onLayersChange(layers);
-  }, [mapStyle.layers, selectedLayerIndex, dispatch]);
-
-  const onLayersChange = useCallback((changedLayers: LayerSpecification[]) => {
-    const changedStyle = {
-      ...mapStyle,
-      layers: changedLayers,
-    };
-    onStyleChanged(changedStyle);
-  }, [mapStyle, onStyleChanged]);
-
-  const onLayerDestroy = useCallback((index: number) => {
-    const layers = mapStyle.layers;
-    const remainingLayers = layers.slice(0);
-    remainingLayers.splice(index, 1);
-    onLayersChange(remainingLayers);
-  }, [mapStyle.layers, onLayersChange]);
-
-  const onLayerCopy = useCallback((index: number) => {
-    const layers = mapStyle.layers;
-    const changedLayers = layers.slice(0);
-
-    const clonedLayer = cloneDeep(changedLayers[index]);
-    clonedLayer.id = clonedLayer.id + "-copy";
-    changedLayers.splice(index, 0, clonedLayer);
-    onLayersChange(changedLayers);
-  }, [mapStyle.layers, onLayersChange]);
-
-  const onLayerFloorFilterToggle = useCallback((index: number) => {
-    const layers = mapStyle.layers;
-    const changedLayers = layers.slice(0);
-
-    const layer = { ...changedLayers[index] };
-    if (!("filter" in layer)) return;
-    // @ts-ignore
-    let changedFilter = [...layer.filter] as
-      | ExpressionSpecification
-      | LegacyFilterSpecification;
-    const metadata = { ...(layer.metadata || {}) };
-
-    if (!hasFloorFilter(changedFilter) && selectedFloorId) {
-      changedFilter = addFloorFilter(changedFilter, selectedFloorId);
-    } else {
-      changedFilter = removeFloorFilter(changedFilter);
-    }
-
-    // Update values
-    layer.filter = changedFilter;
-    if (Object.keys(metadata).length > 0) {
-      layer.metadata = metadata;
-    } else {
-      delete layer.metadata;
-    }
-
-    changedLayers[index] = layer;
-    onLayersChange(changedLayers);
-  }, [mapStyle.layers, selectedFloorId, onLayersChange]);
-
-  const onLayerVisibilityToggle = useCallback((index: number) => {
-    const layers = mapStyle.layers;
-    const changedLayers = layers.slice(0);
-
-    const layer = { ...changedLayers[index] };
-    const changedLayout = "layout" in layer ? { ...layer.layout } : {};
-    changedLayout.visibility =
-      changedLayout.visibility === "none" ? "visible" : "none";
-
-    layer.layout = changedLayout;
-    changedLayers[index] = layer;
-    onLayersChange(changedLayers);
-  }, [mapStyle.layers, onLayersChange]);
-
-  const onLayerIdChange = useCallback((index: number, _oldId: string, newId: string) => {
-    const changedLayers = mapStyle.layers.slice(0);
-    changedLayers[index] = {
-      ...changedLayers[index],
-      id: newId,
-    };
-
-    onLayersChange(changedLayers);
-  }, [mapStyle.layers, onLayersChange]);
-
-  const onLayerChanged = useCallback((index: number, layer: LayerSpecification) => {
-    const changedLayers = mapStyle.layers.slice(0);
-    changedLayers[index] = layer;
-
-    onLayersChange(changedLayers);
-  }, [mapStyle.layers, onLayersChange]);
-
-  const setDefaultValues = useCallback((styleObj: StyleSpecification & { id: string }) => {
-    const metadata: { [key: string]: string } =
-      styleObj.metadata || ({} as any);
-    if (metadata["maputnik:renderer"] === undefined) {
       const changedStyle = {
-        ...styleObj,
+        ...mapStyle,
         metadata: {
-          ...(styleObj.metadata as any),
-          "maputnik:renderer": "mlgljs",
+          ...(mapStyle as any).metadata,
+          [property]: value,
         },
       };
-      return changedStyle;
-    } else {
-      return styleObj;
-    }
-  }, []);
 
-  const openStyle = useCallback((
-    styleObj: StyleSpecification & { id: string },
-    fileHandle: FileSystemFileHandle | null
-  ) => {
-    dispatch(setFileHandle(fileHandle));
-    styleObj = setDefaultValues(styleObj);
-    onStyleChanged(styleObj);
-  }, [dispatch, setDefaultValues, onStyleChanged]);
+      onStyleChanged(changedStyle);
+    },
+    [mapStyle, dispatch]
+  );
 
+  const onLayerSelect = useCallback(
+    (index: number) => {
+      dispatch(setSelectedLayerIndex(index));
+      if (mapStyle.layers[index]) {
+        dispatch(setSelectedLayerOriginalId(mapStyle.layers[index].id));
+      }
+      setStateInUrl();
+    },
+    [dispatch, mapStyle.layers, setStateInUrl]
+  );
 
+  const onMoveLayer = useCallback(
+    (move: SortEnd) => {
+      let { oldIndex, newIndex } = move;
+      let layers = mapStyle.layers;
+      oldIndex = clamp(oldIndex, 0, layers.length - 1);
+      newIndex = clamp(newIndex, 0, layers.length - 1);
+      if (oldIndex === newIndex) return;
+
+      if (oldIndex === selectedLayerIndex) {
+        dispatch(setSelectedLayerIndex(newIndex));
+      }
+
+      layers = layers.slice(0);
+      arrayMoveMutable(layers, oldIndex, newIndex);
+      onLayersChange(layers);
+    },
+    [mapStyle.layers, selectedLayerIndex, dispatch]
+  );
+
+  const onLayersChange = useCallback(
+    (changedLayers: LayerSpecification[]) => {
+      const changedStyle = {
+        ...mapStyle,
+        layers: changedLayers,
+      };
+      onStyleChanged(changedStyle);
+    },
+    [mapStyle, onStyleChanged]
+  );
+
+  const onLayerDestroy = useCallback(
+    (index: number) => {
+      const layers = mapStyle.layers;
+      const remainingLayers = layers.slice(0);
+      remainingLayers.splice(index, 1);
+      onLayersChange(remainingLayers);
+    },
+    [mapStyle.layers, onLayersChange]
+  );
+
+  const onLayerCopy = useCallback(
+    (index: number) => {
+      const layers = mapStyle.layers;
+      const changedLayers = layers.slice(0);
+
+      const clonedLayer = cloneDeep(changedLayers[index]);
+      clonedLayer.id = clonedLayer.id + "-copy";
+      changedLayers.splice(index, 0, clonedLayer);
+      onLayersChange(changedLayers);
+    },
+    [mapStyle.layers, onLayersChange]
+  );
+
+  const onLayerFloorFilterToggle = useCallback(
+    (index: number) => {
+      const layers = mapStyle.layers;
+      const changedLayers = layers.slice(0);
+
+      const layer = { ...changedLayers[index] };
+      if (!("filter" in layer)) return;
+      // @ts-ignore
+      let changedFilter = [...layer.filter] as
+        | ExpressionSpecification
+        | LegacyFilterSpecification;
+      const metadata = { ...(layer.metadata || {}) };
+
+      if (!hasFloorFilter(changedFilter) && selectedFloorId) {
+        changedFilter = addFloorFilter(changedFilter, selectedFloorId);
+      } else {
+        changedFilter = removeFloorFilter(changedFilter);
+      }
+
+      // Update values
+      layer.filter = changedFilter;
+      if (Object.keys(metadata).length > 0) {
+        layer.metadata = metadata;
+      } else {
+        delete layer.metadata;
+      }
+
+      changedLayers[index] = layer;
+      onLayersChange(changedLayers);
+    },
+    [mapStyle.layers, selectedFloorId, onLayersChange]
+  );
+
+  const onLayerVisibilityToggle = useCallback(
+    (index: number) => {
+      const layers = mapStyle.layers;
+      const changedLayers = layers.slice(0);
+
+      const layer = { ...changedLayers[index] };
+      const changedLayout = "layout" in layer ? { ...layer.layout } : {};
+      changedLayout.visibility =
+        changedLayout.visibility === "none" ? "visible" : "none";
+
+      layer.layout = changedLayout;
+      changedLayers[index] = layer;
+      onLayersChange(changedLayers);
+    },
+    [mapStyle.layers, onLayersChange]
+  );
+
+  const onLayerIdChange = useCallback(
+    (index: number, _oldId: string, newId: string) => {
+      const changedLayers = mapStyle.layers.slice(0);
+      changedLayers[index] = {
+        ...changedLayers[index],
+        id: newId,
+      };
+
+      onLayersChange(changedLayers);
+    },
+    [mapStyle.layers, onLayersChange]
+  );
+
+  const onLayerChanged = useCallback(
+    (index: number, layer: LayerSpecification) => {
+      const changedLayers = mapStyle.layers.slice(0);
+      changedLayers[index] = layer;
+
+      onLayersChange(changedLayers);
+    },
+    [mapStyle.layers, onLayersChange]
+  );
+
+  const setDefaultValues = useCallback(
+    (styleObj: StyleSpecification & { id: string }) => {
+      const metadata: { [key: string]: string } =
+        styleObj.metadata || ({} as any);
+      if (metadata["maputnik:renderer"] === undefined) {
+        const changedStyle = {
+          ...styleObj,
+          metadata: {
+            ...(styleObj.metadata as any),
+            "maputnik:renderer": "mlgljs",
+          },
+        };
+        return changedStyle;
+      } else {
+        return styleObj;
+      }
+    },
+    []
+  );
+
+  const openStyle = useCallback(
+    (
+      styleObj: StyleSpecification & { id: string },
+      fileHandle: FileSystemFileHandle | null
+    ) => {
+      dispatch(setFileHandle(fileHandle));
+      styleObj = setDefaultValues(styleObj);
+      onStyleChanged(styleObj);
+    },
+    [dispatch, setDefaultValues, onStyleChanged]
+  );
 
   const _getRenderer = useCallback(() => {
     const metadata: { [key: string]: string } =
@@ -396,12 +441,17 @@ const App = () => {
     return metadata["maputnik:renderer"] || "mlgljs";
   }, [mapStyle.metadata]);
 
-  const onMapChange = useCallback((mapView: {
-    zoom: number;
-    center: LngLat;
-  }) => {
-    dispatch(setMapView({ ...mapView, center: { lat: mapView.center.lat, lng: mapView.center.lng } }));
-  }, [dispatch]);
+  const onMapChange = useCallback(
+    (mapView: { zoom: number; center: LngLat }) => {
+      dispatch(
+        setMapView({
+          ...mapView,
+          center: { lat: mapView.center.lat, lng: mapView.center.lng },
+        })
+      );
+    },
+    [dispatch]
+  );
 
   // TODO ALBA: This should be a component
   const mapRenderer = useCallback(() => {
@@ -438,18 +488,16 @@ const App = () => {
           {...mapProps}
           onChange={onMapChange}
           options={maplibreGlDebugOptions}
-          inspectModeEnabled={mapState === "inspect"}
-          highlightedLayer={
-            mapStyle.layers[selectedLayerIndex]
-          }
+          instyleSpectModeEnabled={mapViewMode === "inspect"}
+          highlightedLayer={mapStyle.layers[selectedLayerIndex]}
           onLayerSelect={onLayerSelect}
         />
       );
     }
 
     let filterName;
-    if (mapState.match(/^filter-/)) {
-      filterName = mapState.replace(/^filter-/, "");
+    if (mapViewMode.match(/^filter-/)) {
+      filterName = mapViewMode.replace(/^filter-/, "");
     }
     const elementStyle: { filter?: string } = {};
     if (filterName) {
@@ -465,29 +513,46 @@ const App = () => {
         {mapElement}
       </div>
     );
-  }, [dirtyMapStyle, mapStyle, mapState, selectedLayerIndex, maplibreGlDebugOptions, openlayersDebugOptions, onMapChange, onLayerSelect, fetchSources, _getRenderer]);
+  }, [
+    dirtyMapStyle,
+    mapStyle,
+    mapViewMode,
+    selectedLayerIndex,
+    maplibreGlDebugOptions,
+    openlayersDebugOptions,
+    onMapChange,
+    onLayerSelect,
+    fetchSources,
+    _getRenderer,
+  ]);
 
-  const toggleModalHandler = useCallback((modalName: keyof typeof isOpen) => {
-    dispatch(toggleModal(modalName));
-  }, [dispatch]);
+  const toggleModalHandler = useCallback(
+    (modalName: keyof typeof isOpen) => {
+      dispatch(toggleModal(modalName));
+    },
+    [dispatch]
+  );
 
-  const onSetFileHandle = useCallback((fileHandle: FileSystemFileHandle | null) => {
-    dispatch(setFileHandle(fileHandle));
-  }, [dispatch]);
+  const onSetFileHandle = useCallback(
+    (fileHandle: FileSystemFileHandle | null) => {
+      dispatch(setFileHandle(fileHandle));
+    },
+    [dispatch]
+  );
 
-  const onChangeOpenlayersDebug = useCallback((
-    key: keyof typeof openlayersDebugOptions,
-    value: boolean
-  ) => {
-    dispatch(setOpenLayersDebugOptions({ [key]: value }));
-  }, [dispatch]);
+  const onChangeOpenlayersDebug = useCallback(
+    (key: keyof typeof openlayersDebugOptions, value: boolean) => {
+      dispatch(setOpenLayersDebugOptions({ [key]: value }));
+    },
+    [dispatch]
+  );
 
-  const onChangeMaplibreGlDebug = useCallback((
-    key: keyof typeof maplibreGlDebugOptions,
-    value: any
-  ) => {
-    dispatch(setMaplibreGlDebugOptions({ [key]: value }));
-  }, [dispatch]);
+  const onChangeMaplibreGlDebug = useCallback(
+    (key: keyof typeof maplibreGlDebugOptions, value: any) => {
+      dispatch(setMaplibreGlDebugOptions({ [key]: value }));
+    },
+    [dispatch]
+  );
 
   // SitumSDK effect
   useEffect(() => {
@@ -532,9 +597,9 @@ const App = () => {
   const toolbar = (
     <AppToolbar
       renderer={_getRenderer()}
-      mapState={mapState}
+      mapState={mapViewMode}
       mapStyle={mapStyle}
-      inspectModeEnabled={mapState === "inspect"}
+      inspectModeEnabled={mapViewMode === "inspect"}
       sources={sources}
       onStyleChanged={onStyleChanged}
       onStyleOpen={onStyleChanged}
@@ -568,13 +633,10 @@ const App = () => {
       layer={selectedLayer}
       layerIndex={selectedLayerIndex}
       isFirstLayer={selectedLayerIndex < 1}
-      isLastLayer={
-        selectedLayerIndex ===
-        mapStyle.layers.length - 1
-      }
+      isLastLayer={selectedLayerIndex === mapStyle.layers.length - 1}
       sources={sources}
       vectorLayers={vectorLayers}
-      spec={spec}
+      spec={styleSpec}
       onMoveLayer={onMoveLayer}
       onLayerChanged={onLayerChanged}
       onLayerDestroy={onLayerDestroy}
@@ -652,9 +714,7 @@ const App = () => {
     <FloorSelector
       selectedFloorId={selectedFloorId}
       floorIds={floorIds}
-      onFloorSelected={(floorId) =>
-        dispatch(setSelectedFloorId(floorId))
-      }
+      onFloorSelected={(floorId) => dispatch(setSelectedFloorId(floorId))}
     />
   );
 
@@ -669,6 +729,6 @@ const App = () => {
       floorSelector={floorSelector}
     />
   );
-}
+};
 
 export default App;

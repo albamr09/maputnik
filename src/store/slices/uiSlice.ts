@@ -1,8 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { UIState, MapState, ModalStates } from '../types';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AppState } from "../index";
+import type { UIState, MapState, ModalStates } from "../types";
+import { createSelector } from "reselect";
 
 const initialState: UIState = {
-  mapState: 'map',
+  mapState: "map",
   isOpen: {
     settings: false,
     sources: false,
@@ -17,7 +19,7 @@ const initialState: UIState = {
 };
 
 const uiSlice = createSlice({
-  name: 'ui',
+  name: "ui",
   initialState,
   reducers: {
     setMapState: (state, action: PayloadAction<MapState>) => {
@@ -53,6 +55,31 @@ const uiSlice = createSlice({
     },
   },
 });
+
+export const selectMapViewMode = createSelector(
+  (state: AppState) => state.ui,
+  (slice: UIState) => slice.mapState
+);
+
+export const selectIsModalOpen = createSelector(
+  (state: AppState) => state.ui,
+  (slice: UIState) => slice.isOpen
+);
+
+export const selectFloorIds = createSelector(
+  (state: AppState) => state.ui,
+  (slice: UIState) => slice.floorIds
+);
+
+export const selectSelectedFloorId = createSelector(
+  (state: AppState) => state.ui,
+  (slice: UIState) => slice.selectedFloorId
+);
+
+export const selectSitumSDK = createSelector(
+  (state: AppState) => state.ui,
+  (slice: UIState) => slice.situmSDK
+);
 
 export const {
   setMapState,

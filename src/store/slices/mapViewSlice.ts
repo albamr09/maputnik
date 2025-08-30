@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { MapViewState, MapView } from '../types';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AppState } from "../index";
+import type { MapViewState, MapView } from "../types";
+import { createSelector } from "reselect";
 
 const initialState: MapViewState = {
   mapView: {
@@ -12,18 +14,20 @@ const initialState: MapViewState = {
 };
 
 const mapViewSlice = createSlice({
-  name: 'mapView',
+  name: "mapView",
   initialState,
   reducers: {
-    setMapView: (state, action: PayloadAction<MapView>) => {
+    setMapView: (state: MapViewState, action: PayloadAction<MapView>) => {
       state.mapView = action.payload;
     },
-
   },
 });
 
-export const {
-  setMapView,
-} = mapViewSlice.actions;
+export const selectMapView = createSelector(
+  (state: AppState) => state.mapView,
+  (slice: MapViewState) => slice.mapView
+);
+
+export const { setMapView } = mapViewSlice.actions;
 
 export default mapViewSlice.reducer;
