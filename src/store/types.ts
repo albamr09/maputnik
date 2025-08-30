@@ -45,55 +45,45 @@ export type MappedError = {
   };
 };
 
-// Root State Type
-export interface RootState {
-  style: StyleState;
-  ui: UIState;
-  layers: LayersState;
-  sources: SourcesState;
-  errors: ErrorsState;
-  mapView: MapViewState;
-  debug: DebugState;
-}
-
 export type ExtendedStyleSpecification = StyleSpecification & { id: string };
 
-// Individual Slice States
-export interface StyleState {
+export interface StyleCoreState {
+  // Style-related state
   mapStyle: ExtendedStyleSpecification;
-  dirtyMapStyle?: StyleSpecification;
+  dirtyMapStyle?: ExtendedStyleSpecification;
   spec: any;
   fileHandle: FileSystemFileHandle | null;
+
+  // Sources-related state
+  sources: { [key: string]: SourceSpecification };
+
+  // Layers-related state
+  selectedLayerIndex: number;
+  selectedLayerOriginalId?: string;
+  vectorLayers: {};
+
+  // Debug-related state
+  maplibreGlDebugOptions: MaplibreGlDebugOptions;
+  openLayersDebugOptions: OpenLayersDebugOptions;
 }
 
-export interface UIState {
+export interface UICoreState {
+  // UI-related state
   mapState: MapState;
   isOpen: ModalStates;
   selectedFloorId?: number;
   floorIds: number[];
-  situmSDK: any | null;
-}
 
-export interface LayersState {
-  selectedLayerIndex: number;
-  selectedLayerOriginalId?: string;
-  vectorLayers: {};
-}
-
-export interface SourcesState {
-  sources: { [key: string]: SourceSpecification };
-}
-
-export interface ErrorsState {
+  // Errors-related state
   errors: MappedError[];
   infos: string[];
-}
 
-export interface MapViewState {
+  // MapView-related state
   mapView: MapView;
 }
 
-export interface DebugState {
-  maplibreGlDebugOptions: MaplibreGlDebugOptions;
-  openLayersDebugOptions: OpenLayersDebugOptions;
+// Root State Type
+export interface RootState {
+  styleCore: StyleCoreState;
+  uiCore: UICoreState;
 }

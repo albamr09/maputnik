@@ -10,7 +10,7 @@ import FieldJson from "./FieldJson";
 import FieldCheckbox from "./FieldCheckbox";
 import { WithTranslation, withTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import SitumSDK from "@situm/sdk-js";
+import { useSitumSDK } from "../providers/SitumSDKProvider";
 
 export type EditorMode =
   | "video"
@@ -140,11 +140,11 @@ class TileURLSourceEditor extends React.Component<TileURLSourceEditorProps> {
 const createCornerLabels: (t: TFunction) => { label: string; key: string }[] = (
   t,
 ) => [
-  { label: t("Coord top left"), key: "top left" },
-  { label: t("Coord top right"), key: "top right" },
-  { label: t("Coord bottom right"), key: "bottom right" },
-  { label: t("Coord bottom left"), key: "bottom left" },
-];
+    { label: t("Coord top left"), key: "top left" },
+    { label: t("Coord top right"), key: "top right" },
+    { label: t("Coord bottom right"), key: "bottom right" },
+    { label: t("Coord bottom left"), key: "bottom left" },
+  ];
 
 type ImageSourceEditorProps = {
   source: {
@@ -358,46 +358,40 @@ class PMTilesSourceEditor extends React.Component<PMTilesSourceEditorProps> {
 
 type ModalSourcesTypeEditorInternalProps = {
   mode: EditorMode;
-  situmSDK?: SitumSDK | null;
   source: any;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
 
-class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEditorInternalProps> {
-  constructor(props: ModalSourcesTypeEditorInternalProps) {
-    super(props);
-    this.handleToggleUseSitumAuth = this.handleToggleUseSitumAuth.bind(this);
-  }
+const ModalSourcesTypeEditorInternal: React.FC<ModalSourcesTypeEditorInternalProps> = ({ mode, source, onChange, t, i18n, tReady }) => {
+  const { isAuthenticated: hasSitumAuth, getJWT: getSitumJWT } = useSitumSDK();
 
-  handleToggleUseSitumAuth = (checked: boolean) => {
-    const accessToken = this.props.situmSDK?.jwt;
+  const handleToggleUseSitumAuth = (checked: boolean) => {
+    const accessToken = getSitumJWT();
     if (checked) {
-      this.props.onChange({ ...this.props.source, x_accessToken: accessToken });
+      onChange({ ...source, x_accessToken: accessToken });
     } else {
-      this.props.onChange({ ...this.props.source, x_accessToken: "" });
+      onChange({ ...source, x_accessToken: "" });
     }
   };
 
-  render() {
-    const t = this.props.t;
-    const commonProps = {
-      source: this.props.source,
-      onChange: this.props.onChange,
-      t: this.props.t,
-      i18n: this.props.i18n,
-      tReady: this.props.tReady,
-    };
+  const commonProps = {
+    source: source,
+    onChange: onChange,
+    t: t,
+    i18n: i18n,
+    tReady: tReady,
+  };
 
-    const accessTokenField = this.props.situmSDK && (
-      <FieldCheckbox
-        label={t("Use Situm Auth")}
-        value={this.props.source.x_accessToken || ""}
-        onChange={this.handleToggleUseSitumAuth}
-        data-wd-key="modal:sources.add.access_token"
-      />
-    );
+  const accessTokenField = hasSitumAuth && (
+    <FieldCheckbox
+      label={t("Use Situm Auth")}
+      value={source.x_accessToken || ""}
+      onChange={handleToggleUseSitumAuth}
+      data-wd-key="modal:sources.add.access_token"
+    />
+  );
 
-    switch (this.props.mode) {
+  switch (mode) {
     case "geojson_url":
       return (
         <div>
@@ -441,14 +435,14 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
               label={t("Tile Size")}
               fieldSpec={latest.source_raster.tileSize}
               onChange={(tileSize) =>
-                this.props.onChange({
-                  ...this.props.source,
+                onChange({
+                  ...source,
                   tileSize: tileSize,
                 })
               }
               value={
-                this.props.source.tileSize ||
-                  latest.source_raster.tileSize.default
+                source.tileSize ||
+                latest.source_raster.tileSize.default
               }
               data-wd-key="modal:sources.add.tile_size"
             />
@@ -471,14 +465,14 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
               label={t("Tile Size")}
               fieldSpec={latest.source_raster_dem.tileSize}
               onChange={(tileSize) =>
-                this.props.onChange({
-                  ...this.props.source,
+                onChange({
+                  ...source,
                   tileSize: tileSize,
                 })
               }
               value={
-                this.props.source.tileSize ||
-                  latest.source_raster_dem.tileSize.default
+                source.tileSize ||
+                latest.source_raster_dem.tileSize.default
               }
               data-wd-key="modal:sources.add.tile_size"
             />
@@ -487,14 +481,14 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
               fieldSpec={latest.source_raster_dem.encoding}
               options={Object.keys(latest.source_raster_dem.encoding.values)}
               onChange={(encoding) =>
-                this.props.onChange({
-                  ...this.props.source,
+                onChange({
+                  ...source,
                   encoding: encoding,
                 })
               }
               value={
-                this.props.source.encoding ||
-                  latest.source_raster_dem.encoding.default
+                source.encoding ||
+                latest.source_raster_dem.encoding.default
               }
             />
           </TileURLSourceEditor>
@@ -524,9 +518,8 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
       );
     default:
       return accessTokenField;
-    }
   }
-}
+};
 
 const ModalSourcesTypeEditor = withTranslation()(
   ModalSourcesTypeEditorInternal,

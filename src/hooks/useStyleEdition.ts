@@ -6,18 +6,7 @@ import {
 } from "../store/types";
 import style from "../libs/style";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import {
-  selectIsModalOpen,
-  selectMapViewMode,
-  setMapState,
-  toggleModal,
-} from "../store/slices/uiSlice";
 import hash from "string-hash";
-import {
-  selectSelectedLayerIndex,
-  setSelectedLayerIndex,
-  setSelectedLayerOriginalId,
-} from "../store/slices/layersSlice";
 import { ValidationError } from "maplibre-gl";
 import cloneDeep from "lodash.clonedeep";
 import { isEqual, unset } from "lodash";
@@ -27,9 +16,19 @@ import {
   setDirtyMapStyle,
   setMapStyle,
   setSpec,
-} from "../store/slices/styleSlice";
-import { addError, clearErrors } from "../store/slices/errorsSlice";
-import { selectSources, setSources } from "../store/slices/sourcesSlice";
+  selectSources,
+  setSources,
+  selectSelectedLayerIndex,
+  setSelectedLayerIndex,
+  setSelectedLayerOriginalId,
+} from "../store/slices/styleCoreSlice";
+import {
+  addError, clearErrors,
+  selectIsModalOpen,
+  selectMapViewMode,
+  setMapState,
+  toggleModal,
+} from "../store/slices/uiCoreSlice";
 import { PMTiles } from "pmtiles";
 import {
   downloadGlyphsMetadata,

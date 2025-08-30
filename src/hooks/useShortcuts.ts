@@ -5,11 +5,12 @@ import {
   selectMapViewMode,
   setMapState,
   toggleModal,
-} from "../store/slices/uiSlice";
-import { addInfo, clearInfos } from "../store/slices/errorsSlice";
+  addInfo,
+  clearInfos
+} from "../store/slices/uiCoreSlice";
 import { redoMessages, undoMessages } from "../libs/diffmessage";
 import useStyleEdition from "./useStyleEdition";
-import { selectMapStyle } from "../store/slices/styleSlice";
+import { selectMapStyle } from "../store/slices/styleCoreSlice";
 
 const useShortcuts = () => {
   const dispatch = useAppDispatch();

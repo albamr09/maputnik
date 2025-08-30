@@ -48,7 +48,7 @@ import {
   hasFloorFilter,
   removeFloorFilter,
 } from "../libs/floor-filter";
-import SitumSDK from "@situm/sdk-js";
+import { useSitumSDK } from "../providers/SitumSDKProvider";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -58,42 +58,35 @@ import {
   selectDirtyMapStyle,
   selectStyleSpec,
   selectFileHandle,
-} from "../store/slices/styleSlice";
-import {
-  setMapState,
-  toggleModal,
-  setSelectedFloorId,
-  setFloorIds,
-  setSitumSDK,
-  selectMapViewMode,
-  selectIsModalOpen,
-  selectSelectedFloorId,
-  selectFloorIds,
-  selectSitumSDK,
-} from "../store/slices/uiSlice";
-import {
+  selectSources,
   selectSelectedLayerIndex,
   selectSelectedLayerOriginalId,
   selectVectorLayers,
   setSelectedLayerIndex,
   setSelectedLayerOriginalId,
   setVectorLayers,
-} from "../store/slices/layersSlice";
-import { selectMapView, setMapView } from "../store/slices/mapViewSlice";
-import {
   selectMaplibreGlDebugOptions,
   selectOpenLayersDebugOptions,
   setMaplibreGlDebugOptions,
   setOpenLayersDebugOptions,
-} from "../store/slices/debugSlice";
+} from "../store/slices/styleCoreSlice";
+import {
+  setMapState,
+  toggleModal,
+  setSelectedFloorId,
+  setFloorIds,
+  selectMapViewMode,
+  selectIsModalOpen,
+  selectSelectedFloorId,
+  selectFloorIds,
+  selectMapView,
+  setMapView,
+  selectErrorMessages,
+  selectInfoMessages,
+} from "../store/slices/uiCoreSlice";
 import useStyleEdition from "../hooks/useStyleEdition";
 import AppToolbar from "./AppToolbar";
 import useShortcuts from "../hooks/useShortcuts";
-import {
-  selectErrorMessages,
-  selectInfoMessages,
-} from "../store/slices/errorsSlice";
-import { selectSources } from "../store/slices/sourcesSlice";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-styleSpec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -109,7 +102,6 @@ const App = () => {
   const isOpen = useAppSelector(selectIsModalOpen);
   const selectedFloorId = useAppSelector(selectSelectedFloorId);
   const floorIds = useAppSelector(selectFloorIds);
-  const situmSDK = useAppSelector(selectSitumSDK);
 
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const selectedLayerOriginalId = useAppSelector(selectSelectedLayerOriginalId);
@@ -130,6 +122,8 @@ const App = () => {
   // Hooks
   const { onStyleChanged, fetchSources, setStateInUrl } = useStyleEdition();
   useShortcuts();
+  // Use SitumSDK from provider
+  const { getBuildingById } = useSitumSDK();
 
   // TODO ALBA: see if this is needed
   // Initialize stores on first render
@@ -573,39 +567,28 @@ const App = () => {
     [dispatch]
   );
 
-  // SitumSDK effect
+  // Floor and SitumSDK effects
   useEffect(() => {
-    // @ts-ignore
-    const apiKey = mapStyle?.metadata?.["maputnik:situm-apikey"];
     // @ts-ignore
     const buildingID = mapStyle?.metadata?.["maputnik:situm-building-id"];
 
-    if (apiKey && (apiKey as string).trim().length > 0) {
-      const newSitumSDK = new SitumSDK({
-        auth: {
-          apiKey: apiKey as string,
-        },
-      });
-      dispatch(setSitumSDK(newSitumSDK));
+    if (buildingID) {
+      getBuildingById(buildingID as number).then((building) => {
+        const floorIds = building.floors
+          .slice()
+          .sort((a, b) => b.level - a.level)
+          .map((floor) => floor.id);
+        dispatch(setFloorIds(floorIds));
+      })
+        .catch((e) => {
+          console.error(`Could not set floors: ${e}`);
+        });
+    }
 
-      // Load building information
-      if (buildingID) {
-        newSitumSDK.cartography
-          .getBuildingById(buildingID as number)
-          .then((building) => {
-            const floorIds = building.floors
-              .slice()
-              .sort((a, b) => b.level - a.level)
-              .map((floor) => floor.id);
-            dispatch(setFloorIds(floorIds));
-          })
-          .catch((e) => {
-            console.error(`Could not set floors: ${e}`);
-          });
-      }
-    } else if (floorIds.length > 0) {
+    else if (floorIds.length > 0) {
       dispatch(setFloorIds([]));
     }
+
   }, [mapStyle.metadata, dispatch, floorIds.length]);
 
   const layers = mapStyle.layers || [];
@@ -720,7 +703,6 @@ const App = () => {
       />
       <ModalSources
         mapStyle={mapStyle}
-        situmSDK={situmSDK}
         onStyleChanged={onStyleChanged}
         isOpen={isOpen.sources}
         onOpenToggle={() => toggleModalHandler("sources")}

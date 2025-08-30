@@ -20,7 +20,6 @@ import ModalSourcesTypeEditor, { EditorMode } from "./ModalSourcesTypeEditor";
 import style from "../libs/style";
 import { deleteSource, addSource, changeSource } from "../libs/source";
 import publicSources from "../config/tilesets.json";
-import SitumSDK from "@situm/sdk-js";
 
 type PublicSourceProps = {
   id: string;
@@ -83,7 +82,6 @@ function editorMode(source: SourceSpecification) {
 type ActiveModalSourcesTypeEditorProps = {
   sourceId: string;
   source: SourceSpecification;
-  situmSDK?: SitumSDK | null;
   onDelete(...args: unknown[]): unknown;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
@@ -114,7 +112,6 @@ class ActiveModalSourcesTypeEditor extends React.Component<ActiveModalSourcesTyp
             onChange={this.props.onChange}
             mode={editorMode(this.props.source)}
             source={this.props.source}
-            situmSDK={this.props.situmSDK}
           />
         </div>
       </div>
@@ -123,7 +120,6 @@ class ActiveModalSourcesTypeEditor extends React.Component<ActiveModalSourcesTyp
 }
 
 type AddSourceProps = {
-  situmSDK?: SitumSDK | null;
   onAdd(...args: unknown[]): unknown;
 } & WithTranslation;
 
@@ -307,7 +303,6 @@ class AddSource extends React.Component<AddSourceProps, AddSourceState> {
           onChange={this.onChangeSource}
           mode={this.state.mode}
           source={this.state.source}
-          situmSDK={this.props.situmSDK}
         />
         <InputButton
           className="maputnik-add-source-button"
@@ -323,7 +318,6 @@ class AddSource extends React.Component<AddSourceProps, AddSourceState> {
 
 type ModalSourcesInternalProps = {
   mapStyle: StyleSpecification;
-  situmSDK?: SitumSDK | null;
   isOpen: boolean;
   onOpenToggle(...args: unknown[]): unknown;
   onStyleChanged(...args: unknown[]): unknown;
@@ -348,7 +342,6 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
           key={sourceId}
           sourceId={sourceId}
           source={source}
-          situmSDK={this.props.situmSDK}
           onChange={(src: SourceSpecification) =>
             this.props.onStyleChanged(changeSource(mapStyle, sourceId, src))
           }
@@ -412,7 +405,6 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
             onAdd={(sourceId: string, source: SourceSpecification) =>
               this.props.onStyleChanged(addSource(mapStyle, sourceId, source))
             }
-            situmSDK={this.props.situmSDK}
             {...i18nProps}
           />
         </section>
