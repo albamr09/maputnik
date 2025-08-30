@@ -29,11 +29,16 @@ export const SitumSDKProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setIsAuthenticated(true);
 
-    return new SitumSDK({
+    const situmSDK = new SitumSDK({
       auth: {
         apiKey: apiKey,
       },
     });
+
+    // Authenticate: only needed so JWT is not null
+    situmSDK.authSession;
+
+    return situmSDK;
   }, [mapStyle?.metadata]);
 
   const getBuildingById: SitumSDKContextType["getBuildingById"] = useCallback(

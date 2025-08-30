@@ -367,6 +367,7 @@ const ModalSourcesTypeEditorInternal: React.FC<ModalSourcesTypeEditorInternalPro
 
   const handleToggleUseSitumAuth = (checked: boolean) => {
     const accessToken = getSitumJWT();
+    
     if (checked) {
       onChange({ ...source, x_accessToken: accessToken });
     } else {
