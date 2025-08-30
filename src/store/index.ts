@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { RootState } from './types';
 
-// Import merged slices
 import styleCoreReducer from './slices/styleCoreSlice';
 import uiCoreReducer from './slices/uiCoreSlice';
 
@@ -15,9 +14,7 @@ export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
 });
 
-// Export types
 export type AppDispatch = typeof store.dispatch;
 export type AppState = RootState;
 
-// Export the store instance
 export default store;

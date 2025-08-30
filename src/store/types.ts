@@ -1,6 +1,5 @@
 import type { StyleSpecification, SourceSpecification, MapOptions } from "maplibre-gl";
 
-// UI State Types
 export type MapState = "map" | "inspect" | "filter-achromatopsia" | "filter-deuteranopia" | "filter-protanopia" | "filter-tritanopia";
 
 export type ModalStates = {
@@ -20,7 +19,6 @@ export type MapView = {
   };
 };
 
-// Avoid type errors for MapOptions due to strict type checking
 type SafeMapOptions = Partial<Record<keyof MapOptions, unknown>>;
 export type MaplibreGlDebugOptions = Partial<SafeMapOptions> & {
   showTileBoundaries: boolean;
@@ -32,7 +30,6 @@ export type OpenLayersDebugOptions = {
   debugToolbox: boolean;
 };
 
-// Error Types
 export type MappedError = {
   message: string;
   parsed?: {
