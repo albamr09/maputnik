@@ -3,28 +3,23 @@ import cloneDeep from "lodash.clonedeep";
 import clamp from "lodash.clamp";
 import buffer from "buffer";
 import get from "lodash.get";
-import { unset } from "lodash";
 import { arrayMoveMutable } from "array-move";
-import hash from "string-hash";
-import { PMTiles } from "pmtiles";
 import {
   Map,
   LayerSpecification,
   StyleSpecification,
-  ValidationError,
+  LngLat,
 } from "maplibre-gl";
 import {
   ExpressionSpecification,
   latest,
   LegacyFilterSpecification,
-  validateStyleMin,
 } from "@maplibre/maplibre-gl-style-spec";
 
 import MapMaplibreGl from "./MapMaplibreGl";
 import MapOpenLayers from "./MapOpenLayers";
 import LayerList from "./LayerList";
 import LayerEditor from "./LayerEditor";
-import AppToolbar, { MapState } from "./AppToolbar";
 import AppLayout from "./AppLayout";
 import MessagePanel from "./AppMessagePanel";
 
@@ -35,23 +30,16 @@ import ModalOpen from "./ModalOpen";
 import ModalShortcuts from "./ModalShortcuts";
 import ModalDebug from "./ModalDebug";
 
-import {
-  downloadGlyphsMetadata,
-  downloadSpriteMetadata,
-} from "../libs/metadata";
 import style from "../libs/style";
 import {
   initialStyleUrl,
   loadStyleUrl,
   removeStyleQuerystring,
 } from "../libs/urlopen";
-import { undoMessages, redoMessages } from "../libs/diffmessage";
 import { StyleStore } from "../libs/stylestore";
 import { ApiStyleStore } from "../libs/apistore";
 import { RevisionStore } from "../libs/revisions";
 import LayerWatcher from "../libs/layerwatcher";
-import tokens from "../config/tokens.json";
-import isEqual from "lodash.isequal";
 import Debug from "../libs/debug";
 import { SortEnd } from "react-sortable-hoc";
 import FloorSelector from "./FloorSelector";
@@ -63,10 +51,7 @@ import {
 import SitumSDK from "@situm/sdk-js";
 
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import type { ExtendedStyleSpecification } from '../store/types';
 import {
-  setMapStyle,
-  setDirtyMapStyle,
   setSpec,
   setFileHandle,
 } from '../store/slices/styleSlice';
@@ -83,71 +68,23 @@ import {
   setVectorLayers,
 } from '../store/slices/layersSlice';
 import {
-  setSources,
-} from '../store/slices/sourcesSlice';
-import {
-  addError,
-  addInfo,
-  clearErrors,
-  clearInfos,
-} from '../store/slices/errorsSlice';
-import {
   setMapView,
 } from '../store/slices/mapViewSlice';
 import {
   setMaplibreGlDebugOptions,
   setOpenLayersDebugOptions,
 } from '../store/slices/debugSlice';
+import useStyleEdition from "../hooks/useStyleEdition";
+import AppToolbar from "./AppToolbar";
+import useShortcuts from "../hooks/useShortcuts";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
 
-function setFetchAccessToken(url: string, mapStyle: StyleSpecification) {
-  const matchesTilehosting = url.match(/\.tilehosting\.com/);
-  const matchesMaptiler = url.match(/\.maptiler\.com/);
-  const matchesThunderforest = url.match(/\.thunderforest\.com/);
-  if (matchesTilehosting || matchesMaptiler) {
-    const accessToken = style.getAccessToken("openmaptiles", mapStyle, {
-      allowFallback: true,
-    });
-    if (accessToken) {
-      return url.replace("{key}", accessToken);
-    }
-  } else if (matchesThunderforest) {
-    const accessToken = style.getAccessToken("thunderforest", mapStyle, {
-      allowFallback: true,
-    });
-    if (accessToken) {
-      return url.replace("{key}", accessToken);
-    }
-  } else {
-    return url;
-  }
-}
-
-function updateRootSpec(spec: any, fieldName: string, newValues: any) {
-  return {
-    ...spec,
-    $root: {
-      ...spec.$root,
-      [fieldName]: {
-        ...spec.$root[fieldName],
-        values: newValues,
-      },
-    },
-  };
-}
-
-type OnStyleChangedOpts = {
-  save?: boolean;
-  addRevision?: boolean;
-  initialLoad?: boolean;
-};
-
 const App = () => {
   const dispatch = useAppDispatch();
 
-  // Redux state selectors
+  // TODO ALBA: These should be selectors
   const mapStyle = useAppSelector(state => state.style.mapStyle);
   const dirtyMapStyle = useAppSelector(state => state.style.dirtyMapStyle);
   const spec = useAppSelector(state => state.style.spec);
@@ -174,10 +111,16 @@ const App = () => {
   const openlayersDebugOptions = useAppSelector(state => state.debug.openLayersDebugOptions);
 
   // Refs for stores and watchers
+  // TODO ALBA: What are these for?
   const revisionStoreRef = useRef<RevisionStore>();
   const styleStoreRef = useRef<StyleStore | ApiStyleStore>();
   const layerWatcherRef = useRef<LayerWatcher>();
 
+  // Hooks
+  const { onStyleChanged, fetchSources, setStateInUrl } = useStyleEdition();
+  useShortcuts();
+
+  // TODO ALBA: see if this is needed
   // Initialize stores on first render
   useEffect(() => {
     revisionStoreRef.current = new RevisionStore();
@@ -244,109 +187,6 @@ const App = () => {
     dispatch(setSpec(latest));
   }, [dispatch]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const shortcuts = [
-      {
-        key: "?",
-        handler: () => {
-          dispatch(toggleModal("shortcuts"));
-        },
-      },
-      {
-        key: "o",
-        handler: () => {
-          dispatch(toggleModal("open"));
-        },
-      },
-      {
-        key: "e",
-        handler: () => {
-          dispatch(toggleModal("export"));
-        },
-      },
-      {
-        key: "d",
-        handler: () => {
-          dispatch(toggleModal("sources"));
-        },
-      },
-      {
-        key: "s",
-        handler: () => {
-          dispatch(toggleModal("settings"));
-        },
-      },
-      {
-        key: "i",
-        handler: () => {
-          dispatch(setMapState(mapState === "map" ? "inspect" : "map"));
-        },
-      },
-      {
-        key: "m",
-        handler: () => {
-          (
-            document.querySelector(".maplibregl-canvas") as HTMLCanvasElement
-          ).focus();
-        },
-      },
-      {
-        key: "!",
-        handler: () => {
-          dispatch(toggleModal("debug"));
-        },
-      },
-    ];
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        (e.target as HTMLElement).blur();
-        document.body.focus();
-      } else if (
-        isOpen.shortcuts ||
-        document.activeElement === document.body
-      ) {
-        const shortcut = shortcuts.find((shortcut) => {
-          return shortcut.key === e.key;
-        });
-
-        if (shortcut) {
-          dispatch(toggleModal("shortcuts"));
-          shortcut.handler();
-        }
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (navigator.platform.toUpperCase().indexOf("MAC") >= 0) {
-        if (e.metaKey && e.shiftKey && e.keyCode === 90) {
-          e.preventDefault();
-          onRedo();
-        } else if (e.metaKey && e.keyCode === 90) {
-          e.preventDefault();
-          onUndo();
-        }
-      } else {
-        if (e.ctrlKey && e.keyCode === 90) {
-          e.preventDefault();
-          onUndo();
-        } else if (e.ctrlKey && e.keyCode === 89) {
-          e.preventDefault();
-          onRedo();
-        }
-      }
-    };
-
-    document.body.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [dispatch, isOpen.shortcuts, mapState]);
-
   // Floor and SitumSDK effects
   useEffect(() => {
     if (selectedFloorId !== undefined) {
@@ -389,31 +229,6 @@ const App = () => {
     onLayersChange(changedLayers);
   }, [mapStyle.layers]);
 
-  const saveStyle = useCallback((snapshotStyle: StyleSpecification & { id: string }) => {
-    styleStoreRef.current?.save(snapshotStyle);
-  }, []);
-
-  const updateFonts = useCallback((urlTemplate: string) => {
-    const metadata: { [key: string]: string } =
-      mapStyle.metadata || ({} as any);
-    const accessToken =
-      metadata["maputnik:openmaptiles_access_token"] || tokens.openmaptiles;
-
-    const glyphUrl =
-      typeof urlTemplate === "string"
-        ? urlTemplate.replace("{key}", accessToken)
-        : urlTemplate;
-    downloadGlyphsMetadata(glyphUrl, (fonts) => {
-      dispatch(setSpec(updateRootSpec(spec, "glyphs", fonts)));
-    });
-  }, [mapStyle.metadata, spec, dispatch]);
-
-  const updateIcons = useCallback((baseUrl: string) => {
-    downloadSpriteMetadata(baseUrl, (icons) => {
-      dispatch(setSpec(updateRootSpec(spec, "sprite", icons)));
-    });
-  }, [spec, dispatch]);
-
   const onChangeMetadataProperty = useCallback((property: string, value: any) => {
     // If we're changing renderer reset the map state.
     if (
@@ -435,199 +250,7 @@ const App = () => {
     onStyleChanged(changedStyle);
   }, [mapStyle, dispatch]);
 
-  const onStyleChanged = useCallback((
-    newStyle: ExtendedStyleSpecification,
-    opts: OnStyleChangedOpts = {}
-  ) => {
-    opts = {
-      save: true,
-      addRevision: true,
-      initialLoad: false,
-      ...opts,
-    };
 
-    // For the style object, find the urls that has "{key}" and insert the correct API keys
-    // Without this, going from e.g. MapTiler to OpenLayers and back will lose the maptlier key.
-
-    if (newStyle.glyphs && typeof newStyle.glyphs === "string") {
-      newStyle.glyphs = setFetchAccessToken(newStyle.glyphs, newStyle);
-    }
-
-    if (newStyle.sprite && typeof newStyle.sprite === "string") {
-      newStyle.sprite = setFetchAccessToken(newStyle.sprite, newStyle);
-    }
-
-    for (const [_sourceId, source] of Object.entries(newStyle.sources)) {
-      if (source && "url" in source && typeof source.url === "string") {
-        source.url = setFetchAccessToken(source.url, newStyle);
-      }
-    }
-
-    if (opts.initialLoad) {
-      getInitialStateFromUrl(newStyle);
-    }
-
-    const errors: ValidationError[] = validateStyleMin(newStyle) || [];
-
-    // The validate function doesn't give us errors for duplicate error with
-    // empty string for layer.id, manually deal with that here.
-    const layerErrors: (Error | ValidationError)[] = [];
-    if (newStyle && newStyle.layers) {
-      const foundLayers = new global.Map();
-      newStyle.layers.forEach((layer, index) => {
-        if (layer.id === "" && foundLayers.has(layer.id)) {
-          const error = new Error(
-            `layers[${index}]: duplicate layer id [empty_string], previously used`
-          );
-          layerErrors.push(error);
-        }
-        foundLayers.set(layer.id, true);
-      });
-    }
-
-    const mappedErrors = layerErrors.concat(errors).map((error) => {
-      // Special case: Duplicate layer id
-      const dupMatch = error.message.match(
-        /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/
-      );
-      if (dupMatch) {
-        const [, index, message] = dupMatch;
-        return {
-          message: error.message,
-          parsed: {
-            type: "layer",
-            data: {
-              index: parseInt(index, 10),
-              key: "id",
-              message,
-            },
-          },
-        };
-      }
-
-      // Special case: Invalid source
-      const invalidSourceMatch = error.message.match(
-        /layers\[(\d+)\]: (source "(?:.*)" not found)/
-      );
-      if (invalidSourceMatch) {
-        const [, index, message] = invalidSourceMatch;
-        return {
-          message: error.message,
-          parsed: {
-            type: "layer",
-            data: {
-              index: parseInt(index, 10),
-              key: "source",
-              message,
-            },
-          },
-        };
-      }
-
-      const layerMatch = error.message.match(
-        /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/
-      );
-      if (layerMatch) {
-        const [, index, group, property, message] = layerMatch;
-        const key = group && property ? [group, property].join(".") : property;
-        return {
-          message: error.message,
-          parsed: {
-            type: "layer",
-            data: {
-              index: parseInt(index, 10),
-              key,
-              message,
-            },
-          },
-        };
-      } else {
-        return {
-          message: error.message,
-        };
-      }
-    });
-
-    let dirtyMapStyle: StyleSpecification | undefined = undefined;
-    if (errors.length > 0) {
-      dirtyMapStyle = cloneDeep(newStyle);
-
-      errors.forEach((error) => {
-        const { message } = error;
-        if (message) {
-          try {
-            const objPath = message.split(":")[0];
-            // Errors can be deply nested for example 'layers[0].filter[1][1][0]' we only care upto the property 'layers[0].filter'
-            const unsetPath = objPath.match(/^\S+?\[\d+\]\.[^[]+/)![0];
-            unset(dirtyMapStyle, unsetPath);
-          } catch (err) {
-            console.warn(err);
-          }
-        }
-      });
-    }
-
-    if (newStyle.glyphs !== mapStyle.glyphs) {
-      updateFonts(newStyle.glyphs as string);
-    }
-    if (newStyle.sprite !== mapStyle.sprite) {
-      updateIcons(newStyle.sprite as string);
-    }
-
-    if (opts.addRevision) {
-      revisionStoreRef.current?.addRevision(newStyle);
-    }
-    if (opts.save) {
-      saveStyle(newStyle as StyleSpecification & { id: string });
-    }
-
-    dispatch(setMapStyle(newStyle));
-    if (dirtyMapStyle) {
-      dispatch(setDirtyMapStyle(dirtyMapStyle));
-    }
-    dispatch(clearErrors());
-    mappedErrors.forEach(error => dispatch(addError(error)));
-
-    // Fetch sources and update URL after state update
-    setTimeout(() => {
-      fetchSources();
-      setStateInUrl();
-    }, 0);
-  }, [mapStyle, dispatch, updateFonts, updateIcons, saveStyle]);
-
-  const onUndo = useCallback(() => {
-    const activeStyle = revisionStoreRef.current?.undo();
-    if (!activeStyle) return;
-
-    const messages = undoMessages(mapStyle, activeStyle);
-    onStyleChanged(activeStyle, { addRevision: false });
-    dispatch(clearInfos());
-    messages.forEach(info => dispatch(addInfo(info)));
-  }, [mapStyle, onStyleChanged, dispatch]);
-
-  const setStateInUrl = useCallback(() => {
-    const url = new URL(location.href);
-    const hashVal = hash(JSON.stringify(mapStyle));
-    url.searchParams.set("layer", `${hashVal}~${selectedLayerIndex}`);
-
-    const openModals = Object.entries(isOpen)
-      .map(([key, val]) => (val === true ? key : null))
-      .filter((val) => val !== null);
-
-    if (openModals.length > 0) {
-      url.searchParams.set("modal", openModals.join(","));
-    } else {
-      url.searchParams.delete("modal");
-    }
-
-    if (mapState === "map") {
-      url.searchParams.delete("view");
-    } else if (mapState === "inspect") {
-      url.searchParams.set("view", "inspect");
-    }
-
-    history.replaceState({ selectedLayerIndex }, "Maputnik", url.href);
-  }, [mapStyle, selectedLayerIndex, isOpen, mapState]);
 
   const onLayerSelect = useCallback((index: number) => {
     dispatch(setSelectedLayerIndex(index));
@@ -636,16 +259,6 @@ const App = () => {
     }
     setStateInUrl();
   }, [dispatch, mapStyle.layers, setStateInUrl]);
-
-  const onRedo = useCallback(() => {
-    const activeStyle = revisionStoreRef.current?.redo();
-    if (!activeStyle) return;
-
-    const messages = redoMessages(mapStyle, activeStyle);
-    onStyleChanged(activeStyle, { addRevision: false });
-    dispatch(clearInfos());
-    messages.forEach(info => dispatch(addInfo(info)));
-  }, [mapStyle, onStyleChanged, dispatch]);
 
   const onMoveLayer = useCallback((move: SortEnd) => {
     let { oldIndex, newIndex } = move;
@@ -775,76 +388,7 @@ const App = () => {
     onStyleChanged(styleObj);
   }, [dispatch, setDefaultValues, onStyleChanged]);
 
-  const fetchSources = useCallback(() => {
-    const sourceList: { [key: string]: any } = {};
 
-    for (const [key, val] of Object.entries(mapStyle.sources)) {
-      if (
-        !Object.prototype.hasOwnProperty.call(sources, key) &&
-        val.type === "vector" &&
-        Object.prototype.hasOwnProperty.call(val, "url")
-      ) {
-        sourceList[key] = {
-          type: val.type,
-          layers: [],
-        };
-
-        let url = val.url;
-
-        try {
-          url = setFetchAccessToken(url!, mapStyle);
-        } catch (err) {
-          console.warn("Failed to setFetchAccessToken: ", err);
-        }
-
-        const setVectorLayers = (json: any) => {
-          if (!Object.prototype.hasOwnProperty.call(json, "vector_layers")) {
-            return;
-          }
-
-          // Create new objects before setState
-          const newSources = Object.assign(
-            {},
-            {
-              [key]: sources[key],
-            }
-          );
-
-          for (const layer of json.vector_layers) {
-            (newSources[key] as any).layers.push(layer.id);
-          }
-
-          dispatch(setSources(newSources));
-        };
-
-        if (url!.startsWith("pmtiles://")) {
-          new PMTiles(url!.substr(10))
-            .getTileJson("")
-            .then((json) => setVectorLayers(json))
-            .catch((err) => {
-              console.error("Failed to process sources for '%s'", url, err);
-            });
-        } else {
-          fetch(url!, {
-            mode: "cors",
-          })
-            .then((response) => response.json())
-            .then((json) => setVectorLayers(json))
-            .catch((err) => {
-              console.error("Failed to process sources for '%s'", url, err);
-            });
-        }
-      } else {
-        sourceList[key] =
-          sources[key] || mapStyle.sources[key];
-      }
-    }
-
-    if (!isEqual(sources, sourceList)) {
-      console.debug("Setting sources");
-      dispatch(setSources(sourceList));
-    }
-  }, [mapStyle.sources, sources, dispatch]);
 
   const _getRenderer = useCallback(() => {
     const metadata: { [key: string]: string } =
@@ -854,14 +398,12 @@ const App = () => {
 
   const onMapChange = useCallback((mapView: {
     zoom: number;
-    center: {
-      lng: number;
-      lat: number;
-    };
+    center: LngLat;
   }) => {
-    dispatch(setMapView(mapView));
+    dispatch(setMapView({ ...mapView, center: { lat: mapView.center.lat, lng: mapView.center.lng } }));
   }, [dispatch]);
 
+  // TODO ALBA: This should be a component
   const mapRenderer = useCallback(() => {
     const mapProps = {
       mapStyle: dirtyMapStyle || mapStyle,
@@ -925,58 +467,6 @@ const App = () => {
     );
   }, [dirtyMapStyle, mapStyle, mapState, selectedLayerIndex, maplibreGlDebugOptions, openlayersDebugOptions, onMapChange, onLayerSelect, fetchSources, _getRenderer]);
 
-  const getInitialStateFromUrl = useCallback((mapStyle: StyleSpecification) => {
-    const url = new URL(location.href);
-    const modalParam = url.searchParams.get("modal");
-
-    if (modalParam && modalParam !== "") {
-      const modals = modalParam.split(",");
-      const modalObj: { [key: string]: boolean } = {};
-      modals.forEach((modalName) => {
-        modalObj[modalName] = true;
-      });
-
-      // Update modal states
-      Object.entries(modalObj).forEach(([modalName, isOpen]) => {
-        if (isOpen) {
-          dispatch(toggleModal(modalName as keyof typeof isOpen));
-        }
-      });
-    }
-
-    const view = url.searchParams.get("view");
-    if (view && view !== "") {
-      dispatch(setMapState(view as MapState));
-    }
-
-    const path = url.searchParams.get("layer");
-    if (path) {
-      try {
-        const parts = path.split("~");
-        const [hashVal, selectedLayerIndex] = [
-          parts[0],
-          parseInt(parts[1], 10),
-        ];
-
-        let valid = true;
-        if (hashVal !== "-") {
-          const currentHashVal = hash(JSON.stringify(mapStyle));
-          if (currentHashVal !== parseInt(hashVal, 10)) {
-            valid = false;
-          }
-        }
-        if (valid) {
-          dispatch(setSelectedLayerIndex(selectedLayerIndex));
-          if (mapStyle.layers[selectedLayerIndex]) {
-            dispatch(setSelectedLayerOriginalId(mapStyle.layers[selectedLayerIndex].id));
-          }
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  }, [dispatch, mapStyle]);
-
   const toggleModalHandler = useCallback((modalName: keyof typeof isOpen) => {
     dispatch(toggleModal(modalName));
   }, [dispatch]);
@@ -1038,6 +528,7 @@ const App = () => {
   const selectedLayer =
     layers.length > 0 ? layers[selectedLayerIndex] : undefined;
 
+  // TODO ALBA: This should be a component
   const toolbar = (
     <AppToolbar
       renderer={_getRenderer()}
@@ -1053,6 +544,7 @@ const App = () => {
     />
   );
 
+  // TODO ALBA: This should be a component
   const layerList = (
     <LayerList
       onMoveLayer={onMoveLayer}
@@ -1069,6 +561,7 @@ const App = () => {
     />
   );
 
+  // TODO ALBA: This should be a component
   const layerEditor = selectedLayer ? (
     <LayerEditor
       key={selectedLayerOriginalId}
@@ -1093,6 +586,7 @@ const App = () => {
     />
   ) : undefined;
 
+  // TODO ALBA: This should be a component
   const bottomPanel =
     errors.length + infos.length > 0 ? (
       <MessagePanel
@@ -1105,6 +599,7 @@ const App = () => {
       />
     ) : undefined;
 
+  // TODO ALBA: This should be a component
   const modals = (
     <div>
       <ModalDebug
@@ -1152,6 +647,7 @@ const App = () => {
     </div>
   );
 
+  // TODO ALBA: This should be a component
   const floorSelector = (
     <FloorSelector
       selectedFloorId={selectedFloorId}
