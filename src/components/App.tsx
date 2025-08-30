@@ -455,8 +455,27 @@ const App = () => {
 
   // TODO ALBA: This should be a component
   const mapRenderer = useCallback(() => {
+    // Ensure we have a valid mapStyle before rendering
+    if (!mapStyle || !mapStyle.layers) {
+      return (
+        <div className="maputnik-map__container">
+          <div>Loading map...</div>
+        </div>
+      );
+    }
+
+    // Ensure we have a valid mapStyle before creating mapProps
+    const validMapStyle = dirtyMapStyle || mapStyle;
+    if (!validMapStyle || !validMapStyle.sources) {
+      return (
+        <div className="maputnik-map__container">
+          <div>Loading map style...</div>
+        </div>
+      );
+    }
+
     const mapProps = {
-      mapStyle: dirtyMapStyle || mapStyle,
+      mapStyle: validMapStyle,
       replaceAccessTokens: (mapStyle: StyleSpecification) => {
         return style.replaceAccessTokens(mapStyle, {
           allowFallback: true,
@@ -487,9 +506,9 @@ const App = () => {
         <MapMaplibreGl
           {...mapProps}
           onChange={onMapChange}
-          options={maplibreGlDebugOptions}
-          instyleSpectModeEnabled={mapViewMode === "inspect"}
-          highlightedLayer={mapStyle.layers[selectedLayerIndex]}
+          options={maplibreGlDebugOptions as any}
+          inspectModeEnabled={mapViewMode === "inspect"}
+          highlightedLayer={mapStyle?.layers?.[selectedLayerIndex]}
           onLayerSelect={onLayerSelect}
         />
       );
