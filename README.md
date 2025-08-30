@@ -35,7 +35,11 @@ Maputnik is written in typescript and is using [React](https://github.com/facebo
 
 We ensure building and developing Maputnik works with the [current active LTS Node.js version and above](https://github.com/nodejs/Release#release-schedule).
 
-Check out our [Internationalization guide](./src/locales/README.md) for UI text related changes.
+## Contributing
+
+### Internationalization
+
+Check out our [Internationalization guide](./public/locales/README.md) for UI text related changes.
 
 ### Getting Involved
 

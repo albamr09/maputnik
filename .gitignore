@@ -30,7 +30,6 @@ build/Release
 node_modules
 
 # Ignore build files
-public
 /errorShots
 /old
 /cypress/screenshots

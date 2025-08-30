@@ -2,7 +2,6 @@ import { IconContext } from "react-icons";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 
-import "./favicon.ico";
 import "./styles/index.scss";
 import "./i18n";
 import App from "./components/App";
