@@ -13,19 +13,11 @@ const errorsSlice = createSlice({
     addError: (state, action: PayloadAction<MappedError>) => {
       state.errors.push(action.payload);
     },
-    removeError: (state, action: PayloadAction<number>) => {
-      const index = action.payload;
-      state.errors.splice(index, 1);
-    },
     clearErrors: (state) => {
       state.errors = [];
     },
     addInfo: (state, action: PayloadAction<string>) => {
       state.infos.push(action.payload);
-    },
-    removeInfo: (state, action: PayloadAction<number>) => {
-      const index = action.payload;
-      state.infos.splice(index, 1);
     },
     clearInfos: (state) => {
       state.infos = [];
@@ -39,10 +31,8 @@ const errorsSlice = createSlice({
 
 export const {
   addError,
-  removeError,
   clearErrors,
   addInfo,
-  removeInfo,
   clearInfos,
   clearAllMessages,
 } = errorsSlice.actions;

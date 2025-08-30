@@ -17,28 +17,12 @@ const sourcesSlice = createSlice({
       const { id, source } = action.payload;
       state.sources[id] = source;
     },
-    updateSource: (state, action: PayloadAction<{ id: string; source: Partial<SourceSpecification> }>) => {
-      const { id, source } = action.payload;
-      if (state.sources[id]) {
-        state.sources[id] = { ...state.sources[id], ...source } as SourceSpecification;
-      }
-    },
-    removeSource: (state, action: PayloadAction<string>) => {
-      const id = action.payload;
-      delete state.sources[id];
-    },
-    clearSources: (state) => {
-      state.sources = {};
-    },
   },
 });
 
 export const {
   setSources,
   addSource,
-  updateSource,
-  removeSource,
-  clearSources,
 } = sourcesSlice.actions;
 
 export default sourcesSlice.reducer;

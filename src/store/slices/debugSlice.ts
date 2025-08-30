@@ -20,16 +20,8 @@ const debugSlice = createSlice({
       state.maplibreGlDebugOptions = { ...state.maplibreGlDebugOptions, ...action.payload };
       state.maplibreGlDebugOptions = state.maplibreGlDebugOptions;
     },
-    toggleMaplibreGlDebugOption: (state, action: PayloadAction<keyof MaplibreGlDebugOptions>) => {
-      const option = action.payload;
-      state.maplibreGlDebugOptions[option] = !state.maplibreGlDebugOptions[option];
-    },
     setOpenLayersDebugOptions: (state, action: PayloadAction<Partial<OpenLayersDebugOptions>>) => {
       state.openLayersDebugOptions = { ...state.openLayersDebugOptions, ...action.payload };
-    },
-    toggleOpenLayersDebugOption: (state, action: PayloadAction<keyof OpenLayersDebugOptions>) => {
-      const option = action.payload;
-      state.openLayersDebugOptions[option] = !state.openLayersDebugOptions[option];
     },
     resetDebugOptions: (state) => {
       state.maplibreGlDebugOptions = initialState.maplibreGlDebugOptions;
@@ -40,9 +32,7 @@ const debugSlice = createSlice({
 
 export const {
   setMaplibreGlDebugOptions,
-  toggleMaplibreGlDebugOption,
   setOpenLayersDebugOptions,
-  toggleOpenLayersDebugOption,
   resetDebugOptions,
 } = debugSlice.actions;
 
