@@ -1,8 +1,7 @@
-import type { StyleSpecification, SourceSpecification } from "maplibre-gl";
-import type { MapOptions } from "maplibre-gl";
+import type { StyleSpecification, SourceSpecification, MapOptions } from "maplibre-gl";
 
 // UI State Types
-export type MapState = "map" | "inspect";
+export type MapState = "map" | "inspect" | "filter-achromatopsia" | "filter-deuteranopia" | "filter-protanopia" | "filter-tritanopia";
 
 export type ModalStates = {
   settings: boolean;
@@ -35,9 +34,15 @@ export type OpenLayersDebugOptions = {
 
 // Error Types
 export type MappedError = {
-  index: number;
-  key: string;
   message: string;
+  parsed?: {
+    type: string;
+    data: {
+      index: number;
+      key: string;
+      message: string;
+    };
+  };
 };
 
 // Root State Type
