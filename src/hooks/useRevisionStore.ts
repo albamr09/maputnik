@@ -2,19 +2,22 @@ import { useCallback } from "react";
 import type { StyleSpecification } from "maplibre-gl";
 import { ExtendedStyleSpecification } from "../store/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { appendRevision, setRevisions, selectRevisions, selectRevisionCurrentIdx, setCurrentRevisionIdx } from "../store/slices/styleStoreSlice";
+import {
+  appendRevision,
+  setRevisions,
+  selectRevisions,
+  selectRevisionCurrentIdx,
+  setCurrentRevisionIdx,
+} from "../store/slices/styleStoreSlice";
 
 const useRevisionStore = () => {
   const dispatch = useAppDispatch();
   const revisions = useAppSelector(selectRevisions);
   const currentRevisionIdx = useAppSelector(selectRevisionCurrentIdx);
 
-  const addRevision = useCallback(
-    (revision: ExtendedStyleSpecification) => {
-      dispatch(appendRevision(revision));
-    },
-    []
-  );
+  const addRevision = useCallback((revision: ExtendedStyleSpecification) => {
+    dispatch(appendRevision(revision));
+  }, []);
 
   const undo = useCallback(() => {
     if (currentRevisionIdx > 0) {
@@ -29,7 +32,7 @@ const useRevisionStore = () => {
     if (currentRevisionIdx < revisions.length - 1) {
       const newIndex = currentRevisionIdx + 1;
       dispatch(setCurrentRevisionIdx(newIndex));
-      return revisions[newIndex]
+      return revisions[newIndex];
     }
     return null;
   }, [currentRevisionIdx, revisions.length]);

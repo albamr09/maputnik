@@ -129,16 +129,14 @@ const App = () => {
         "Load style from URL: " + styleUrl + " and discard current changes?"
       )
     ) {
-
       loadStyleUrl(styleUrl, (mapStyle) => onStyleChanged(mapStyle));
       removeStyleQuerystring();
     } else {
       console.log("Falling back to local storage for storing styles");
       styleUrl && removeStyleQuerystring();
       loadLatestStoredStyle((mapStyle) => {
-        onStyleChanged(mapStyle, { initialLoad: true })
-      }
-      );
+        onStyleChanged(mapStyle, { initialLoad: true });
+      });
     }
 
     // Initialize layer watcher
@@ -532,22 +530,20 @@ const App = () => {
     const buildingID = mapStyle?.metadata?.["maputnik:situm-building-id"];
 
     if (buildingID) {
-      getBuildingById(buildingID as number).then((building) => {
-        const floorIds = building.floors
-          .slice()
-          .sort((a, b) => b.level - a.level)
-          .map((floor) => floor.id);
-        dispatch(setFloorIds(floorIds));
-      })
+      getBuildingById(buildingID as number)
+        .then((building) => {
+          const floorIds = building.floors
+            .slice()
+            .sort((a, b) => b.level - a.level)
+            .map((floor) => floor.id);
+          dispatch(setFloorIds(floorIds));
+        })
         .catch((e) => {
           console.error(`Could not set floors: ${e}`);
         });
-    }
-
-    else if (floorIds.length > 0) {
+    } else if (floorIds.length > 0) {
       dispatch(setFloorIds([]));
     }
-
   }, [mapStyle.metadata, dispatch, floorIds.length]);
 
   const layers = mapStyle.layers || [];
