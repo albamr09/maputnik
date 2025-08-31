@@ -83,6 +83,9 @@ export interface StyleStoreState {
   // Revisions
   revisions: ExtendedStyleSpecification[];
   currentIdx: number;
+
+  // Style store
+  storedStyles: string[];
 }
 
 // Root State Type

@@ -36,8 +36,6 @@ import {
   loadStyleUrl,
   removeStyleQuerystring,
 } from "../libs/urlopen";
-import { StyleStore } from "../libs/stylestore";
-import { ApiStyleStore } from "../libs/apistore";
 import LayerWatcher from "../libs/layerwatcher";
 import { SortEnd } from "react-sortable-hoc";
 import FloorSelector from "./FloorSelector";
@@ -85,6 +83,7 @@ import {
 import useStyleEdition from "../hooks/useStyleEdition";
 import AppToolbar from "./AppToolbar";
 import useShortcuts from "../hooks/useShortcuts";
+import useStyleStore from "../hooks/useStyleStore";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-styleSpec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -112,36 +111,17 @@ const App = () => {
   const openlayersDebugOptions = useAppSelector(selectOpenLayersDebugOptions);
 
   // Refs for stores and watchers
-  // TODO ALBA: What are these for?
-  const styleStoreRef = useRef<StyleStore | ApiStyleStore>();
   const layerWatcherRef = useRef<LayerWatcher>();
 
   // Hooks
-  const { onStyleChanged, fetchSources, setStateInUrl } = useStyleEdition();
+  const { onStyleChanged, fetchSourcesRef, setStateInUrl } = useStyleEdition();
   useShortcuts();
-  // Use SitumSDK from provider
+  const { initializeStoredStyles, loadLatestStoredStyle } = useStyleStore();
   const { getBuildingById } = useSitumSDK();
 
-  // Initialize stores on first render
+  // Initialize store on first render
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search.substring(1));
-    let port = params.get("localport");
-    if (
-      port == null &&
-      window.location.port !== "80" &&
-      window.location.port !== "443"
-    ) {
-      port = window.location.port;
-    }
-
-    styleStoreRef.current = new ApiStyleStore({
-      onLocalStyleChange: (mapStyle) =>
-        onStyleChanged(mapStyle, { save: false }),
-      port: port,
-      host: params.get("localhost"),
-    });
-
-    // Initialize style store
+    initializeStoredStyles();
     const styleUrl = initialStyleUrl();
     if (
       styleUrl &&
@@ -149,24 +129,17 @@ const App = () => {
         "Load style from URL: " + styleUrl + " and discard current changes?"
       )
     ) {
-      styleStoreRef.current = new StyleStore();
+
       loadStyleUrl(styleUrl, (mapStyle) => onStyleChanged(mapStyle));
       removeStyleQuerystring();
     } else {
-      if (styleUrl) {
-        removeStyleQuerystring();
+      console.log("Falling back to local storage for storing styles");
+      styleUrl && removeStyleQuerystring();
+      loadLatestStoredStyle((mapStyle) => {
+        onStyleChanged(mapStyle, { initialLoad: true })
       }
-      styleStoreRef.current.init((err) => {
-        if (err) {
-          console.log("Falling back to local storage for storing styles");
-          styleStoreRef.current = new StyleStore();
-        }
-        styleStoreRef.current!.latestStyle((mapStyle) =>
-          onStyleChanged(mapStyle, { initialLoad: true })
-        );
-      });
+      );
     }
-
 
     // Initialize layer watcher
     layerWatcherRef.current = new LayerWatcher({
@@ -175,7 +148,7 @@ const App = () => {
 
     // Set initial styleSpec
     dispatch(setSpec(latest));
-  }, [dispatch]);
+  }, []);
 
   // Floor and SitumSDK effects
   useEffect(() => {
@@ -462,7 +435,7 @@ const App = () => {
       },
       onDataChange: (e: { map: Map }) => {
         layerWatcherRef.current?.analyzeMap(e.map);
-        fetchSources();
+        fetchSourcesRef.current();
       },
     };
 
@@ -520,7 +493,6 @@ const App = () => {
     openlayersDebugOptions,
     onMapChange,
     onLayerSelect,
-    fetchSources,
     _getRenderer,
   ]);
 

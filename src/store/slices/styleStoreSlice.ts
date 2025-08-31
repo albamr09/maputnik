@@ -7,6 +7,9 @@ const initialState: StyleStoreState = {
     // Revision
     revisions: [],
     currentIdx: -1,
+
+    // Style store
+    storedStyles: []
 };
 
 const styleStoreSlice = createSlice({
@@ -29,6 +32,15 @@ const styleStoreSlice = createSlice({
         },
         setCurrentRevisionIdx: (state, action: PayloadAction<number>) => {
             state.currentIdx = action.payload;
+        },
+        setStoredStyles: (state, action: PayloadAction<string[]>) => {
+            state.storedStyles = action.payload;
+        },
+        addStoredStyles: (state, action: PayloadAction<string>) => {
+            state.storedStyles.push(action.payload);
+        },
+        resetStoredStyles: (state) => {
+            state.storedStyles = [];
         }
     },
 });
@@ -43,12 +55,21 @@ export const selectRevisionCurrentIdx = createSelector(
     (slice: StyleStoreState) => slice.currentIdx
 );
 
+export const selectStoredStyles = createSelector(
+    (state: AppState) => state.styleStore,
+    (slice: StyleStoreState) => slice.storedStyles
+);
+
 // Export actions
 export const {
     // Revisions actions
     appendRevision,
     setRevisions,
-    setCurrentRevisionIdx
+    setCurrentRevisionIdx,
+    // Stored styles actions
+    setStoredStyles,
+    addStoredStyles,
+    resetStoredStyles
 } = styleStoreSlice.actions;
 
 export default styleStoreSlice.reducer;

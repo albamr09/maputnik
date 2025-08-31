@@ -38,6 +38,8 @@ import {
 import tokens from "../config/tokens.json";
 import { validateStyleMin } from "@maplibre/maplibre-gl-style-spec";
 import useRevisionStore from "./useRevisionStore";
+import useStyleStore from "./useStyleStore";
+import useRefListener from "./useRefListener";
 
 type OnStyleChangedOpts = {
   save?: boolean;
@@ -57,6 +59,7 @@ const useStyleEdition = () => {
 
   // Hooks
   const { addRevision } = useRevisionStore();
+  const { save } = useStyleStore();
 
   // Helpers
   const setFetchAccessToken = useCallback(
@@ -86,11 +89,10 @@ const useStyleEdition = () => {
   );
 
   const saveStyle = useCallback(
-    (_snapshotStyle: ExtendedStyleSpecification) => {
-      // TODO ALBA: what does this do
-      //styleStoreRef.current?.save(snapshotStyle);
+    (snapshotStyle: ExtendedStyleSpecification) => {
+      save(snapshotStyle);
     },
-    []
+    [save]
   );
 
   const updateRootSpec = useCallback(
@@ -124,7 +126,7 @@ const useStyleEdition = () => {
         dispatch(setSpec(updateRootSpec(styleSpec, "glyphs", fonts)));
       });
     },
-    [mapStyle.metadata, styleSpec, dispatch]
+    [mapStyle.metadata, styleSpec]
   );
 
   const updateIcons = useCallback(
@@ -133,7 +135,7 @@ const useStyleEdition = () => {
         dispatch(setSpec(updateRootSpec(styleSpec, "sprite", icons)));
       });
     },
-    [styleSpec, dispatch]
+    [styleSpec]
   );
 
   const getInitialStateFromUrl = useCallback(
@@ -263,7 +265,9 @@ const useStyleEdition = () => {
       console.debug("Setting sources");
       dispatch(setSources(sourceList));
     }
-  }, [mapStyle.sources, sources, dispatch]);
+  }, [mapStyle.sources, sources]);
+
+  const fetchSourcesRef = useRefListener(() => fetchSources(), [fetchSources]);
 
   const setStateInUrl = useCallback(() => {
     const url = new URL(location.href);
@@ -288,6 +292,8 @@ const useStyleEdition = () => {
 
     history.replaceState({ selectedLayerIndex }, "Maputnik", url.href);
   }, [mapStyle, selectedLayerIndex, isOpen, mapViewMode]);
+
+  const setStateInUrlRef = useRefListener(() => setStateInUrl(), [setStateInUrl]);
 
   const onStyleChanged = useCallback(
     (newStyle: ExtendedStyleSpecification, opts: OnStyleChangedOpts = {}) => {
@@ -450,14 +456,14 @@ const useStyleEdition = () => {
 
       // Fetch sources and update URL after state update
       setTimeout(() => {
-        fetchSources();
-        setStateInUrl();
+        fetchSourcesRef.current();
+        setStateInUrlRef.current();
       }, 0);
     },
-    [mapStyle, dispatch, updateFonts, updateIcons, saveStyle]
+    [mapStyle, updateFonts, updateIcons, saveStyle]
   );
 
-  return { onStyleChanged, fetchSources, setStateInUrl };
+  return { onStyleChanged, fetchSourcesRef, setStateInUrl };
 };
 
 export default useStyleEdition;
