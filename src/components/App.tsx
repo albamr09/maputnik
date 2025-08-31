@@ -114,7 +114,7 @@ const App = () => {
   const layerWatcherRef = useRef<LayerWatcher>();
 
   // Hooks
-  const { onStyleChanged, fetchSourcesRef, setStateInUrl } = useStyleEdition();
+  const { onStyleChanged, fetchSources, setStateInUrl } = useStyleEdition();
   useShortcuts();
   const { initializeStoredStyles, loadLatestStoredStyle } = useStyleStore();
   const { getBuildingById } = useSitumSDK();
@@ -427,6 +427,8 @@ const App = () => {
     }
 
     const mapProps = {
+      // This forces a re-render of the component
+      key: validMapStyle.id,
       mapStyle: validMapStyle,
       replaceAccessTokens: (mapStyle: StyleSpecification) => {
         return style.replaceAccessTokens(mapStyle, {
@@ -435,7 +437,7 @@ const App = () => {
       },
       onDataChange: (e: { map: Map }) => {
         layerWatcherRef.current?.analyzeMap(e.map);
-        fetchSourcesRef.current();
+        fetchSources();
       },
     };
 

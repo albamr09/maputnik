@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
   ExtendedStyleSpecification,
   MapState,
@@ -39,7 +39,6 @@ import tokens from "../config/tokens.json";
 import { validateStyleMin } from "@maplibre/maplibre-gl-style-spec";
 import useRevisionStore from "./useRevisionStore";
 import useStyleStore from "./useStyleStore";
-import useRefListener from "./useRefListener";
 
 type OnStyleChangedOpts = {
   save?: boolean;
@@ -267,7 +266,12 @@ const useStyleEdition = () => {
     }
   }, [mapStyle.sources, sources]);
 
-  const fetchSourcesRef = useRefListener(() => fetchSources(), [fetchSources]);
+  // Watch for changes in mapStyle.sources and fetch sources when they change
+  useEffect(() => {
+    if (mapStyle.sources && Object.keys(mapStyle.sources).length > 0) {
+      fetchSources();
+    }
+  }, [mapStyle.sources, fetchSources]);
 
   const setStateInUrl = useCallback(() => {
     const url = new URL(location.href);
@@ -292,8 +296,6 @@ const useStyleEdition = () => {
 
     history.replaceState({ selectedLayerIndex }, "Maputnik", url.href);
   }, [mapStyle, selectedLayerIndex, isOpen, mapViewMode]);
-
-  const setStateInUrlRef = useRefListener(() => setStateInUrl(), [setStateInUrl]);
 
   const onStyleChanged = useCallback(
     (newStyle: ExtendedStyleSpecification, opts: OnStyleChangedOpts = {}) => {
@@ -454,16 +456,13 @@ const useStyleEdition = () => {
       dispatch(clearErrors());
       mappedErrors.forEach((error) => dispatch(addError(error)));
 
-      // Fetch sources and update URL after state update
-      setTimeout(() => {
-        fetchSourcesRef.current();
-        setStateInUrlRef.current();
-      }, 0);
+      // Update URL after state update
+      setStateInUrl();
     },
     [mapStyle, updateFonts, updateIcons, saveStyle]
   );
 
-  return { onStyleChanged, fetchSourcesRef, setStateInUrl };
+  return { onStyleChanged, fetchSources, setStateInUrl };
 };
 
 export default useStyleEdition;
