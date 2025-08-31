@@ -1,17 +1,20 @@
 export default {
-  output: 'src/locales/$LOCALE/$NAMESPACE.json',
-  locales: [ 'de', 'fr', 'he', 'it','ja', 'zh' ],
-
-  // Because some keys are dynamically generated, i18next-parser can't detect them.
-  // We add these keys manually, so we don't want to remove them.
-  keepRemoved: true,
-
-  // We use plain English keys, so we disable key and namespace separators.
+  input: ['src/**/*.{ts,tsx}'],
+  output: 'public/locales/$LOCALE/$NAMESPACE.json',
+  locales: ['en', 'de', 'fr', 'he', 'it', 'ja', 'zh'],
+  defaultLocale: 'en',
   keySeparator: false,
-  namespaceSeparator: false,
-
-  defaultValue: (_locale, _ns, _key) => {
-    // The default value is a string that indicates that the string is not translated.
-    return '__STRING_NOT_TRANSLATED__';
+  nsSeparator: false,
+  keepRemoved: true,
+  sort: true,
+  skipUntranslated: true,
+  createOldCatalogs: false,
+  useKeysAsDefaultValue: true,
+  debug: false,
+  removeUnusedKeys: true,
+  contextSeparator: '_',
+  interpolation: {
+    prefix: '{{',
+    suffix: '}}'
   }
-}
+};

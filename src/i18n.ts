@@ -21,7 +21,8 @@ i18n
         // English is the default language, so we don't need to load any resources for it.
         return {};
       }
-      return import(`./locales/${lang}/${ns}.json`);
+      // Use fetch to load from public folder at runtime
+      return fetch(`/locales/${lang}/${ns}.json`).then(res => res.json());
     })
   )
   .use(initReactI18next) // required to initialize react-i18next

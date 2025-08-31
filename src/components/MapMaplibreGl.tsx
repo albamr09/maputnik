@@ -23,6 +23,16 @@ function renderPopup(popup: JSX.Element, mountNode: ReactDOM.Container): HTMLEle
 }
 
 function buildInspectStyle(originalMapStyle: StyleSpecification, coloredLayers: HighlightedLayer[], highlightedLayer?: HighlightedLayer) {
+  // Add null check
+  if (!originalMapStyle || !originalMapStyle.sources) {
+    console.warn('buildInspectStyle: originalMapStyle or sources is undefined, returning empty style');
+    return {
+      version: 8,
+      sources: {},
+      layers: []
+    } as StyleSpecification;
+  }
+
   const backgroundLayer = {
     "id": "background",
     "type": "background",
@@ -31,9 +41,12 @@ function buildInspectStyle(originalMapStyle: StyleSpecification, coloredLayers: 
     }
   } as LayerSpecification
 
+  // Ensure coloredLayers is always an array
+  const safeColoredLayers = Array.isArray(coloredLayers) ? coloredLayers : [];
+
   const layer = colorHighlightedLayer(highlightedLayer)
   if(layer) {
-    coloredLayers.push(layer)
+    safeColoredLayers.push(layer)
   }
 
   const sources: {[key:string]: SourceSpecification} = {}
@@ -48,7 +61,7 @@ function buildInspectStyle(originalMapStyle: StyleSpecification, coloredLayers: 
   const inspectStyle = {
     ...originalMapStyle,
     sources: sources,
-    layers: [backgroundLayer].concat(coloredLayers as LayerSpecification[])
+    layers: [backgroundLayer].concat(safeColoredLayers as LayerSpecification[])
   }
   return inspectStyle
 }
@@ -110,8 +123,18 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
     return should;
   }
 
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('MapMaplibreGlInternal error:', error, errorInfo);
+  }
+
   componentDidUpdate() {
     const map = this.state.map;
+
+    // Add safety check to ensure mapStyle is valid
+    if (!this.props.mapStyle || !this.props.mapStyle.sources) {
+      console.warn('componentDidUpdate: mapStyle or sources is undefined, skipping update');
+      return;
+    }
 
     const styleWithTokens = this.props.replaceAccessTokens(this.props.mapStyle);
     if (map) {
@@ -128,23 +151,39 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
       this.state.inspect.toggleInspector()
     }
     if (this.state.inspect && this.props.inspectModeEnabled) {
-      this.state.inspect.setOriginalStyle(styleWithTokens);
-      // In case the sources are the same, there's a need to refresh the style
-      setTimeout(() => {
-        this.state.inspect!.render();
-      }, 500);
+      try {
+        this.state.inspect.setOriginalStyle(styleWithTokens);
+        // In case the sources are the same, there's a need to refresh the style
+        setTimeout(() => {
+          if (this.state.inspect) {
+            this.state.inspect.render();
+          }
+        }, 500);
+      } catch (error) {
+        console.warn('Error updating inspect style:', error);
+      }
     }
 
   }
 
   componentDidMount() {
+    // Add safety check to ensure mapStyle is valid before creating the map
+    if (!this.props.mapStyle || !this.props.mapStyle.sources) {
+      console.warn('componentDidMount: mapStyle or sources is undefined, cannot create map', {
+        mapStyle: this.props.mapStyle,
+        hasMapStyle: !!this.props.mapStyle,
+        hasSources: this.props.mapStyle?.sources
+      });
+      return;
+    }
+
     const mapOpts = {
       ...this.props.options,
       container: this.container!,
       style: this.props.mapStyle,
       hash: true,
       maxZoom: 24,
-      // setting to always load glyphs of CJK fonts from server
+      // setting to always load glyphs from server
       // https://maplibre.org/maplibre-gl-js/docs/examples/local-ideographs/
       localIdeographFontFamily: false
     } satisfies MapOptions;
@@ -186,7 +225,18 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
       assignLayerColor: (layerId: string, alpha: number) => {
         return Color(colors.brightColor(layerId, alpha)).desaturate(0.5).string()
       },
-      buildInspectStyle: (originalMapStyle: StyleSpecification, coloredLayers: HighlightedLayer[]) => buildInspectStyle(originalMapStyle, coloredLayers, this.props.highlightedLayer),
+      buildInspectStyle: (originalMapStyle: StyleSpecification, coloredLayers: HighlightedLayer[]) => {
+        // Add safety check to ensure we have valid props before calling buildInspectStyle
+        if (!this.props.mapStyle || !this.props.mapStyle.sources) {
+          console.warn('MaplibreInspect buildInspectStyle: mapStyle or sources is undefined, returning empty style');
+          return {
+            version: 8,
+            sources: {},
+            layers: []
+          } as StyleSpecification;
+        }
+        return buildInspectStyle(originalMapStyle, coloredLayers, this.props.highlightedLayer);
+      },
       renderPopup: (features: InspectFeature[]) => {
         if(this.props.inspectModeEnabled) {
           return renderPopup(<MapMaplibreGlFeaturePropertyPopup features={features} />, tmpNode);
@@ -229,6 +279,12 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
   }
 
   onLayerSelectById = (id: string) => {
+    // Add safety check to ensure mapStyle and layers exist
+    if (!this.props.mapStyle || !this.props.mapStyle.layers) {
+      console.warn('onLayerSelectById: mapStyle or layers is undefined');
+      return;
+    }
+    
     const index = this.props.mapStyle.layers.findIndex(layer => layer.id === id);
     this.props.onLayerSelect(index);
   }
@@ -280,8 +336,27 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
 
   render() {
     const t = this.props.t;
-    this.state.geocoder?.setPlaceholder(t("Search"));
-    this.state.zoomControl?.setLabel(t("Zoom:"));
+    
+    // Add safety check to ensure mapStyle is valid before rendering
+    if (!this.props.mapStyle || !this.props.mapStyle.sources) {
+      return <div
+        className="maputnik-map__map"
+        role="region"
+        aria-label={t("Map view")}
+        data-wd-key="maplibre:map"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0f0f0' }}
+      >
+        <div>Loading map style...</div>
+      </div>;
+    }
+    
+    // Only try to update controls if they exist and the map is ready
+    if (this.state.map && this.state.geocoder) {
+      this.state.geocoder.setPlaceholder(t("Search"));
+    }
+    if (this.state.map && this.state.zoomControl) {
+      this.state.zoomControl.setLabel(t("Zoom:"));
+    }
     return <div
       className="maputnik-map__map"
       role="region"
