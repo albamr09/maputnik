@@ -37,6 +37,7 @@ import {
 } from "../libs/metadata";
 import tokens from "../config/tokens.json";
 import { validateStyleMin } from "@maplibre/maplibre-gl-style-spec";
+import useRevisionStore from "./useRevisionStore";
 
 type OnStyleChangedOpts = {
   save?: boolean;
@@ -53,6 +54,9 @@ const useStyleEdition = () => {
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const mapViewMode = useAppSelector(selectMapViewMode);
   const isOpen = useAppSelector(selectIsModalOpen);
+
+  // Hooks
+  const { addRevision } = useRevisionStore();
 
   // Helpers
   const setFetchAccessToken = useCallback(
@@ -431,8 +435,7 @@ const useStyleEdition = () => {
       }
 
       if (opts.addRevision) {
-        // TODO ALBA: what is this
-        // revisionStoreRef.current?.addRevision(mutableStyle);
+        addRevision(mutableStyle);
       }
       if (opts.save) {
         saveStyle(mutableStyle as ExtendedStyleSpecification);

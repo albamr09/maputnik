@@ -79,8 +79,15 @@ export interface UICoreState {
   mapView: MapView;
 }
 
+export interface StyleStoreState {
+  // Revisions
+  revisions: ExtendedStyleSpecification[];
+  currentIdx: number;
+}
+
 // Root State Type
 export interface RootState {
   styleCore: StyleCoreState;
+  styleStore: StyleStoreState;
   uiCore: UICoreState;
 }

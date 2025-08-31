@@ -38,9 +38,7 @@ import {
 } from "../libs/urlopen";
 import { StyleStore } from "../libs/stylestore";
 import { ApiStyleStore } from "../libs/apistore";
-import { RevisionStore } from "../libs/revisions";
 import LayerWatcher from "../libs/layerwatcher";
-import Debug from "../libs/debug";
 import { SortEnd } from "react-sortable-hoc";
 import FloorSelector from "./FloorSelector";
 import {
@@ -115,7 +113,6 @@ const App = () => {
 
   // Refs for stores and watchers
   // TODO ALBA: What are these for?
-  const revisionStoreRef = useRef<RevisionStore>();
   const styleStoreRef = useRef<StyleStore | ApiStyleStore>();
   const layerWatcherRef = useRef<LayerWatcher>();
 
@@ -125,11 +122,8 @@ const App = () => {
   // Use SitumSDK from provider
   const { getBuildingById } = useSitumSDK();
 
-  // TODO ALBA: see if this is needed
   // Initialize stores on first render
   useEffect(() => {
-    revisionStoreRef.current = new RevisionStore();
-
     const params = new URLSearchParams(window.location.search.substring(1));
     let port = params.get("localport");
     if (
@@ -170,18 +164,9 @@ const App = () => {
         styleStoreRef.current!.latestStyle((mapStyle) =>
           onStyleChanged(mapStyle, { initialLoad: true })
         );
-
-        if (Debug.enabled()) {
-          Debug.set("maputnik", "styleStore", styleStoreRef.current);
-          Debug.set("maputnik", "revisionStore", revisionStoreRef.current);
-        }
       });
     }
 
-    if (Debug.enabled()) {
-      Debug.set("maputnik", "revisionStore", revisionStoreRef.current);
-      Debug.set("maputnik", "styleStore", styleStoreRef.current);
-    }
 
     // Initialize layer watcher
     layerWatcherRef.current = new LayerWatcher({

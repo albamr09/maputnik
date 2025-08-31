@@ -16,9 +16,9 @@ const root = createRoot(appContainer);
 root.render(
   <Provider store={store}>
     <SitumSDKProvider>
-      <IconContext.Provider value={{ className: "react-icons" }}>
-        <App />
-      </IconContext.Provider>
+        <IconContext.Provider value={{ className: "react-icons" }}>
+          <App />
+        </IconContext.Provider>
     </SitumSDKProvider>
   </Provider>
 );

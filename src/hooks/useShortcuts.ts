@@ -1,16 +1,18 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   selectIsModalOpen,
   selectMapViewMode,
   setMapState,
   toggleModal,
-  // addInfo,
-  // clearInfos
+  addInfo,
+  clearInfos,
 } from "../store/slices/uiCoreSlice";
-// import { redoMessages, undoMessages } from "../libs/diffmessage";
+import { redoMessages, undoMessages } from "../libs/diffmessage";
 import useStyleEdition from "./useStyleEdition";
 import { selectMapStyle } from "../store/slices/styleCoreSlice";
+import useRevisionStore from "./useRevisionStore";
+import useRefListener from "./useRefListener";
 
 const useShortcuts = () => {
   const dispatch = useAppDispatch();
@@ -21,27 +23,25 @@ const useShortcuts = () => {
 
   // Hooks
   const { onStyleChanged } = useStyleEdition();
+  const { undo, redo } = useRevisionStore();
 
-  // TODO ALBA: redo/undo functionality is probably a hook on itself
-  const onUndo = useCallback(() => {
-    // TODO ALBA: restore this
-    // const activeStyle = revisionStoreRef.current?.undo();
-    // if (!activeStyle) return;
-    // const messages = undoMessages(mapStyle, activeStyle);
-    // onStyleChanged(activeStyle, { addRevision: false });
-    // dispatch(clearInfos());
-    // messages.forEach(info => dispatch(addInfo(info)));
-  }, [mapStyle, onStyleChanged, dispatch]);
+  const onUndo = useRefListener(() => {
+    const previousStyle = undo();
+    if (!previousStyle) return;
+    const messages = undoMessages(mapStyle, previousStyle);
+    onStyleChanged(previousStyle, { addRevision: false });
+    dispatch(clearInfos());
+    messages.forEach((info) => dispatch(addInfo(info)));
+  }, [mapStyle, onStyleChanged, undo]);
 
-  const onRedo = useCallback(() => {
-    // TODO ALBA: restore this
-    // const activeStyle = revisionStoreRef.current?.redo();
-    // if (!activeStyle) return;
-    // const messages = redoMessages(mapStyle, activeStyle);
-    // onStyleChanged(activeStyle, { addRevision: false });
-    // dispatch(clearInfos());
-    // messages.forEach(info => dispatch(addInfo(info)));
-  }, [mapStyle, onStyleChanged, dispatch]);
+  const onRedo = useRefListener(() => {
+    const nextStyle = redo();
+    if (!nextStyle) return;
+    const messages = redoMessages(mapStyle, nextStyle);
+    onStyleChanged(nextStyle, { addRevision: false });
+    dispatch(clearInfos());
+    messages.forEach((info) => dispatch(addInfo(info)));
+  }, [mapStyle, onStyleChanged, redo]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -118,18 +118,18 @@ const useShortcuts = () => {
       if (navigator.platform.toUpperCase().indexOf("MAC") >= 0) {
         if (e.metaKey && e.shiftKey && e.keyCode === 90) {
           e.preventDefault();
-          onRedo();
+          onRedo.current();
         } else if (e.metaKey && e.keyCode === 90) {
           e.preventDefault();
-          onUndo();
+          onUndo.current();
         }
       } else {
         if (e.ctrlKey && e.keyCode === 90) {
           e.preventDefault();
-          onUndo();
+          onUndo.current();
         } else if (e.ctrlKey && e.keyCode === 89) {
           e.preventDefault();
-          onRedo();
+          onRedo.current();
         }
       }
     };
@@ -141,7 +141,7 @@ const useShortcuts = () => {
       document.body.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [dispatch, isOpen.shortcuts, mapViewMode]);
+  }, [isOpen.shortcuts, mapViewMode, redo]);
 };
 
 export default useShortcuts;
