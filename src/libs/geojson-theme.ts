@@ -40,39 +40,49 @@ const getEffectiveValue = <T>(
 
 // Utility function to create MapLibre condition based on
 // feature_type and category
-const createFilterForFeatureTypeAndCategory = (themeEntryName: string): FilterSpecification => {
-  if (themeEntryName.startsWith(".")) {
-    // Only category is present: ".bar"
-    const category = themeEntryName.substring(1);
-    return ["==", ["get", "category"], category];
-  } else if (themeEntryName.includes(".")) {
+const createFilterForFeatureTypeAndCategory = (
+  themeEntryName: string,
+): FilterSpecification => {
+  if (themeEntryName.includes(".") && !themeEntryName.startsWith(".")) {
     // Both feature_type and category are present: "foo.bar"
     const [featureType, category] = themeEntryName.split(".", 2);
     return [
       "all",
       ["==", ["get", "feature_type"], featureType],
-      ["==", ["get", "category"], category]
+      ["==", ["get", "category"], category],
     ];
-  } else {
-    // Only feature_type is present: "foo"
-    return ["==", ["get", "feature_type"], themeEntryName];
   }
+
+  if (themeEntryName.startsWith(".")) {
+    // Only category is present: ".bar"
+    const category = themeEntryName.substring(1);
+    return ["==", ["get", "category"], category];
+  }
+
+  // Only feature_type is present: "foo"
+  return ["==", ["get", "feature_type"], themeEntryName];
 };
 
 // Create MapLibre expression for mapping categories to property values
-const createCategoryExpression = (
+const createThemeEntryExpression = (
   theme: Theme,
   defaultProps: ThemeEntryProperties,
   propertyName: keyof ThemeEntryProperties,
   fallback: any,
 ): ExpressionSpecification => {
-  const cases: any[] = [];
+  // Extract and sort entries by specificity so conditinals are checked correctly
+  const sortedEntries = Object.entries(theme)
+    .filter(([catName, catProps]) => catName !== "default" && catProps)
+    .sort(([a], [b]) => {
+      const score = (name: string) => {
+        if (name.includes(".") && !name.startsWith(".")) return 0; // feature_type+category
+        if (name.startsWith(".")) return 1; // category only
+        return 2; // feature_type only
+      };
+      return score(a) - score(b);
+    }) as [string, ThemeEntryProperties][];
 
-  for (const [catName, catProps] of Object.entries(theme)) {
-    if (catName === "default" || !catProps) {
-      continue;
-    }
-
+  const cases = sortedEntries.reduce((acc, [catName, catProps]) => {
     let value = getEffectiveValue(
       catProps,
       defaultProps,
@@ -87,19 +97,16 @@ const createCategoryExpression = (
       "strokeWidth",
     ].includes(propertyName);
 
-    // Convert to float for numeric properties
     if (isNumberValue) {
       value = parseFloat(value as string);
     }
 
-    // Parse the category name to determine the condition
     const condition = createFilterForFeatureTypeAndCategory(catName);
+    acc.push(condition, value);
+    return acc;
+  }, [] as any[]);
 
-    // Add condition and value for this category
-    cases.push(condition, value);
-  }
-
-  // Add default value at the end
+  // Add default at the end
   const defaultValue = defaultProps[propertyName] ?? fallback;
   cases.push(defaultValue);
 
@@ -155,10 +162,13 @@ const createOpacityFilter = (
 
   // Condition 2: Feature doesn't have fillOpacity but its category has this opacity
   if (themeEntryNamesForOpacity.length > 0) {
-    const themeBasedConditions = themeEntryNamesForOpacity.reduce((acc, themeEntryName) => {
-      acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
-      return acc;
-    }, [] as FilterSpecification[]);
+    const themeBasedConditions = themeEntryNamesForOpacity.reduce(
+      (acc, themeEntryName) => {
+        acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
+        return acc;
+      },
+      [] as FilterSpecification[],
+    );
 
     conditions.push([
       "all",
@@ -221,7 +231,8 @@ const getThemeEntriesWithoutExtrusion = (
     );
 
     if (
-      effectiveExtrusion == null || effectiveExtrusion === undefined ||
+      effectiveExtrusion == null ||
+      effectiveExtrusion === undefined ||
       parseFloat(effectiveExtrusion as any) == 0
     ) {
       // Store the full theme entry name for proper filtering
@@ -252,7 +263,8 @@ const getThemeEntriesThatShouldBeShown = (
     );
 
     if (
-      effectiveExtrusion == null || effectiveExtrusion === undefined ||
+      effectiveExtrusion == null ||
+      effectiveExtrusion === undefined ||
       effectiveExtrusion == true
     ) {
       // Store the full theme entry name for proper filtering
@@ -269,7 +281,10 @@ const createExtrusionFilter = (
   defaultProps: ThemeEntryProperties,
 ): FilterSpecification => {
   // Get theme entries that have extrusion defined
-  const themeEntriesWithExtrusion = getThemeEntriesWithExtrusion(theme, defaultProps);
+  const themeEntriesWithExtrusion = getThemeEntriesWithExtrusion(
+    theme,
+    defaultProps,
+  );
 
   const conditions = [];
 
@@ -282,10 +297,13 @@ const createExtrusionFilter = (
 
   // Condition 2: Feature doesn't have extrusionHeight but its theme entry has extrusion defined
   if (themeEntriesWithExtrusion.length > 0) {
-    const themeBasedConditions = themeEntriesWithExtrusion.reduce((acc, themeEntryName) => {
-      acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
-      return acc;
-    }, [] as FilterSpecification[]);
+    const themeBasedConditions = themeEntriesWithExtrusion.reduce(
+      (acc, themeEntryName) => {
+        acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
+        return acc;
+      },
+      [] as FilterSpecification[],
+    );
 
     conditions.push([
       "all",
@@ -312,7 +330,10 @@ const createExtrusionLayer = (
   );
 
   // Create opacity filter
-  const opacityFilter = createOpacityFilter(opacityLevel, themeEntryNamesForOpacity);
+  const opacityFilter = createOpacityFilter(
+    opacityLevel,
+    themeEntryNamesForOpacity,
+  );
 
   // Create extrusion filter
   const extrusionFilter = createExtrusionFilter(theme, defaultProps);
@@ -337,13 +358,13 @@ const createExtrusionLayer = (
       "case",
       ["has", "fillColor"],
       ["get", "fillColor"],
-      createCategoryExpression(theme, defaultProps, "fillColor", "#000000"),
+      createThemeEntryExpression(theme, defaultProps, "fillColor", "#000000"),
     ] as ExpressionSpecification,
     "fill-extrusion-height": [
       "case",
       ["has", "extrusionHeight"],
       ["to-number", ["get", "extrusionHeight"]],
-      createCategoryExpression(theme, defaultProps, "extrusionHeight", 0),
+      createThemeEntryExpression(theme, defaultProps, "extrusionHeight", 0),
     ] as ExpressionSpecification,
     "fill-extrusion-opacity": opacityLevel,
   };
@@ -366,24 +387,30 @@ const createFlatOrStrokeLayerFilter = (
   theme: Theme,
   defaultProps: ThemeEntryProperties,
 ): FilterSpecification => {
-
   // Get theme entries that do not have extrusion defined or are zero
-  const themeEntriesWithoutExtrusion = getThemeEntriesWithoutExtrusion(theme, defaultProps);
+  const themeEntriesWithoutExtrusion = getThemeEntriesWithoutExtrusion(
+    theme,
+    defaultProps,
+  );
 
   const conditions = [];
 
   // Condition 1: Feature has extrusion height defined and is zero
-  conditions.push(["all", 
+  conditions.push([
+    "all",
     ["has", "extrusionHeight"],
-    ["==", ["get", "extrusionHeight"], 0]
+    ["==", ["get", "extrusionHeight"], 0],
   ]);
 
   // Condition 2: Feature doesn't have extrusion defined and extrusion is also not defined or zero on the theme
   if (themeEntriesWithoutExtrusion.length > 0) {
-    const themeBasedConditions = themeEntriesWithoutExtrusion.reduce((acc, themeEntryName) => {
-      acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
-      return acc;
-    }, [] as FilterSpecification[]);
+    const themeBasedConditions = themeEntriesWithoutExtrusion.reduce(
+      (acc, themeEntryName) => {
+        acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
+        return acc;
+      },
+      [] as FilterSpecification[],
+    );
 
     conditions.push([
       "all",
@@ -393,26 +420,36 @@ const createFlatOrStrokeLayerFilter = (
   }
 
   return ["any", ...conditions] as FilterSpecification;
-}
+};
 
-const createShowFilter = (theme: Theme, defaultProps: ThemeEntryProperties): FilterSpecification => {
+const createShowFilter = (
+  theme: Theme,
+  defaultProps: ThemeEntryProperties,
+): FilterSpecification => {
   const conditions = [];
 
   // Get theme entries that do not have extrusion defined or are zero
-  const themeEntriesThatShouldBeShown = getThemeEntriesThatShouldBeShown(theme, defaultProps);
+  const themeEntriesThatShouldBeShown = getThemeEntriesThatShouldBeShown(
+    theme,
+    defaultProps,
+  );
 
-   // Condition 1: Feature has show defined and is true
-  conditions.push(["all", 
-    ["has", "show"], 
-    ["==", ["to-boolean", ["get", "show"]], true]
+  // Condition 1: Feature has show defined and is true
+  conditions.push([
+    "all",
+    ["has", "show"],
+    ["==", ["to-boolean", ["get", "show"]], true],
   ]);
 
   // Condition 2: Feature doesn't have show defined and is true or is not defined on the theme
   if (themeEntriesThatShouldBeShown.length > 0) {
-    const themeBasedConditions = themeEntriesThatShouldBeShown.reduce((acc, themeEntryName) => {
-      acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
-      return acc;
-    }, [] as FilterSpecification[]);
+    const themeBasedConditions = themeEntriesThatShouldBeShown.reduce(
+      (acc, themeEntryName) => {
+        acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
+        return acc;
+      },
+      [] as FilterSpecification[],
+    );
 
     conditions.push([
       "all",
@@ -422,7 +459,7 @@ const createShowFilter = (theme: Theme, defaultProps: ThemeEntryProperties): Fil
   }
 
   return ["any", ...conditions] as FilterSpecification;
-}
+};
 
 // Create standard layer (flat, stroke, line)
 const createLayer = (
@@ -471,13 +508,13 @@ const createLayer = (
         "case",
         ["has", "fillColor"],
         ["get", "fillColor"],
-        createCategoryExpression(theme, defaultProps, "fillColor", "#000000"),
+        createThemeEntryExpression(theme, defaultProps, "fillColor", "#000000"),
       ] as ExpressionSpecification,
       "fill-opacity": [
         "case",
         ["has", "fillOpacity"],
         ["to-number", ["get", "fillOpacity"]],
-        createCategoryExpression(theme, defaultProps, "fillOpacity", 1),
+        createThemeEntryExpression(theme, defaultProps, "fillOpacity", 1),
       ] as ExpressionSpecification,
     };
   } else if (layerType === "stroke") {
@@ -486,19 +523,24 @@ const createLayer = (
         "case",
         ["has", "strokeColor"],
         ["get", "strokeColor"],
-        createCategoryExpression(theme, defaultProps, "strokeColor", "#000000"),
+        createThemeEntryExpression(
+          theme,
+          defaultProps,
+          "strokeColor",
+          "#000000",
+        ),
       ] as ExpressionSpecification,
       "line-width": [
         "case",
         ["has", "strokeWidth"],
         ["to-number", ["get", "strokeWidth"]],
-        createCategoryExpression(theme, defaultProps, "strokeWidth", 1),
+        createThemeEntryExpression(theme, defaultProps, "strokeWidth", 1),
       ] as ExpressionSpecification,
       "line-opacity": [
         "case",
         ["has", "fillOpacity"],
         ["to-number", ["get", "fillOpacity"]],
-        createCategoryExpression(theme, defaultProps, "fillOpacity", 1),
+        createThemeEntryExpression(theme, defaultProps, "fillOpacity", 1),
       ] as ExpressionSpecification,
     };
   } else if (layerType === "line") {
@@ -507,19 +549,24 @@ const createLayer = (
         "case",
         ["has", "strokeColor"],
         ["get", "strokeColor"],
-        createCategoryExpression(theme, defaultProps, "strokeColor", "#000000"),
+        createThemeEntryExpression(
+          theme,
+          defaultProps,
+          "strokeColor",
+          "#000000",
+        ),
       ] as ExpressionSpecification,
       "line-width": [
         "case",
         ["has", "strokeWidth"],
         ["to-number", ["get", "strokeWidth"]],
-        createCategoryExpression(theme, defaultProps, "strokeWidth", 1),
+        createThemeEntryExpression(theme, defaultProps, "strokeWidth", 1),
       ] as ExpressionSpecification,
       "line-opacity": [
         "case",
         ["has", "strokeOpacity"],
         ["to-number", ["get", "strokeOpacity"]],
-        createCategoryExpression(theme, defaultProps, "strokeOpacity", 1),
+        createThemeEntryExpression(theme, defaultProps, "strokeOpacity", 1),
       ] as ExpressionSpecification,
     };
   }
