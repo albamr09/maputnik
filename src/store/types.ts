@@ -1,6 +1,16 @@
-import type { StyleSpecification, SourceSpecification, MapOptions } from "maplibre-gl";
+import type {
+  StyleSpecification,
+  SourceSpecification,
+  MapOptions,
+} from "maplibre-gl";
 
-export type MapState = "map" | "inspect" | "filter-achromatopsia" | "filter-deuteranopia" | "filter-protanopia" | "filter-tritanopia";
+export type MapState =
+  | "map"
+  | "inspect"
+  | "filter-achromatopsia"
+  | "filter-deuteranopia"
+  | "filter-protanopia"
+  | "filter-tritanopia";
 
 export type ModalStates = {
   settings: boolean;
@@ -24,10 +34,6 @@ export type MaplibreGlDebugOptions = Partial<SafeMapOptions> & {
   showTileBoundaries: boolean;
   showCollisionBoxes: boolean;
   showOverdrawInspector: boolean;
-};
-
-export type OpenLayersDebugOptions = {
-  debugToolbox: boolean;
 };
 
 export type MappedError = {
@@ -61,7 +67,6 @@ export interface StyleCoreState {
 
   // Debug-related state
   maplibreGlDebugOptions: MaplibreGlDebugOptions;
-  openLayersDebugOptions: OpenLayersDebugOptions;
 }
 
 export interface UICoreState {
@@ -94,3 +99,4 @@ export interface RootState {
   styleStore: StyleStoreState;
   uiCore: UICoreState;
 }
+

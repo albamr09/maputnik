@@ -188,7 +188,6 @@ export const {
 
   // Debug actions
   setMaplibreGlDebugOptions,
-  setOpenLayersDebugOptions,
   resetDebugOptions,
 } = styleCoreSlice.actions;
 

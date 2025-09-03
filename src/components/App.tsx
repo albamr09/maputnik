@@ -1,16 +1,12 @@
 import { useEffect, useRef, useCallback } from "react";
 import buffer from "buffer";
-import { Map, StyleSpecification, LngLat } from "maplibre-gl";
 import {
   ExpressionSpecification,
   latest,
 } from "@maplibre/maplibre-gl-style-spec";
 
-import MapMaplibreGl from "./MapMaplibreGl";
-import MapOpenLayers from "./MapOpenLayers";
 import AppLayout from "./pages/AppLayout";
 
-import style from "../libs/style";
 import {
   initialStyleUrl,
   loadStyleUrl,

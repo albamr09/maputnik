@@ -1,8 +1,7 @@
 import { MaputnikDriver } from "./maputnik-driver";
-import tokens from "../../src/config/tokens.json" with {type: "json"};
 
 describe("modals", () => {
-  const { beforeAndAfter, when, get, given, then } = new MaputnikDriver();
+  const { beforeAndAfter, when, get, then } = new MaputnikDriver();
   beforeAndAfter();
 
   beforeEach(() => {
@@ -88,7 +87,10 @@ describe("modals", () => {
       const sourceId = "pmtilestest";
       when.setValue("modal:sources.add.source_id", sourceId);
       when.select("modal:sources.add.source_type", "pmtiles_vector");
-      when.setValue("modal:sources.add.source_url", "https://data.source.coop/protomaps/openstreetmap/v4.pmtiles");
+      when.setValue(
+        "modal:sources.add.source_url",
+        "https://data.source.coop/protomaps/openstreetmap/v4.pmtiles"
+      );
       when.click("modal:sources.add.add_source");
       when.click("modal:sources.add.add_source");
       when.wait(200);
@@ -214,10 +216,7 @@ describe("modals", () => {
 
     it("stadia access token", () => {
       const apiKey = "testing123";
-      when.setValue(
-        "modal:settings.maputnik:stadia_access_token",
-        apiKey
-      );
+      when.setValue("modal:settings.maputnik:stadia_access_token", apiKey);
       when.click("modal:settings.name");
       then(
         get.styleFromLocalStorage().then((style) => style.metadata)
@@ -251,7 +250,7 @@ describe("modals", () => {
       cy.clearLocalStorage();
 
       // fill localStorage until we get a QuotaExceededError
-      cy.window().then(win => {
+      cy.window().then((win) => {
         let chunkSize = 1000;
         const chunk = new Array(chunkSize).join("x");
         let index = 0;
@@ -263,7 +262,7 @@ describe("modals", () => {
             win.localStorage.setItem(key, chunk);
           } catch (e: any) {
             // Verify it's a quota error
-            if (e.name === 'QuotaExceededError') {
+            if (e.name === "QuotaExceededError") {
               if (chunkSize <= 1) return;
               else {
                 chunkSize /= 2;

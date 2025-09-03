@@ -12,7 +12,6 @@ import FieldArray from "./FieldArray";
 import FieldNumber from "./FieldNumber";
 import FieldString from "./FieldString";
 import FieldUrl from "./FieldUrl";
-import FieldSelect from "./FieldSelect";
 import FieldEnum from "./FieldEnum";
 import FieldColor from "./FieldColor";
 import Modal from "./Modal";

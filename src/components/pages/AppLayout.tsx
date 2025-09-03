@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import MapMaplibreGl from "../MapMaplibreGl";
-import { StyleSpecification, Map } from "maplibre-gl";
+import { StyleSpecification, Map, LngLat } from "maplibre-gl";
 import ScrollContainer from "../ScrollContainer";
 import { withTranslation } from "react-i18next";
 import { IconContext } from "react-icons";
@@ -241,6 +241,7 @@ const _AppLayout = () => {
                   });
                 }}
                 onDataChange={(_e: { map: Map }) => {
+                  // TODO ALBA: I should restore this some time
                   //layerWatcherRef.current?.analyzeMap(e.map);
                   fetchSources();
                 }}
