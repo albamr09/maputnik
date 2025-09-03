@@ -29,7 +29,7 @@ type ModalSettingsInternalProps = {
 class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> {
   changeTransitionProperty(
     property: keyof TransitionSpecification,
-    value: number | undefined,
+    value: number | undefined
   ) {
     const transition = {
       ...this.props.mapStyle.transition,
@@ -85,7 +85,7 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
 
   changeStyleProperty(
     property: keyof StyleSpecification | "owner",
-    value: any,
+    value: any
   ) {
     const changedStyle = {
       ...this.props.mapStyle,
@@ -129,7 +129,7 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             label={t("Owner")}
             fieldSpec={{
               doc: t(
-                "Owner ID of the style. Used by Mapbox or future style APIs.",
+                "Owner ID of the style. Used by Mapbox or future style APIs."
               ),
             }}
             data-wd-key="modal:settings.owner"
@@ -156,14 +156,14 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             label={t("Situm API Key")}
             fieldSpec={{
               doc: t(
-                "APIKey that is currently being used to access Situm's services",
+                "APIKey that is currently being used to access Situm's services"
               ),
             }}
             data-wd-key="modal:settings.maputnik:situm-apikey"
             value={metadata["maputnik:situm-apikey"]}
             onChange={onChangeMetadataProperty.bind(
               this,
-              "maputnik:situm-apikey",
+              "maputnik:situm-apikey"
             )}
           />
 
@@ -174,7 +174,7 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             value={metadata["maputnik:openmaptiles_access_token"]}
             onChange={onChangeMetadataProperty.bind(
               this,
-              "maputnik:openmaptiles_access_token",
+              "maputnik:openmaptiles_access_token"
             )}
           />
 
@@ -185,7 +185,7 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             value={metadata["maputnik:thunderforest_access_token"]}
             onChange={onChangeMetadataProperty.bind(
               this,
-              "maputnik:thunderforest_access_token",
+              "maputnik:thunderforest_access_token"
             )}
           />
 
@@ -196,7 +196,7 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             value={metadata["maputnik:stadia_access_token"]}
             onChange={onChangeMetadataProperty.bind(
               this,
-              "maputnik:stadia_access_token",
+              "maputnik:stadia_access_token"
             )}
           />
 
@@ -209,7 +209,7 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             value={metadata["maputnik:situm-building-id"]}
             onChange={onChangeMetadataProperty.bind(
               this,
-              "maputnik:situm-building-id",
+              "maputnik:situm-building-id"
             )}
           />
           <FieldArray
@@ -312,18 +312,6 @@ class ModalSettingsInternal extends React.Component<ModalSettingsInternalProps> 
             value={transition.duration}
             default={latest.transition.duration.default}
             onChange={this.changeTransitionProperty.bind(this, "duration")}
-          />
-
-          <FieldSelect
-            label={fsa.maputnik.style_renderer.label}
-            fieldSpec={fsa.maputnik.style_renderer}
-            data-wd-key="modal:settings.maputnik:renderer"
-            options={[
-              ["mlgljs", "MapLibreGL JS"],
-              ["ol", t("Open Layers (experimental)")],
-            ]}
-            value={metadata["maputnik:renderer"] || "mlgljs"}
-            onChange={onChangeMetadataProperty.bind(this, "maputnik:renderer")}
           />
         </div>
       </Modal>

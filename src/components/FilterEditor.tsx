@@ -24,7 +24,7 @@ import ExpressionProperty from "./_ExpressionProperty";
 import { WithTranslation, withTranslation } from "react-i18next";
 
 function combiningFilter(
-  props: FilterEditorInternalProps,
+  props: FilterEditorInternalProps
 ): LegacyFilterSpecification | ExpressionSpecification {
   const filter = props.filter || ["all"];
 
@@ -46,7 +46,7 @@ function combiningFilter(
 }
 
 function migrateFilter(
-  filter: LegacyFilterSpecification | ExpressionSpecification,
+  filter: LegacyFilterSpecification | ExpressionSpecification
 ) {
   // This "any" can be removed in latest version of maplibre where maplibre re-exported types from style-spec
   return (migrate(createStyleFromFilter(filter) as any).layers[0] as any)
@@ -54,13 +54,12 @@ function migrateFilter(
 }
 
 function createStyleFromFilter(
-  filter: LegacyFilterSpecification | ExpressionSpecification,
+  filter: LegacyFilterSpecification | ExpressionSpecification
 ): StyleSpecification & { id: string } {
   return {
     id: "tmp",
     version: 8,
     name: "Empty Style",
-    metadata: { "maputnik:renderer": "mlgljs" },
     sources: {
       tmp: {
         type: "geojson",
@@ -85,7 +84,7 @@ export const FILTER_OPS = ["all", "any", "none"];
 
 // If we convert a filter that is an expression to an expression it'll remain the same in value
 function checkIfSimpleFilter(
-  filter: LegacyFilterSpecification | ExpressionSpecification,
+  filter: LegacyFilterSpecification | ExpressionSpecification
 ) {
   if (filter.length === 1 && FILTER_OPS.includes(filter[0])) {
     return true;
@@ -95,13 +94,13 @@ function checkIfSimpleFilter(
 }
 
 function hasCombiningFilter(
-  filter: LegacyFilterSpecification | ExpressionSpecification,
+  filter: LegacyFilterSpecification | ExpressionSpecification
 ) {
   return combiningFilterOps.indexOf(filter[0]) >= 0;
 }
 
 function hasNestedCombiningFilter(
-  filter: LegacyFilterSpecification | ExpressionSpecification,
+  filter: LegacyFilterSpecification | ExpressionSpecification
 ) {
   if (hasCombiningFilter(filter)) {
     return (
@@ -192,7 +191,7 @@ class FilterEditorInternal extends React.Component<
 
   static getDerivedStateFromProps(
     props: Readonly<FilterEditorInternalProps>,
-    state: FilterEditorState,
+    state: FilterEditorState
   ) {
     const displaySimpleFilter = checkIfSimpleFilter(combiningFilter(props));
 

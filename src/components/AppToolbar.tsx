@@ -115,7 +115,6 @@ type AppToolbarInternalProps = {
   onToggleModal(...args: unknown[]): unknown;
   onSetMapState(mapState: MapState): unknown;
   mapState?: MapState;
-  renderer?: string;
 } & WithTranslation;
 
 class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
@@ -144,7 +143,7 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
       ).focus();
     } else {
       const el = document.querySelector(
-        "#skip-target-" + target,
+        "#skip-target-" + target
       ) as HTMLButtonElement;
       el.focus();
     }
@@ -160,14 +159,14 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
         const geojsonTheme = JSON.parse(e.target?.result as string);
         const generatedLayers = generateMapLibreLayers(
           geojsonTheme,
-          this.props.selectedFloorId,
+          this.props.selectedFloorId
         );
         // @ts-ignore
         const filteredSitumLayers = (this.props.mapStyle?.layers || []).filter(
           // @ts-ignore
           (layer) => {
             return !layer.id.includes("situm-geojson");
-          },
+          }
         );
         const newStyle = {
           ...this.props.mapStyle,
@@ -196,7 +195,6 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
         id: "inspect",
         group: "general",
         title: t("Inspect"),
-        disabled: this.props.renderer === "ol",
       },
       {
         id: "filter-deuteranopia",
