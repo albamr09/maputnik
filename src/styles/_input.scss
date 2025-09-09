@@ -1,14 +1,14 @@
 @use "mixins";
 @use "vars";
 
-@use 'sass:color';
+@use "sass:color";
+
 //INPUT
 .maputnik-input {
   height: 24px;
   width: 100%;
   display: block;
   box-sizing: border-box;
-  font-size: vars.$font-size-6;
   line-height: 2;
   padding-left: vars.$margin-2;
   padding-right: vars.$margin-2;
@@ -17,13 +17,14 @@
   color: color.adjust(vars.$color-lowgray, $lightness: 12%);
 
   &:invalid {
-    border: solid 1px #B71C1C;
+    border: solid 1px #b71c1c;
     border-radius: 2px;
   }
 }
 
 .maputnik-string {
-  @extend .maputnik-input !optional; /* stylelint-disable-line */
+  @extend .maputnik-input !optional;
+  /* stylelint-disable-line */
 
   &--multi {
     resize: vertical;
@@ -47,12 +48,14 @@
 }
 
 .maputnik-number {
-  @extend .maputnik-input !optional; /* stylelint-disable-line */
+  @extend .maputnik-input !optional;
+  /* stylelint-disable-line */
 }
 
 //COLOR PICKER
 .maputnik-color {
-  @extend .maputnik-input !optional; /* stylelint-disable-line */
+  @extend .maputnik-input !optional;
+  /* stylelint-disable-line */
 
   height: 26px;
 }
@@ -73,7 +76,7 @@
 // ARRAY
 
 .maputnik-array {
-  > * {
+  >* {
     margin-bottom: vars.$margin-3;
   }
 
@@ -99,7 +102,8 @@
 
 // SELECT
 .maputnik-select {
-  @extend .maputnik-input !optional; /* stylelint-disable-line */
+  @extend .maputnik-input !optional;
+  /* stylelint-disable-line */
 
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -110,6 +114,7 @@
 
   height: 24px;
 }
+
 [dir="rtl"] .maputnik-select {
   background: vars.$color-gray url("#{vars.$icon-down-arrow}") left center no-repeat;
 }
@@ -140,7 +145,8 @@
   outline: none;
 
   &-wrapper {
-    @extend .maputnik-input !optional; /* stylelint-disable-line */
+    @extend .maputnik-input !optional;
+    /* stylelint-disable-line */
 
     padding-left: 0;
     padding-right: 0;
@@ -179,10 +185,9 @@
     z-index: 8;
   }
 
-  &:focus + &-box {
+  &:focus+&-box {
     z-index: 9;
   }
-
 
   &-icon {
     width: 50%;
@@ -210,7 +215,6 @@
     color: vars.$color-lowgray;
     cursor: default;
     padding: vars.$margin-1;
-    font-size: vars.$font-size-6;
     z-index: 3;
     background: vars.$color-gray;
   }
@@ -241,7 +245,8 @@
   width: 100%;
   margin-top: vars.$margin-3;
 
-  td, th {
+  td,
+  th {
     border: solid 1px vars.$color-midgray;
     padding: 4px 6px;
     white-space: nowrap;

@@ -72,7 +72,7 @@ export interface StyleCoreState {
 export interface UICoreState {
   // UI-related state
   mapViewMode: MapViewMode;
-  isOpen: ModalStates;
+  modalsState: ModalStates;
   selectedFloorId?: number;
   floorIds: number[];
 
@@ -99,4 +99,3 @@ export interface RootState {
   styleStore: StyleStoreState;
   uiCore: UICoreState;
 }
-

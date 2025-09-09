@@ -3,7 +3,6 @@ import MapMaplibreGl from "../MapMaplibreGl";
 import { StyleSpecification, Map, LngLat } from "maplibre-gl";
 import ScrollContainer from "../ScrollContainer";
 import { withTranslation } from "react-i18next";
-import { IconContext } from "react-icons";
 import LayerList from "../LayerList";
 import FloorSelector from "../FloorSelector";
 import MessagePanel from "../AppMessagePanel";
@@ -13,7 +12,7 @@ import {
   selectErrorMessages,
   selectFloorIds,
   selectInfoMessages,
-  selectIsModalOpen,
+  selectModalsState,
   selectMapView,
   selectMapViewMode,
   selectSelectedFloorId,
@@ -49,7 +48,7 @@ import LayerEditor from "../LayerEditor";
 import AppToolbar from "../molecules/AppToolbar";
 import useLayerEdition from "../../hooks/useLayerEdition";
 import style from "../../libs/style";
-import { Button } from "../atoms/button";
+import Toolbar from "@/components/molecules/toolbar";
 
 const _AppLayout = () => {
   const dispatch = useAppDispatch();
@@ -57,7 +56,7 @@ const _AppLayout = () => {
   const floorIds = useAppSelector(selectFloorIds);
   const mapView = useAppSelector(selectMapView);
   const maplibreGlDebugOptions = useAppSelector(selectMaplibreGlDebugOptions);
-  const isOpen = useAppSelector(selectIsModalOpen);
+  const modalsState = useAppSelector(selectModalsState);
   const fileHandle = useAppSelector(selectFileHandle);
   const mapStyle = useAppSelector(selectMapStyle);
   const errors = useAppSelector(selectErrorMessages);
@@ -87,7 +86,7 @@ const _AppLayout = () => {
 
   // TODO ALBA: Most of these functions should be inside of each component
   const toggleModalHandler = useCallback(
-    (modalName: keyof typeof isOpen) => {
+    (modalName: keyof typeof modalsState) => {
       dispatch(toggleModal(modalName));
     },
     [dispatch],
@@ -171,156 +170,140 @@ const _AppLayout = () => {
     return elementStyle;
   }, [mapViewMode]);
 
-  return <Button variant="outline"> This is a test</Button>;
-
   return (
-    <IconContext.Provider value={{ size: "14px" }}>
-      <div>
-        <AppToolbar
-          mapState={mapViewMode}
-          mapStyle={mapStyle}
-          inspectModeEnabled={mapViewMode === "inspect"}
-          sources={sources}
-          onStyleChanged={onStyleChanged}
-          onStyleOpen={onStyleChanged}
-          onSetMapState={(newState) => dispatch(setMapState(newState))}
-          onToggleModal={toggleModalHandler}
-          selectedFloorId={selectedFloorId ?? 0}
-        />
-        <div className="maputnik-layout-main">
-          <div className="maputnik-layout-list">
-            <LayerList
-              onMoveLayer={onMoveLayer}
-              onLayerDestroy={onLayerDestroy}
-              onLayerCopy={onLayerCopy}
-              onLayerVisibilityToggle={onLayerVisibilityToggle}
-              onLayerFloorFilterToggle={onLayerFloorFilterToggle}
-              onLayersChange={onLayersChange}
-              onLayerSelect={onLayerSelect}
-              selectedLayerIndex={selectedLayerIndex}
-              layers={mapStyleLayers}
-              sources={sources}
-              errors={errors}
-            />
-          </div>
-          {selectedLayer && (
-            <div className="maputnik-layout-drawer">
-              <ScrollContainer>
-                <LayerEditor
-                  key={selectedLayerOriginalId}
-                  layer={selectedLayer}
-                  layerIndex={selectedLayerIndex}
-                  isFirstLayer={selectedLayerIndex < 1}
-                  isLastLayer={
-                    selectedLayerIndex === mapStyle.layers.length - 1
-                  }
-                  sources={sources}
-                  vectorLayers={vectorLayers}
-                  spec={styleSpec}
-                  onMoveLayer={onMoveLayer}
-                  onLayerChanged={onLayerChanged}
-                  onLayerDestroy={onLayerDestroy}
-                  onLayerCopy={onLayerCopy}
-                  onLayerVisibilityToggle={onLayerVisibilityToggle}
-                  onLayerIdChange={onLayerIdChange}
-                  errors={errors}
-                  selectedFloorId={selectedFloorId}
-                />
-              </ScrollContainer>
-            </div>
-          )}
-          {isMapLoaded && (
-            <div
-              style={mapElementStyle}
-              className="maputnik-map__container"
-              data-wd-key="maplibre:container"
-            >
-              <MapMaplibreGl
-                key={mapStyleToRender.id}
-                mapStyle={mapStyleToRender}
-                replaceAccessTokens={(mapStyle: StyleSpecification) => {
-                  return style.replaceAccessTokens(mapStyle, {
-                    allowFallback: true,
-                  });
-                }}
-                onDataChange={(_e: { map: Map }) => {
-                  // TODO ALBA: I should restore this some time
-                  //layerWatcherRef.current?.analyzeMap(e.map);
-                  fetchSources();
-                }}
-                onChange={onMapChange}
-                options={maplibreGlDebugOptions as any}
-                inspectModeEnabled={mapViewMode === "inspect"}
-                highlightedLayer={mapStyleLayers?.[selectedLayerIndex]}
-                onLayerSelect={onLayerSelect}
-              />
-            </div>
-          )}
+    <div>
+      <Toolbar />
+      <div className="maputnik-layout-main">
+        <div className="maputnik-layout-list">
+          <LayerList
+            onMoveLayer={onMoveLayer}
+            onLayerDestroy={onLayerDestroy}
+            onLayerCopy={onLayerCopy}
+            onLayerVisibilityToggle={onLayerVisibilityToggle}
+            onLayerFloorFilterToggle={onLayerFloorFilterToggle}
+            onLayersChange={onLayersChange}
+            onLayerSelect={onLayerSelect}
+            selectedLayerIndex={selectedLayerIndex}
+            layers={mapStyleLayers}
+            sources={sources}
+            errors={errors}
+          />
         </div>
-        {/* TODO ALBA: Does this even work? */}
-        {errors.length + infos.length > 0 && (
-          <div className="maputnik-layout-bottom">
-            <MessagePanel
-              currentLayer={selectedLayer}
-              selectedLayerIndex={selectedLayerIndex}
+        {selectedLayer && (
+          <div className="maputnik-layout-drawer">
+            <ScrollContainer>
+              <LayerEditor
+                key={selectedLayerOriginalId}
+                layer={selectedLayer}
+                layerIndex={selectedLayerIndex}
+                isFirstLayer={selectedLayerIndex < 1}
+                isLastLayer={selectedLayerIndex === mapStyle.layers.length - 1}
+                sources={sources}
+                vectorLayers={vectorLayers}
+                spec={styleSpec}
+                onMoveLayer={onMoveLayer}
+                onLayerChanged={onLayerChanged}
+                onLayerDestroy={onLayerDestroy}
+                onLayerCopy={onLayerCopy}
+                onLayerVisibilityToggle={onLayerVisibilityToggle}
+                onLayerIdChange={onLayerIdChange}
+                errors={errors}
+                selectedFloorId={selectedFloorId}
+              />
+            </ScrollContainer>
+          </div>
+        )}
+        {isMapLoaded && (
+          <div
+            style={mapElementStyle}
+            className="maputnik-map__container"
+            data-wd-key="maplibre:container"
+          >
+            <MapMaplibreGl
+              key={mapStyleToRender.id}
+              mapStyle={mapStyleToRender}
+              replaceAccessTokens={(mapStyle: StyleSpecification) => {
+                return style.replaceAccessTokens(mapStyle, {
+                  allowFallback: true,
+                });
+              }}
+              onDataChange={(_e: { map: Map }) => {
+                // TODO ALBA: I should restore this some time
+                //layerWatcherRef.current?.analyzeMap(e.map);
+                fetchSources();
+              }}
+              onChange={onMapChange}
+              options={maplibreGlDebugOptions as any}
+              inspectModeEnabled={mapViewMode === "inspect"}
+              highlightedLayer={mapStyleLayers?.[selectedLayerIndex]}
               onLayerSelect={onLayerSelect}
-              mapStyle={mapStyle}
-              errors={errors}
-              infos={infos}
             />
           </div>
         )}
-
-        {/*Modals*/}
-        <div>
-          <ModalDebug
-            maplibreGlDebugOptions={maplibreGlDebugOptions}
-            onChangeMaplibreGlDebug={onChangeMaplibreGlDebug}
-            isOpen={isOpen.debug}
-            onOpenToggle={() => toggleModalHandler("debug")}
-            mapView={mapView}
-          />
-          <ModalShortcuts
-            isOpen={isOpen.shortcuts}
-            onOpenToggle={() => toggleModalHandler("shortcuts")}
-          />
-          <ModalSettings
+      </div>
+      {/* TODO ALBA: Does this even work? */}
+      {errors.length + infos.length > 0 && (
+        <div className="maputnik-layout-bottom">
+          <MessagePanel
+            currentLayer={selectedLayer}
+            selectedLayerIndex={selectedLayerIndex}
+            onLayerSelect={onLayerSelect}
             mapStyle={mapStyle}
-            onStyleChanged={onStyleChanged}
-            onChangeMetadataProperty={onChangeMetadataProperty}
-            isOpen={isOpen.settings}
-            onOpenToggle={() => toggleModalHandler("settings")}
-          />
-          <ModalExport
-            mapStyle={mapStyle}
-            onStyleChanged={onStyleChanged}
-            isOpen={isOpen.export}
-            onOpenToggle={() => toggleModalHandler("export")}
-            fileHandle={fileHandle}
-            onSetFileHandle={onSetFileHandle}
-          />
-          <ModalOpen
-            isOpen={isOpen.open}
-            onStyleOpen={openStyle}
-            onOpenToggle={() => toggleModalHandler("open")}
-            fileHandle={fileHandle}
-          />
-          <ModalSources
-            mapStyle={mapStyle}
-            onStyleChanged={onStyleChanged}
-            isOpen={isOpen.sources}
-            onOpenToggle={() => toggleModalHandler("sources")}
+            errors={errors}
+            infos={infos}
           />
         </div>
+      )}
 
-        {/*Floor selector*/}
-        <FloorSelector
-          selectedFloorId={selectedFloorId}
-          floorIds={floorIds}
-          onFloorSelected={(floorId) => dispatch(setSelectedFloorId(floorId))}
+      {/*Modals*/}
+      <div>
+        <ModalDebug
+          maplibreGlDebugOptions={maplibreGlDebugOptions}
+          onChangeMaplibreGlDebug={onChangeMaplibreGlDebug}
+          isOpen={modalsState.debug}
+          onOpenToggle={() => toggleModalHandler("debug")}
+          mapView={mapView}
+        />
+        <ModalShortcuts
+          isOpen={modalsState.shortcuts}
+          onOpenToggle={() => toggleModalHandler("shortcuts")}
+        />
+        <ModalSettings
+          mapStyle={mapStyle}
+          onStyleChanged={onStyleChanged}
+          onChangeMetadataProperty={onChangeMetadataProperty}
+          isOpen={modalsState.settings}
+          onOpenToggle={() => toggleModalHandler("settings")}
+        />
+        <ModalExport
+          mapStyle={mapStyle}
+          onStyleChanged={onStyleChanged}
+          isOpen={modalsState.export}
+          onOpenToggle={() => toggleModalHandler("export")}
+          fileHandle={fileHandle}
+          onSetFileHandle={onSetFileHandle}
+        />
+        <ModalOpen
+          isOpen={modalsState.open}
+          onStyleOpen={openStyle}
+          onOpenToggle={() => toggleModalHandler("open")}
+          fileHandle={fileHandle}
+        />
+        <ModalSources
+          mapStyle={mapStyle}
+          onStyleChanged={onStyleChanged}
+          isOpen={modalsState.sources}
+          onOpenToggle={() => toggleModalHandler("sources")}
         />
       </div>
-    </IconContext.Provider>
+
+      {/*Floor selector*/}
+      <FloorSelector
+        selectedFloorId={selectedFloorId}
+        floorIds={floorIds}
+        onFloorSelected={(floorId) => dispatch(setSelectedFloorId(floorId))}
+      />
+    </div>
   );
 };
 

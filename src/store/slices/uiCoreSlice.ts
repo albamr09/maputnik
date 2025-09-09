@@ -12,7 +12,7 @@ import { createSelector } from "reselect";
 const initialState: UICoreState = {
   // UI
   mapViewMode: "map",
-  isOpen: {
+  modalsState: {
     settings: false,
     sources: false,
     open: false,
@@ -47,19 +47,19 @@ const uiCoreSlice = createSlice({
     },
     toggleModal: (state, action: PayloadAction<keyof ModalStates>) => {
       const modalName = action.payload;
-      state.isOpen[modalName] = !state.isOpen[modalName];
+      state.modalsState[modalName] = !state.modalsState[modalName];
     },
     openModal: (state, action: PayloadAction<keyof ModalStates>) => {
       const modalName = action.payload;
-      state.isOpen[modalName] = true;
+      state.modalsState[modalName] = true;
     },
     closeModal: (state, action: PayloadAction<keyof ModalStates>) => {
       const modalName = action.payload;
-      state.isOpen[modalName] = false;
+      state.modalsState[modalName] = false;
     },
     closeAllModals: (state) => {
-      Object.keys(state.isOpen).forEach((key) => {
-        state.isOpen[key as keyof ModalStates] = false;
+      Object.keys(state.modalsState).forEach((key) => {
+        state.modalsState[key as keyof ModalStates] = false;
       });
     },
     setSelectedFloorId: (state, action: PayloadAction<number | undefined>) => {
@@ -91,43 +91,49 @@ const uiCoreSlice = createSlice({
     setMapView: (state: UICoreState, action: PayloadAction<MapView>) => {
       state.mapView = action.payload;
     },
+    setMapViewMode: (
+      state: UICoreState,
+      action: PayloadAction<MapViewMode>,
+    ) => {
+      state.mapViewMode = action.payload;
+    },
   },
 });
 
 // Selectors
 export const selectMapViewMode = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.mapViewMode
+  (slice: UICoreState) => slice.mapViewMode,
 );
 
-export const selectIsModalOpen = createSelector(
+export const selectModalsState = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.isOpen
+  (slice: UICoreState) => slice.modalsState,
 );
 
 export const selectFloorIds = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.floorIds
+  (slice: UICoreState) => slice.floorIds,
 );
 
 export const selectSelectedFloorId = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.selectedFloorId
+  (slice: UICoreState) => slice.selectedFloorId,
 );
 
 export const selectErrorMessages = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.errors
+  (slice: UICoreState) => slice.errors,
 );
 
 export const selectInfoMessages = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.infos
+  (slice: UICoreState) => slice.infos,
 );
 
 export const selectMapView = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.mapView
+  (slice: UICoreState) => slice.mapView,
 );
 
 // Export actions
@@ -150,6 +156,7 @@ export const {
 
   // MapView actions
   setMapView,
+  setMapViewMode,
 } = uiCoreSlice.actions;
 
 export default uiCoreSlice.reducer;

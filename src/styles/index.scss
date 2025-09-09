@@ -1,22 +1,21 @@
-@use 'vars';
-@use 'mixins';
-@use 'reset';
-@use 'base';
-@use 'components';
-@use 'scrollbar';
-@use 'picker';
-@use 'toolbar';
-@use 'modal';
-@use 'export';
-@use 'layout';
-@use 'layer';
-@use 'input';
-@use 'filtereditor';
-@use 'zoomproperty';
-@use 'popup';
-@use 'map';
-@use 'codemirror';
-@use 'react-collapse';
+@use "vars";
+@use "mixins";
+@use "reset";
+@use "base";
+@use "components";
+@use "scrollbar";
+@use "picker";
+@use "toolbar";
+@use "modal";
+@use "export";
+@use "layout";
+@use "layer";
+@use "input";
+@use "filtereditor";
+@use "zoomproperty";
+@use "popup";
+@use "codemirror";
+@use "react-collapse";
 
 @tailwind base;
 @tailwind components;
@@ -79,6 +78,11 @@
   }
 }
 
+body {
+  height: 100vh;
+  width: 100vw;
+}
+
 .maputnik-layout {
   height: 100vh;
 }
@@ -114,12 +118,10 @@
     margin-top: vars.$margin-3;
     text-align: right;
   }
-
 }
 
 .maputnik-data-spec-property {
   legend {
-    font-size: vars.$font-size-6;
     color: vars.$color-lowgray;
     margin-bottom: vars.$margin-3;
   }
@@ -150,19 +152,17 @@
     color: vars.$color-lowgray;
   }
 
-  td, th {
-    font-size: vars.$font-size-6;
-    color: vars.$color-white;
+  td,
+  th {
 
     // HACK
-    > * {
+    >* {
       display: inline-block;
       width: 100%;
       vertical-align: text-top;
     }
 
-    &:not(:first-child)
-    {
+    &:not(:first-child) {
       padding: vars.$margin-1;
     }
 
@@ -190,7 +190,9 @@
   }
 
   &--zoom {
-    td, th {
+
+    td,
+    th {
       &:nth-child(2) {
         width: auto;
       }
@@ -211,7 +213,6 @@
     color: vars.$color-lowgray;
     text-align: left;
     border-top: solid 1px vars.$color-black;
-    font-size: vars.$font-size-6;
     height: 0px;
     overflow: hidden;
   }

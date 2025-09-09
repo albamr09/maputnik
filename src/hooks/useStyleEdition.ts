@@ -25,7 +25,7 @@ import {
 import {
   addError,
   clearErrors,
-  selectIsModalOpen,
+  selectModalsState,
   selectMapViewMode,
   setMapState,
   toggleModal,
@@ -54,7 +54,7 @@ const useStyleEdition = () => {
   const sources = useAppSelector(selectSources);
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const mapViewMode = useAppSelector(selectMapViewMode);
-  const isOpen = useAppSelector(selectIsModalOpen);
+  const modalsState = useAppSelector(selectModalsState);
 
   // Hooks
   const { addRevision } = useRevisionStore();
@@ -84,14 +84,14 @@ const useStyleEdition = () => {
         return url;
       }
     },
-    []
+    [],
   );
 
   const saveStyle = useCallback(
     (snapshotStyle: ExtendedStyleSpecification) => {
       save(snapshotStyle);
     },
-    [save]
+    [save],
   );
 
   const updateRootSpec = useCallback(
@@ -107,7 +107,7 @@ const useStyleEdition = () => {
         },
       };
     },
-    []
+    [],
   );
 
   const updateFonts = useCallback(
@@ -125,7 +125,7 @@ const useStyleEdition = () => {
         dispatch(setSpec(updateRootSpec(styleSpec, "glyphs", fonts)));
       });
     },
-    [mapStyle.metadata, styleSpec]
+    [mapStyle.metadata, styleSpec],
   );
 
   const updateIcons = useCallback(
@@ -134,7 +134,7 @@ const useStyleEdition = () => {
         dispatch(setSpec(updateRootSpec(styleSpec, "sprite", icons)));
       });
     },
-    [styleSpec]
+    [styleSpec],
   );
 
   const getInitialStateFromUrl = useCallback(
@@ -183,8 +183,8 @@ const useStyleEdition = () => {
             if (mapStyle.layers[selectedLayerIndex]) {
               dispatch(
                 setSelectedLayerOriginalId(
-                  mapStyle.layers[selectedLayerIndex].id
-                )
+                  mapStyle.layers[selectedLayerIndex].id,
+                ),
               );
             }
           }
@@ -193,7 +193,7 @@ const useStyleEdition = () => {
         }
       }
     },
-    [dispatch, mapStyle]
+    [dispatch, mapStyle],
   );
 
   const fetchSources = useCallback(() => {
@@ -228,7 +228,7 @@ const useStyleEdition = () => {
             {},
             {
               [key]: sources[key],
-            }
+            },
           );
 
           for (const layer of json.vector_layers) {
@@ -278,7 +278,7 @@ const useStyleEdition = () => {
     const hashVal = hash(JSON.stringify(mapStyle));
     url.searchParams.set("layer", `${hashVal}~${selectedLayerIndex}`);
 
-    const openModals = Object.entries(isOpen)
+    const openModals = Object.entries(modalsState)
       .map(([key, val]) => (val === true ? key : null))
       .filter((val) => val !== null);
 
@@ -295,7 +295,7 @@ const useStyleEdition = () => {
     }
 
     history.replaceState({ selectedLayerIndex }, "Maputnik", url.href);
-  }, [mapStyle, selectedLayerIndex, isOpen, mapViewMode]);
+  }, [mapStyle, selectedLayerIndex, modalsState, mapViewMode]);
 
   const onStyleChanged = useCallback(
     (newStyle: ExtendedStyleSpecification, opts: OnStyleChangedOpts = {}) => {
@@ -313,14 +313,14 @@ const useStyleEdition = () => {
       if (mutableStyle.glyphs && typeof mutableStyle.glyphs === "string") {
         mutableStyle.glyphs = setFetchAccessToken(
           mutableStyle.glyphs,
-          mutableStyle
+          mutableStyle,
         );
       }
 
       if (mutableStyle.sprite && typeof mutableStyle.sprite === "string") {
         mutableStyle.sprite = setFetchAccessToken(
           mutableStyle.sprite,
-          mutableStyle
+          mutableStyle,
         );
       }
 
@@ -344,7 +344,7 @@ const useStyleEdition = () => {
         mutableStyle.layers.forEach((layer, index) => {
           if (layer.id === "" && foundLayers.has(layer.id)) {
             const error = new Error(
-              `layers[${index}]: duplicate layer id [empty_string], previously used`
+              `layers[${index}]: duplicate layer id [empty_string], previously used`,
             );
             layerErrors.push(error);
           }
@@ -355,7 +355,7 @@ const useStyleEdition = () => {
       const mappedErrors = layerErrors.concat(errors).map((error) => {
         // Special case: Duplicate layer id
         const dupMatch = error.message.match(
-          /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/
+          /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/,
         );
         if (dupMatch) {
           const [, index, message] = dupMatch;
@@ -374,7 +374,7 @@ const useStyleEdition = () => {
 
         // Special case: Invalid source
         const invalidSourceMatch = error.message.match(
-          /layers\[(\d+)\]: (source "(?:.*)" not found)/
+          /layers\[(\d+)\]: (source "(?:.*)" not found)/,
         );
         if (invalidSourceMatch) {
           const [, index, message] = invalidSourceMatch;
@@ -392,7 +392,7 @@ const useStyleEdition = () => {
         }
 
         const layerMatch = error.message.match(
-          /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/
+          /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/,
         );
         if (layerMatch) {
           const [, index, group, property, message] = layerMatch;
@@ -459,7 +459,7 @@ const useStyleEdition = () => {
       // Update URL after state update
       setStateInUrl();
     },
-    [mapStyle, updateFonts, updateIcons, saveStyle]
+    [mapStyle, updateFonts, updateIcons, saveStyle],
   );
 
   return { onStyleChanged, fetchSources, setStateInUrl };

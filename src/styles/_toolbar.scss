@@ -4,12 +4,8 @@
 
 // TOOLBAR
 .maputnik-toolbar {
-  position: fixed;
   height: vars.$toolbar-height;
   width: 100%;
-  z-index: 100;
-  left: 0;
-  top: vars.$toolbar-offset;
   background-color: vars.$color-black;
 }
 
@@ -47,7 +43,6 @@
   height: vars.$toolbar-height;
   display: inline-block;
   padding: vars.$margin-3;
-  font-size: vars.$font-size-5;
   cursor: pointer;
   color: vars.$color-white;
   text-decoration: none;

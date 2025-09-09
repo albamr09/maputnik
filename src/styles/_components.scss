@@ -1,7 +1,8 @@
 @use "mixins";
 @use "vars";
 
-@use 'sass:color';
+@use "sass:color";
+
 // MAP
 .maputnik-map__container {
   background: white;
@@ -35,11 +36,9 @@
 
 // DOC LABEL
 .maputnik-doc {
-
   &-wrapper {
     display: inline-block;
     box-sizing: border-box;
-    font-size: vars.$font-size-6;
     line-height: 2;
     user-select: none;
     position: relative;
@@ -100,7 +99,6 @@
   cursor: pointer;
   background-color: vars.$color-midgray;
   color: vars.$color-lowgray;
-  font-size: vars.$font-size-6;
   padding: vars.$margin-2;
   user-select: none;
   border-width: 0;
@@ -124,7 +122,6 @@
   margin-top: vars.$margin-3;
   display: inline-block;
   padding: vars.$margin-3;
-  font-size: vars.$font-size-5;
 }
 
 .maputnik-wide-button {
@@ -199,10 +196,9 @@
     width: 18%;
   }
 
-  .maputnik-input-block-action > div {
+  .maputnik-input-block-action>div {
     text-align: right;
   }
-
 }
 
 .maputnik-data-spec-block,
@@ -291,7 +287,6 @@
 }
 
 .maputnik-expr-infobox {
-  font-size: vars.$font-size-6;
   background: vars.$color-midgray;
   padding: vars.$margin-2;
   border-radius: 2px;

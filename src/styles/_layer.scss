@@ -23,7 +23,6 @@
   }
 
   &-header-title {
-    font-size: vars.$font-size-5;
     color: vars.$color-white;
     font-weight: bold;
     line-height: 1.3;
@@ -52,7 +51,6 @@
     border: solid 1px transparent;
     font-weight: 400;
     color: vars.$color-lowgray;
-    font-size: vars.$font-size-6;
     border-bottom-color: color.adjust(vars.$color-black, $lightness: 0.1%);
     user-select: none;
     list-style: none;
@@ -157,7 +155,6 @@
 
   &-group-header {
     border: solid 1px transparent;
-    font-size: vars.$font-size-6;
     color: vars.$color-lowgray;
     background-color: color.adjust(vars.$color-black, $lightness: 2%);
     user-select: none;
@@ -192,7 +189,6 @@
 // FILTER EDITOR
 .maputnik-layer-editor-group {
   font-weight: bold;
-  font-size: vars.$font-size-5;
   background-color: color.adjust(vars.$color-black, $lightness: 2%);
   color: vars.$color-white;
   cursor: pointer;
@@ -315,7 +311,6 @@
 
 // Clone of the element which is sorted
 .sortableHelper {
-  font-family: vars.$font-family;
   z-index: 9999;
   border: none;
 }

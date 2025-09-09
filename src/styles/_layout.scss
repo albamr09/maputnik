@@ -13,10 +13,8 @@
 
 //APP LAYOUT
 .maputnik-layout {
-  font-family: vars.$font-family;
-  color: vars.$color-white;
-
   &-main {
+    font-size: 12px;
     position: fixed;
     bottom: 0;
     height: calc(100% - #{vars.$toolbar-height + vars.$toolbar-offset});

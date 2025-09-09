@@ -1,32 +1,5 @@
 @use "vars";
 
-@font-face {
-  font-family: 'Roboto';
-  src: url('../fonts/Roboto-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('../fonts/Roboto-Medium.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-html {
-  color: vars.$color-white;
-  font-size: vars.$font-size-5;
-  box-sizing: border-box;
-}
-
-body {
-  // The UI is 100% height so prevent bounce scroll on OSX
-  overflow: hidden;
-}
-
 *,
 *::before,
 *::after {
@@ -34,7 +7,6 @@ body {
 }
 
 p {
-  font-size: vars.$font-size-6;
   margin-top: vars.$margin-2;
   margin-bottom: vars.$margin-2;
   color: vars.$color-lowgray;
@@ -42,25 +14,21 @@ p {
 }
 
 h1 {
-  font-size: vars.$font-size-2;
   margin-bottom: vars.$margin-3;
   font-weight: bold;
 }
 
 h2 {
-  font-size: vars.$font-size-3;
   margin-bottom: vars.$margin-3;
   font-weight: bold;
 }
 
 h3 {
-  font-size: vars.$font-size-4;
   margin-bottom: vars.$margin-3;
   font-weight: bold;
 }
 
 h4 {
-  font-size: vars.$font-size-5;
   margin-bottom: vars.$margin-3;
 }
 
@@ -74,20 +42,12 @@ select:focus {
   outline: #8e8e8e auto 1px;
 }
 
-label:hover {
-  color: vars.$color-white;
-}
-
 .clearfix {
   &::after {
     content: "";
     display: table;
     clear: both;
   }
-}
-
-a {
-  color: white;
 }
 
 .hide {
