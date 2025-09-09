@@ -7,7 +7,6 @@ import {
   MenubarRadioGroup,
   MenubarRadioItem,
   MenubarSeparator,
-  MenubarShortcut,
   MenubarTrigger,
 } from "@/components/atoms/menubar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";

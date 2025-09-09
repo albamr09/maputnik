@@ -45,7 +45,6 @@ import useStyleEdition from "../../hooks/useStyleEdition";
 import { setMapState } from "../../store/slices/uiCoreSlice";
 import { ExtendedStyleSpecification } from "../../store/types";
 import LayerEditor from "../LayerEditor";
-import AppToolbar from "../molecules/AppToolbar";
 import useLayerEdition from "../../hooks/useLayerEdition";
 import style from "../../libs/style";
 import Toolbar from "@/components/molecules/toolbar";
