@@ -64,7 +64,7 @@ const App = () => {
     if (
       styleUrl &&
       window.confirm(
-        "Load style from URL: " + styleUrl + " and discard current changes?"
+        "Load style from URL: " + styleUrl + " and discard current changes?",
       )
     ) {
       loadStyleUrl(styleUrl, (mapStyle) => onStyleChanged(mapStyle));
@@ -117,7 +117,7 @@ const App = () => {
 
         const newFilter = addFloorFilter(
           removeFloorFilter(existingFilter),
-          floorId
+          floorId,
         );
 
         return {
@@ -128,7 +128,7 @@ const App = () => {
 
       onLayersChange(changedLayers);
     },
-    [mapStyle.layers]
+    [mapStyle.layers],
   );
 
   // Floor and SitumSDK effects

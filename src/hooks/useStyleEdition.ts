@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import {
   ExtendedStyleSpecification,
-  MapState,
+  MapViewMode,
   ModalStates,
 } from "../store/types";
 import style from "../libs/style";
@@ -159,7 +159,7 @@ const useStyleEdition = () => {
 
       const view = url.searchParams.get("view");
       if (view && view !== "") {
-        dispatch(setMapState(view as MapState));
+        dispatch(setMapState(view as MapViewMode));
       }
 
       const path = url.searchParams.get("layer");

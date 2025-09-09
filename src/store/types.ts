@@ -4,7 +4,7 @@ import type {
   MapOptions,
 } from "maplibre-gl";
 
-export type MapState =
+export type MapViewMode =
   | "map"
   | "inspect"
   | "filter-achromatopsia"
@@ -71,7 +71,7 @@ export interface StyleCoreState {
 
 export interface UICoreState {
   // UI-related state
-  mapState: MapState;
+  mapViewMode: MapViewMode;
   isOpen: ModalStates;
   selectedFloorId?: number;
   floorIds: number[];

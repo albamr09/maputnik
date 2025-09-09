@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppState } from "../index";
-import type { 
-  MapState, 
-  ModalStates, 
+import type {
+  MapViewMode,
+  ModalStates,
   MappedError,
-  MapView, 
-  UICoreState
+  MapView,
+  UICoreState,
 } from "../types";
 import { createSelector } from "reselect";
 
 const initialState: UICoreState = {
   // UI
-  mapState: "map",
+  mapViewMode: "map",
   isOpen: {
     settings: false,
     sources: false,
@@ -22,11 +22,11 @@ const initialState: UICoreState = {
   },
   selectedFloorId: undefined,
   floorIds: [],
-  
+
   // Errors
   errors: [],
   infos: [],
-  
+
   // MapView
   mapView: {
     zoom: 0,
@@ -42,8 +42,8 @@ const uiCoreSlice = createSlice({
   initialState,
   reducers: {
     // UI actions
-    setMapState: (state, action: PayloadAction<MapState>) => {
-      state.mapState = action.payload;
+    setMapState: (state, action: PayloadAction<MapViewMode>) => {
+      state.mapViewMode = action.payload;
     },
     toggleModal: (state, action: PayloadAction<keyof ModalStates>) => {
       const modalName = action.payload;
@@ -68,7 +68,7 @@ const uiCoreSlice = createSlice({
     setFloorIds: (state, action: PayloadAction<number[]>) => {
       state.floorIds = action.payload;
     },
-    
+
     // Errors actions
     addError: (state: UICoreState, action: PayloadAction<MappedError>) => {
       state.errors.push(action.payload);
@@ -86,7 +86,7 @@ const uiCoreSlice = createSlice({
       state.errors = [];
       state.infos = [];
     },
-    
+
     // MapView actions
     setMapView: (state: UICoreState, action: PayloadAction<MapView>) => {
       state.mapView = action.payload;
@@ -97,7 +97,7 @@ const uiCoreSlice = createSlice({
 // Selectors
 export const selectMapViewMode = createSelector(
   (state: AppState) => state.uiCore,
-  (slice: UICoreState) => slice.mapState
+  (slice: UICoreState) => slice.mapViewMode
 );
 
 export const selectIsModalOpen = createSelector(
@@ -140,14 +140,14 @@ export const {
   closeAllModals,
   setSelectedFloorId,
   setFloorIds,
-  
+
   // Errors actions
   addError,
   clearErrors,
   addInfo,
   clearInfos,
   clearAllMessages,
-  
+
   // MapView actions
   setMapView,
 } = uiCoreSlice.actions;

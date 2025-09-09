@@ -46,9 +46,10 @@ import useStyleEdition from "../../hooks/useStyleEdition";
 import { setMapState } from "../../store/slices/uiCoreSlice";
 import { ExtendedStyleSpecification } from "../../store/types";
 import LayerEditor from "../LayerEditor";
-import AppToolbar from "../AppToolbar";
+import AppToolbar from "../molecules/AppToolbar";
 import useLayerEdition from "../../hooks/useLayerEdition";
 import style from "../../libs/style";
+import { Button } from "../atoms/button";
 
 const _AppLayout = () => {
   const dispatch = useAppDispatch();
@@ -89,21 +90,21 @@ const _AppLayout = () => {
     (modalName: keyof typeof isOpen) => {
       dispatch(toggleModal(modalName));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onChangeMaplibreGlDebug = useCallback(
     (key: keyof typeof maplibreGlDebugOptions, value: any) => {
       dispatch(setMaplibreGlDebugOptions({ [key]: value }));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onSetFileHandle = useCallback(
     (fileHandle: FileSystemFileHandle | null) => {
       dispatch(setFileHandle(fileHandle));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const onChangeMetadataProperty = useCallback(
@@ -126,18 +127,18 @@ const _AppLayout = () => {
 
       onStyleChanged(changedStyle);
     },
-    [mapStyle, dispatch]
+    [mapStyle, dispatch],
   );
 
   const openStyle = useCallback(
     (
       styleObj: ExtendedStyleSpecification,
-      fileHandle: FileSystemFileHandle | null
+      fileHandle: FileSystemFileHandle | null,
     ) => {
       dispatch(setFileHandle(fileHandle));
       onStyleChanged(styleObj);
     },
-    [dispatch, onStyleChanged]
+    [dispatch, onStyleChanged],
   );
 
   const onMapChange = useCallback(
@@ -146,10 +147,10 @@ const _AppLayout = () => {
         setMapView({
           ...mapView,
           center: { lat: mapView.center.lat, lng: mapView.center.lng },
-        })
+        }),
       );
     },
-    [dispatch]
+    [dispatch],
   );
 
   const isMapLoaded = useMemo(() => {
@@ -170,9 +171,11 @@ const _AppLayout = () => {
     return elementStyle;
   }, [mapViewMode]);
 
+  return <Button variant="outline"> This is a test</Button>;
+
   return (
     <IconContext.Provider value={{ size: "14px" }}>
-      <div className="maputnik-layout">
+      <div>
         <AppToolbar
           mapState={mapViewMode}
           mapStyle={mapStyle}

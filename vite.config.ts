@@ -2,6 +2,7 @@ import replace from "@rollup/plugin-replace";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import istanbul from "vite-plugin-istanbul";
+import path from "path";
 
 export default defineConfig({
   server: {
@@ -29,5 +30,10 @@ export default defineConfig({
   ],
   define: {
     global: "window",
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
 });
