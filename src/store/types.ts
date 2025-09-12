@@ -4,13 +4,7 @@ import type {
   MapOptions,
 } from "maplibre-gl";
 
-export type MapViewMode =
-  | "map"
-  | "inspect"
-  | "filter-achromatopsia"
-  | "filter-deuteranopia"
-  | "filter-protanopia"
-  | "filter-tritanopia";
+export type MapViewMode = "map" | "inspect";
 
 export type ModalStates = {
   settings: boolean;

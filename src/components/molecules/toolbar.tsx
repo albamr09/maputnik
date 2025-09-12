@@ -16,102 +16,133 @@ import {
   toggleModal,
 } from "@/store/slices/uiCoreSlice";
 import { supportedLanguages } from "@/i18n";
-import { withTranslation, WithTranslationProps } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import pkgJson from "../../../package.json";
+import { Badge } from "@/components/atoms/badge";
 
-// TODO ALBA: add translations
-const ToolbarInternal = (props: WithTranslationProps) => {
+const Toolbar = () => {
+  const { t, i18n } = useTranslation();
   const dispach = useAppDispatch();
   const mapViewMode = useAppSelector(selectMapViewMode);
 
-  // TODO ALBA: add logo
-
   return (
-    <Menubar className="justify-end">
-      <MenubarMenu>
-        <MenubarTrigger>File</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem
-            onClick={() => {
-              dispach(toggleModal("open"));
-            }}
-          >
-            Open file...
-          </MenubarItem>
-          <MenubarItem
-            onClick={() => {
-              dispach(toggleModal("export"));
-            }}
-          >
-            Save file...
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>Edit</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem
-            onClick={() => {
-              dispach(toggleModal("sources"));
-            }}
-          >
-            Datasources...
-          </MenubarItem>
-          <MenubarItem
-            onClick={() => {
-              dispach(toggleModal("settings"));
-            }}
-          >
-            Metadata...
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>Process GeoJSON Theme</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>View</MenubarTrigger>
-        <MenubarContent>
-          <MenubarCheckboxItem
-            checked={mapViewMode === "map"}
-            onClick={() => {
-              dispach(setMapViewMode("map"));
-            }}
-          >
-            Map View
-          </MenubarCheckboxItem>
-          <MenubarCheckboxItem
-            checked={mapViewMode === "inspect"}
-            onClick={() => {
-              dispach(setMapViewMode("inspect"));
-            }}
-          >
-            Inspect View
-          </MenubarCheckboxItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>Settings</MenubarTrigger>
-        <MenubarContent>
-          <MenubarRadioGroup value={props.i18n?.language}>
-            {Object.entries(supportedLanguages).map(([code, name]) => {
-              return (
-                <MenubarRadioItem
-                  value={code}
-                  onClick={() => {
-                    props.i18n?.changeLanguage(code);
-                  }}
-                >
-                  {name}
-                </MenubarRadioItem>
-              );
-            })}
-          </MenubarRadioGroup>
-          <MenubarSeparator />
-          <MenubarItem>Profile...</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
+    <div className="flex items-center justify-between bg-background px-2">
+      <a
+        className="flex items-center gap-4"
+        target="blank"
+        rel="noreferrer noopener"
+        href="https://github.com/albamr09/maputnik"
+      >
+        <img src="/img/maputnik.png" alt="Maputnik" className="h-6 w-6" />
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-lg capitalize">
+            {pkgJson.name.replace(/-/g, " ")}
+          </span>
+          <Badge variant="secondary" className="text-xxs">
+            v{pkgJson.version}
+          </Badge>
+        </div>
+      </a>
+      <Menubar className="justify-end">
+        <MenubarMenu>
+          <MenubarTrigger>{t("File")}</MenubarTrigger>
+          <MenubarContent>
+            <MenubarItem
+              onClick={() => {
+                dispach(toggleModal("open"));
+              }}
+            >
+              {t("Open File...")}
+            </MenubarItem>
+            <MenubarItem
+              onClick={() => {
+                dispach(toggleModal("open"));
+              }}
+            >
+              {
+                // TODO ALBA: open modal to select options
+                t("Import GeoJSON Theme")
+              }
+            </MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem
+              onClick={() => {
+                dispach(toggleModal("export"));
+              }}
+            >
+              {t("Save File...")}
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>{t("Edit")}</MenubarTrigger>
+          <MenubarContent>
+            <MenubarItem
+              onClick={() => {
+                dispach(toggleModal("sources"));
+              }}
+            >
+              {t("Datasources")}
+            </MenubarItem>
+            <MenubarItem
+              onClick={() => {
+                dispach(toggleModal("settings"));
+              }}
+            >
+              {t("Metadata")}
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>{t("View")}</MenubarTrigger>
+          <MenubarContent>
+            <MenubarCheckboxItem
+              checked={mapViewMode === "map"}
+              onClick={() => {
+                dispach(setMapViewMode("map"));
+              }}
+            >
+              {t("Map View")}
+            </MenubarCheckboxItem>
+            <MenubarCheckboxItem
+              checked={mapViewMode === "inspect"}
+              onClick={() => {
+                dispach(setMapViewMode("inspect"));
+              }}
+            >
+              {t("Inspect View")}
+            </MenubarCheckboxItem>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>{t("Settings")}</MenubarTrigger>
+          <MenubarContent>
+            <MenubarRadioGroup value={i18n?.language}>
+              {Object.entries(supportedLanguages).map(([code, name]) => {
+                return (
+                  <MenubarRadioItem
+                    value={code}
+                    onClick={() => {
+                      i18n?.changeLanguage(code);
+                    }}
+                  >
+                    {name}
+                  </MenubarRadioItem>
+                );
+              })}
+            </MenubarRadioGroup>
+            <MenubarSeparator />
+            <MenubarItem>
+              {
+                // TODO ALBA: open modal to authenticate
+                t("Profile")
+              }
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+    </div>
   );
 };
 
-const Toolbar = withTranslation()(ToolbarInternal);
 export default Toolbar;
