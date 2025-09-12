@@ -7,22 +7,16 @@ import LayerList from "../LayerList";
 import FloorSelector from "../FloorSelector";
 import MessagePanel from "../AppMessagePanel";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import get from "lodash.get";
 import {
   selectErrorMessages,
   selectFloorIds,
   selectInfoMessages,
-  selectModalsState,
-  selectMapView,
   selectMapViewMode,
   selectSelectedFloorId,
   setMapView,
   setSelectedFloorId,
-  toggleModal,
 } from "../../store/slices/uiCoreSlice";
-import ModalDebug from "../ModalDebug";
 import {
-  selectFileHandle,
   selectMaplibreGlDebugOptions,
   selectMapStyle,
   selectMapStyleLayers,
@@ -33,17 +27,8 @@ import {
   selectSources,
   selectStyleSpec,
   selectVectorLayers,
-  setFileHandle,
-  setMaplibreGlDebugOptions,
 } from "../../store/slices/styleCoreSlice";
-import ModalShortcuts from "../ModalShortcuts";
-import ModalSettings from "../ModalSettings";
-import ModalExport from "../ModalExport";
-import ModalOpen from "../ModalOpen";
-import ModalSources from "../ModalSources";
 import useStyleEdition from "../../hooks/useStyleEdition";
-import { setMapState } from "../../store/slices/uiCoreSlice";
-import { ExtendedStyleSpecification } from "../../store/types";
 import LayerEditor from "../LayerEditor";
 import useLayerEdition from "../../hooks/useLayerEdition";
 import style from "../../libs/style";
@@ -55,7 +40,6 @@ const _AppLayout = () => {
   const selectedFloorId = useAppSelector(selectSelectedFloorId);
   const floorIds = useAppSelector(selectFloorIds);
   const maplibreGlDebugOptions = useAppSelector(selectMaplibreGlDebugOptions);
-  const modalsState = useAppSelector(selectModalsState);
   const mapStyle = useAppSelector(selectMapStyle);
   const errors = useAppSelector(selectErrorMessages);
   const infos = useAppSelector(selectInfoMessages);
@@ -69,7 +53,7 @@ const _AppLayout = () => {
   const mapViewMode = useAppSelector(selectMapViewMode);
   const mapStyleToRender = useAppSelector(selectMapStyleToRender);
 
-  const { onStyleChanged, fetchSources } = useStyleEdition();
+  const { fetchSources } = useStyleEdition();
   const {
     onMoveLayer,
     onLayerSelect,
@@ -83,60 +67,60 @@ const _AppLayout = () => {
   } = useLayerEdition();
 
   // TODO ALBA: Most of these functions should be inside of each component
-  const toggleModalHandler = useCallback(
-    (modalName: keyof typeof modalsState) => {
-      dispatch(toggleModal(modalName));
-    },
-    [dispatch],
-  );
+  // const toggleModalHandler = useCallback(
+  //   (modalName: keyof typeof modalsState) => {
+  //     dispatch(toggleModal(modalName));
+  //   },
+  //   [dispatch],
+  // );
 
-  const onChangeMaplibreGlDebug = useCallback(
-    (key: keyof typeof maplibreGlDebugOptions, value: any) => {
-      dispatch(setMaplibreGlDebugOptions({ [key]: value }));
-    },
-    [dispatch],
-  );
+  // const onChangeMaplibreGlDebug = useCallback(
+  //   (key: keyof typeof maplibreGlDebugOptions, value: any) => {
+  //     dispatch(setMaplibreGlDebugOptions({ [key]: value }));
+  //   },
+  //   [dispatch],
+  // );
 
-  const onSetFileHandle = useCallback(
-    (fileHandle: FileSystemFileHandle | null) => {
-      dispatch(setFileHandle(fileHandle));
-    },
-    [dispatch],
-  );
+  // const onSetFileHandle = useCallback(
+  //   (fileHandle: FileSystemFileHandle | null) => {
+  //     dispatch(setFileHandle(fileHandle));
+  //   },
+  //   [dispatch],
+  // );
 
-  const onChangeMetadataProperty = useCallback(
-    (property: string, value: any) => {
-      // If we're changing renderer reset the map state.
-      if (
-        property === "maputnik:renderer" &&
-        value !== get(mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
-      ) {
-        dispatch(setMapState("map"));
-      }
+  // const onChangeMetadataProperty = useCallback(
+  //   (property: string, value: any) => {
+  //     // If we're changing renderer reset the map state.
+  //     if (
+  //       property === "maputnik:renderer" &&
+  //       value !== get(mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
+  //     ) {
+  //       dispatch(setMapState("map"));
+  //     }
 
-      const changedStyle = {
-        ...mapStyle,
-        metadata: {
-          ...(mapStyle as any).metadata,
-          [property]: value,
-        },
-      };
+  //     const changedStyle = {
+  //       ...mapStyle,
+  //       metadata: {
+  //         ...(mapStyle as any).metadata,
+  //         [property]: value,
+  //       },
+  //     };
 
-      onStyleChanged(changedStyle);
-    },
-    [mapStyle, dispatch],
-  );
+  //     onStyleChanged(changedStyle);
+  //   },
+  //   [mapStyle, dispatch],
+  // );
 
-  const openStyle = useCallback(
-    (
-      styleObj: ExtendedStyleSpecification,
-      fileHandle: FileSystemFileHandle | null,
-    ) => {
-      dispatch(setFileHandle(fileHandle));
-      onStyleChanged(styleObj);
-    },
-    [dispatch, onStyleChanged],
-  );
+  // const openStyle = useCallback(
+  //   (
+  //     styleObj: ExtendedStyleSpecification,
+  //     fileHandle: FileSystemFileHandle | null,
+  //   ) => {
+  //     dispatch(setFileHandle(fileHandle));
+  //     onStyleChanged(styleObj);
+  //   },
+  //   [dispatch, onStyleChanged],
+  // );
 
   const onMapChange = useCallback(
     (mapView: { zoom: number; center: LngLat }) => {

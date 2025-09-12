@@ -1,5 +1,4 @@
 import React from "react";
-import latest from "@maplibre/maplibre-gl-style-spec/dist/latest.json";
 import type {
   LightSpecification,
   StyleSpecification,
@@ -8,14 +7,8 @@ import type {
 } from "maplibre-gl";
 import { WithTranslation, withTranslation } from "react-i18next";
 
-import FieldArray from "./FieldArray";
-import FieldNumber from "./FieldNumber";
 import FieldString from "./FieldString";
-import FieldUrl from "./FieldUrl";
-import FieldEnum from "./FieldEnum";
-import FieldColor from "./FieldColor";
 import Modal from "./Modal";
-import fieldSpecAdditional from "../libs/field-spec-additional";
 
 type ModalSettingsInternalProps = {
   mapStyle: StyleSpecification;

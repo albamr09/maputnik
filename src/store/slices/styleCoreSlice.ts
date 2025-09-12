@@ -7,7 +7,7 @@ import type {
 import style from "../../libs/style";
 import { AppState } from "../index";
 import { createSelector } from "reselect";
-import { SourceSpecification, TerrainSpecification } from "maplibre-gl";
+import { SourceSpecification } from "maplibre-gl";
 
 const initialState: StyleCoreState = {
   // Style
