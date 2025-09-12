@@ -32,16 +32,6 @@ h4 {
   margin-bottom: vars.$margin-3;
 }
 
-input:focus,
-textarea:focus,
-*[role="button"]:focus,
-button:focus,
-.maputnik-toolbar-link:focus,
-select:focus {
-  color: vars.$color-white;
-  outline: #8e8e8e auto 1px;
-}
-
 .clearfix {
   &::after {
     content: "";

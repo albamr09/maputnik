@@ -47,16 +47,15 @@ import { ExtendedStyleSpecification } from "../../store/types";
 import LayerEditor from "../LayerEditor";
 import useLayerEdition from "../../hooks/useLayerEdition";
 import style from "../../libs/style";
-import Toolbar from "@/components/molecules/toolbar";
+import Toolbar from "@/components/organisms/toolbar";
+import ModalManager from "@/components/organisms/modal-manager";
 
 const _AppLayout = () => {
   const dispatch = useAppDispatch();
   const selectedFloorId = useAppSelector(selectSelectedFloorId);
   const floorIds = useAppSelector(selectFloorIds);
-  const mapView = useAppSelector(selectMapView);
   const maplibreGlDebugOptions = useAppSelector(selectMaplibreGlDebugOptions);
   const modalsState = useAppSelector(selectModalsState);
-  const fileHandle = useAppSelector(selectFileHandle);
   const mapStyle = useAppSelector(selectMapStyle);
   const errors = useAppSelector(selectErrorMessages);
   const infos = useAppSelector(selectInfoMessages);
@@ -255,46 +254,7 @@ const _AppLayout = () => {
       )}
 
       {/*Modals*/}
-      <div>
-        <ModalDebug
-          maplibreGlDebugOptions={maplibreGlDebugOptions}
-          onChangeMaplibreGlDebug={onChangeMaplibreGlDebug}
-          isOpen={modalsState.debug}
-          onOpenToggle={() => toggleModalHandler("debug")}
-          mapView={mapView}
-        />
-        <ModalShortcuts
-          isOpen={modalsState.shortcuts}
-          onOpenToggle={() => toggleModalHandler("shortcuts")}
-        />
-        <ModalSettings
-          mapStyle={mapStyle}
-          onStyleChanged={onStyleChanged}
-          onChangeMetadataProperty={onChangeMetadataProperty}
-          isOpen={modalsState.settings}
-          onOpenToggle={() => toggleModalHandler("settings")}
-        />
-        <ModalExport
-          mapStyle={mapStyle}
-          onStyleChanged={onStyleChanged}
-          isOpen={modalsState.export}
-          onOpenToggle={() => toggleModalHandler("export")}
-          fileHandle={fileHandle}
-          onSetFileHandle={onSetFileHandle}
-        />
-        <ModalOpen
-          isOpen={modalsState.open}
-          onStyleOpen={openStyle}
-          onOpenToggle={() => toggleModalHandler("open")}
-          fileHandle={fileHandle}
-        />
-        <ModalSources
-          mapStyle={mapStyle}
-          onStyleChanged={onStyleChanged}
-          isOpen={modalsState.sources}
-          onOpenToggle={() => toggleModalHandler("sources")}
-        />
-      </div>
+      <ModalManager />
 
       {/*Floor selector*/}
       <FloorSelector
