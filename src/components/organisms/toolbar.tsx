@@ -43,7 +43,7 @@ const Toolbar = () => {
           </Badge>
         </div>
       </a>
-      <Menubar className="justify-end">
+      <Menubar>
         <MenubarMenu>
           <MenubarTrigger>{t("File")}</MenubarTrigger>
           <MenubarContent>

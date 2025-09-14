@@ -1,9 +1,11 @@
 import ModalMetadata from "@/components/organisms/modal-metadata";
+import ModalDatasources from "@/components/organisms/modal-datasources";
 
 const ModalManager = () => {
   return (
     <>
       <ModalMetadata />
+      <ModalDatasources />
     </>
   );
 };
