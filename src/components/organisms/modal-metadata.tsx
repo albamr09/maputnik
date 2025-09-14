@@ -117,8 +117,8 @@ const ModalMetadata = () => {
 
   return (
     <Modal
-      isOpen={modalsState.settings}
-      onClose={() => dispatch(closeModal("settings"))}
+      isOpen={modalsState.metadata}
+      onClose={() => dispatch(closeModal("metadata"))}
       title={t("Style Metadata")}
       description={t("Change additional data about your map style.")}
       cancelText={t("Close")}

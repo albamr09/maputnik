@@ -298,7 +298,7 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
             </ToolbarAction>
             <ToolbarAction
               wdKey="nav:settings"
-              onClick={this.props.onToggleModal.bind(this, "settings")}
+              onClick={this.props.onToggleModal.bind(this, "metadata")}
             >
               <MdSettings />
               <IconText>{t("Style Settings")}</IconText>

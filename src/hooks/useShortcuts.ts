@@ -67,7 +67,7 @@ const useShortcuts = () => {
       {
         key: "s",
         handler: () => {
-          dispatch(toggleModal("settings"));
+          dispatch(toggleModal("metadata"));
         },
       },
       {

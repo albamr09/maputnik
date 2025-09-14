@@ -7,7 +7,7 @@ import type {
 export type MapViewMode = "map" | "inspect";
 
 export type ModalStates = {
-  settings: boolean;
+  metadata: boolean;
   sources: boolean;
   open: boolean;
   shortcuts: boolean;
