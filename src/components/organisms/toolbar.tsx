@@ -55,14 +55,14 @@ const Toolbar = () => {
           <MenubarContent>
             <MenubarItem
               onClick={() => {
-                dispach(toggleModal("open"));
+                dispach(toggleModal("import"));
               }}
             >
               {t("Open File...")}
             </MenubarItem>
             <MenubarItem
               onClick={() => {
-                dispach(toggleModal("open"));
+                dispach(toggleModal("import"));
               }}
             >
               {
@@ -104,7 +104,7 @@ const Toolbar = () => {
             </MenubarItem>
             <MenubarItem
               onClick={() => {
-                dispach(toggleModal("settings"));
+                dispach(toggleModal("metadata"));
               }}
             >
               {t("Metadata")}

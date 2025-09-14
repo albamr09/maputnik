@@ -9,7 +9,7 @@ export type MapViewMode = "map" | "inspect";
 export type ModalStates = {
   metadata: boolean;
   sources: boolean;
-  open: boolean;
+  import: boolean;
   shortcuts: boolean;
   debug: boolean;
 };
