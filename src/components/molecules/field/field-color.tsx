@@ -1,46 +1,29 @@
 import { Button } from "@/components/atoms/button";
-import { Field } from "@/components/atoms/field";
+import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
 import { cn } from "@/lib/utils";
 
-interface FieldColorProps {
-  label: string;
-  description?: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-  required?: boolean;
-  className?: string;
-  presetColors?: string[];
-}
+export interface FieldColorProps
+  extends Omit<FieldProps, "children">,
+    BaseFieldProps<string> {}
 
 const FieldColor: React.FC<FieldColorProps> = ({
-  label,
-  description,
   value,
-  onChange,
-  error,
-  required,
-  className,
+  onChange = () => {},
+  ...fieldProps
 }) => {
   const handleColorChange = (color: string) => {
     onChange(color);
   };
 
   return (
-    <Field
-      label={label}
-      description={description}
-      error={error}
-      required={required}
-      className={className}
-    >
+    <Field {...fieldProps}>
       <div className="flex items-center gap-2">
         <div className="relative">
           <Button
             variant="outline"
             className={cn(
               "w-12 h-8 p-1 border border-input",
-              error && "border-destructive",
+              fieldProps.error && "border-destructive",
             )}
           >
             <div

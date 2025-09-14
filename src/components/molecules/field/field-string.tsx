@@ -1,40 +1,25 @@
 import { Input } from "@/components/atoms/input";
-import { Field } from "@/components/atoms/field";
+import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
 
-interface FieldStringProps {
-  label: string;
-  value?: string;
-  onChange: (value: string) => void;
-  description?: string;
+export interface FieldStringProps
+  extends Omit<FieldProps, "children">,
+    BaseFieldProps<string> {
   placeholder?: string;
-  error?: string;
-  required?: boolean;
-  className?: string;
 }
 
 const FieldString: React.FC<FieldStringProps> = ({
-  label,
   value,
-  onChange,
-  description,
+  onChange = () => {},
   placeholder,
-  error,
-  required,
-  className,
+  ...fieldProps
 }) => {
   return (
-    <Field
-      label={label}
-      error={error}
-      description={description}
-      required={required}
-      className={className}
-    >
+    <Field {...fieldProps}>
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={error ? "border-destructive" : ""}
+        className={fieldProps.error ? "border-destructive" : ""}
       />
     </Field>
   );

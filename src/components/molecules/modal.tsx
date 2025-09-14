@@ -1,4 +1,3 @@
-// src/components/molecules/modal.tsx
 import React from "react";
 import {
   Dialog,
@@ -31,7 +30,6 @@ interface ModalProps {
     | "ghost"
     | "link";
   maxHeight?: string;
-  scrollable?: boolean;
 }
 
 const sizeClasses = {
@@ -54,7 +52,6 @@ export const Modal: React.FC<ModalProps> = ({
   className = "",
   confirmVariant = "default",
   maxHeight = "80vh",
-  scrollable = true,
 }) => {
   const handleConfirm = () => {
     onConfirm?.();
@@ -64,35 +61,20 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className={cn(
-          sizeClasses[size],
-          "grid grid-rows-[auto_1fr_auto] p-0",
-          className,
-        )}
+        className={cn(sizeClasses[size], "flex flex-col py-5 px-2", className)}
         onPointerDownOutside={onClose}
         onEscapeKeyDown={onClose}
         style={{
-          maxHeight: scrollable ? maxHeight : undefined,
-          height: scrollable ? maxHeight : "auto",
+          height: `calc(${maxHeight} - 10px)`,
         }}
       >
-        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
-          <DialogTitle className="flex items-center justify-between">
-            {title}
-          </DialogTitle>
+        <DialogHeader className="px-3">
+          <DialogTitle className="flex">{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-
-        {scrollable ? (
-          <ScrollArea className="px-6">
-            <div className="space-y-4 pb-4">{children}</div>
-          </ScrollArea>
-        ) : (
-          <div className="px-6 py-2">{children}</div>
-        )}
-
+        <ScrollArea>{children}</ScrollArea>
         {(cancelText || confirmText) && (
-          <DialogFooter className="flex-shrink-0 gap-2 px-6 pb-4">
+          <DialogFooter className="flex gap-2 px-3">
             <Button variant="outline" onClick={onClose}>
               {cancelText}
             </Button>

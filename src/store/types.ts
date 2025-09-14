@@ -42,7 +42,10 @@ export type MappedError = {
   };
 };
 
-export type ExtendedStyleSpecification = StyleSpecification & { id: string };
+export type ExtendedStyleSpecification = StyleSpecification & {
+  id: string;
+  owner?: string;
+};
 
 export interface StyleCoreState {
   // Style-related state

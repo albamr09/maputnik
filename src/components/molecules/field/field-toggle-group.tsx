@@ -1,37 +1,22 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/atoms/toggle-group";
-import { Field } from "@/components/atoms/field";
+import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
 
-interface FieldToggleGroupProps {
-  label: string;
-  description?: string;
-  value: string;
-  onChange: (value: string) => void;
+export interface FieldToggleGroupProps
+  extends Omit<FieldProps, "children">,
+    BaseFieldProps<string> {
   options: { value: string; label: string; icon?: React.ReactNode }[];
-  error?: string;
-  required?: boolean;
-  className?: string;
   orientation?: "horizontal" | "vertical";
 }
 
 const FieldToggleGroup: React.FC<FieldToggleGroupProps> = ({
-  label,
-  description,
   value,
-  onChange,
+  onChange = () => {},
   options,
-  error,
-  required,
-  className,
   orientation = "horizontal",
+  ...fieldProps
 }) => {
   return (
-    <Field
-      label={label}
-      description={description}
-      error={error}
-      required={required}
-      className={className}
-    >
+    <Field {...fieldProps}>
       <ToggleGroup
         type="single"
         value={value}

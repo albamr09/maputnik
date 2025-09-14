@@ -1,39 +1,24 @@
 import { Input } from "@/components/atoms/input";
-import { Field } from "@/components/atoms/field";
+import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
 
-interface FieldNumberProps {
-  label: string;
-  value: number;
-  onChange: (value: number) => void;
+export interface FieldNumberProps
+  extends Omit<FieldProps, "children">,
+    BaseFieldProps<number> {
   min?: number;
   max?: number;
   step?: number;
-  error?: string;
-  required?: boolean;
-  description?: string;
-  className?: string;
 }
 
 const FieldNumber: React.FC<FieldNumberProps> = ({
-  label,
   value,
-  description,
-  onChange,
+  onChange = () => {},
   min,
   max,
   step,
-  error,
-  required,
-  className,
+  ...fieldProps
 }) => {
   return (
-    <Field
-      label={label}
-      error={error}
-      required={required}
-      description={description}
-      className={className}
-    >
+    <Field {...fieldProps}>
       <Input
         type="number"
         value={value}
@@ -41,7 +26,7 @@ const FieldNumber: React.FC<FieldNumberProps> = ({
         min={min}
         max={max}
         step={step}
-        className={error ? "border-destructive" : ""}
+        className={fieldProps.error ? "border-destructive" : ""}
       />
     </Field>
   );

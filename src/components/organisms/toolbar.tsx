@@ -121,6 +121,7 @@ const Toolbar = () => {
               {Object.entries(supportedLanguages).map(([code, name]) => {
                 return (
                   <MenubarRadioItem
+                    key={code}
                     value={code}
                     onClick={() => {
                       i18n?.changeLanguage(code);

@@ -1,113 +1,114 @@
-// src/components/molecules/field/field-array.tsx
 import { Button } from "@/components/atoms/button";
-import { Field } from "@/components/atoms/field";
+import { Field, FieldProps } from "@/components/atoms/field";
 import { Plus, Trash2 } from "lucide-react";
-import { ComponentType } from "react";
+import { ComponentType, useCallback } from "react";
+import { FieldNumberProps } from "@/components/molecules/field/field-number";
+import { FieldStringProps } from "@/components/molecules/field/field-string";
+import { FieldColorProps } from "@/components/molecules/field/field-color";
+import { FieldToggleGroupProps } from "@/components/molecules/field/field-toggle-group";
 
-interface FieldArrayProps<T = any> {
-  label: string;
-  description?: string;
-  value: T[];
-  onChange: (value: T[]) => void;
-  error?: string;
-  required?: boolean;
-  className?: string;
-  variant?: "vertical" | "horizontal";
+type SupportedFieldProps =
+  | FieldNumberProps
+  | FieldStringProps
+  | FieldColorProps
+  | FieldToggleGroupProps;
+
+interface FieldArrayProps<T extends SupportedFieldProps = SupportedFieldProps>
+  extends Omit<FieldProps, "children"> {
+  value?: T["value"][];
+  itemLabels?: string[];
+  onChange?: (value: T["value"][]) => void;
   minItems?: number;
   maxItems?: number;
-  FieldComponent: ComponentType<any>;
-  fieldProps?: Record<string, any>;
-  getDefaultValue: () => T;
+  canAdd?: boolean;
+  Component: ComponentType<T>;
+  componentProps?: Omit<T, "value" | "onChange">;
+  getDefaultValue: () => T["value"];
   emptyMessage?: string;
 }
 
-const FieldArray: React.FC<FieldArrayProps> = ({
-  label,
-  description,
-  value,
-  onChange,
-  error,
-  required,
-  className,
+function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
+  itemLabels,
+  value = [],
+  onChange = () => {},
   minItems = 0,
   maxItems = Infinity,
-  FieldComponent,
-  fieldProps = {},
+  canAdd = true,
+  Component,
+  componentProps,
   getDefaultValue,
-  emptyMessage = "No items added yet",
-}) => {
-  const addItem = () => {
+  ...fieldProps
+}: FieldArrayProps<T>) {
+  const addItem = useCallback(() => {
     if (value.length < maxItems) {
       const newItem = getDefaultValue();
       onChange([...value, newItem]);
     }
-  };
+  }, [value, onChange, getDefaultValue]);
 
-  const removeItem = (index: number) => {
-    if (value.length > minItems) {
-      const newValue = value.filter((_, i) => i !== index);
-      onChange(newValue);
-    }
-  };
+  const removeItem = useCallback(
+    (index: number) => {
+      if (value.length > minItems) {
+        const newValue = value.filter((_, i) => i !== index);
+        onChange(newValue);
+      }
+    },
+    [value, onChange],
+  );
 
-  const updateItem = (index: number, newValue: any) => {
-    const newArray = [...value];
-    newArray[index] = newValue;
-    onChange(newArray);
-  };
+  const updateItem = useCallback(
+    (index: number, newValue: any) => {
+      const newArray = [...value];
+      newArray[index] = newValue;
+      onChange(newArray);
+    },
+    [value, onChange],
+  );
 
   return (
-    <Field
-      label={label}
-      description={description}
-      error={error}
-      required={required}
-      className={className}
-    >
-      <div className="space-y-2">
-        {value.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic py-2">
-            {emptyMessage}
-          </p>
-        ) : (
-          value.map((item, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className="flex-1">
-                <FieldComponent
-                  value={item}
-                  onChange={(newValue: any) => updateItem(index, newValue)}
-                  {...fieldProps}
-                />
-              </div>
-              {minItems != maxItems && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeItem(index)}
-                  disabled={value.length <= minItems}
-                  className="h-8 w-8 p-0 shrink-0 opacity-60 hover:opacity-100"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              )}
-              {index === value.length - 1 && minItems != maxItems && (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={addItem}
-                  disabled={value.length >= maxItems}
-                  className="ml-auto"
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              )}
+    <Field labelAlignment="start" {...fieldProps}>
+      <div className="flex flex-col gap-2">
+        {value.map((item, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div className="size-full">
+              {/*@ts-ignore*/}
+              <Component
+                {...componentProps}
+                label={itemLabels?.[index]}
+                labelVariant="secondary"
+                sizeDistribution={itemLabels ? "label-sm" : "no-label"}
+                value={item as T["value"]}
+                onChange={(value: T["value"]) => {
+                  updateItem(index, value);
+                }}
+              />
             </div>
-          ))
+            {canAdd && (
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => removeItem(index)}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        ))}
+        {canAdd && (
+          <Button
+            type="button"
+            size="sm"
+            onClick={addItem}
+            disabled={value.length >= maxItems}
+            className="flex"
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
         )}
       </div>
     </Field>
   );
-};
+}
 
 export default FieldArray;

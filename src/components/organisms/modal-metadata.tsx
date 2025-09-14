@@ -124,7 +124,7 @@ const ModalMetadata = () => {
       cancelText={t("Close")}
       size="xl"
     >
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <FieldString
           label={t("Name")}
           placeholder={latest.$root.name.example}
@@ -167,15 +167,15 @@ const ModalMetadata = () => {
         <Separator />
         <FieldArray
           label={t("Map Center")}
+          itemLabels={["X", "Y"]}
           value={mapStyle.center || [0, 0]}
           description={latest.$root.center.doc}
           onChange={(value) => {
             changeStyleProperty("center", value);
           }}
-          FieldComponent={FieldNumber}
-          getDefaultValue={() => ""}
-          minItems={2}
-          maxItems={2}
+          canAdd={false}
+          Component={FieldNumber}
+          getDefaultValue={() => 0}
         />
         <FieldNumber
           label={t("Map Zoom")}
@@ -237,6 +237,7 @@ const ModalMetadata = () => {
         />
         <FieldArray
           label={t("Light Position")}
+          itemLabels={["X", "Y", "Z"]}
           value={
             (mapStyleLight?.position as number[]) ||
             latest.light.position.default
@@ -245,15 +246,14 @@ const ModalMetadata = () => {
           onChange={(value) => {
             changeLightProperty("position", value);
           }}
-          FieldComponent={FieldNumber}
-          getDefaultValue={() => ""}
-          minItems={latest.light.position.length}
-          maxItems={latest.light.position.length}
+          Component={FieldNumber}
+          getDefaultValue={() => 0}
+          canAdd={false}
         />
         <Separator />
         <FieldString
           label={t("Terrain source")}
-          value={mapStyleTerrain?.source}
+          value={mapStyleTerrain?.source || ""}
           description={latest.terrain.source.doc}
           onChange={(value) => {
             changeTerrainProperty("source", value);
