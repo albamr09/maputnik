@@ -7,6 +7,9 @@ import {
   MenubarRadioGroup,
   MenubarRadioItem,
   MenubarSeparator,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/atoms/menubar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -19,11 +22,14 @@ import { supportedLanguages } from "@/i18n";
 import { useTranslation } from "react-i18next";
 import pkgJson from "../../../package.json";
 import { Badge } from "@/components/atoms/badge";
+import { createMapStyleHTML, saveMapStyle } from "@/libs/export";
+import { selectMapStyle } from "@/store/slices/styleCoreSlice";
 
 const Toolbar = () => {
   const { t, i18n } = useTranslation();
   const dispach = useAppDispatch();
   const mapViewMode = useAppSelector(selectMapViewMode);
+  const mapStyle = useAppSelector(selectMapStyle);
 
   return (
     <div className="flex items-center justify-between bg-background px-2">
@@ -65,13 +71,25 @@ const Toolbar = () => {
               }
             </MenubarItem>
             <MenubarSeparator />
-            <MenubarItem
-              onClick={() => {
-                dispach(toggleModal("export"));
-              }}
-            >
-              {t("Save File...")}
-            </MenubarItem>
+            <MenubarSub>
+              <MenubarSubTrigger>{t("Export as...")}</MenubarSubTrigger>
+              <MenubarSubContent>
+                <MenubarItem
+                  onClick={() => {
+                    saveMapStyle(mapStyle);
+                  }}
+                >
+                  {t("Export as JSON")}
+                </MenubarItem>
+                <MenubarItem
+                  onClick={() => {
+                    createMapStyleHTML(mapStyle);
+                  }}
+                >
+                  {t("Export as HTML")}
+                </MenubarItem>
+              </MenubarSubContent>
+            </MenubarSub>
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>

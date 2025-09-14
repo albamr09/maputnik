@@ -17,7 +17,6 @@ const initialState: UICoreState = {
     sources: false,
     open: false,
     shortcuts: false,
-    export: false,
     debug: false,
   },
   selectedFloorId: undefined,

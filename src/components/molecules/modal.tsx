@@ -61,18 +61,28 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className={cn(sizeClasses[size], "flex flex-col py-5 px-2", className)}
+        className={cn(
+          sizeClasses[size],
+          "flex flex-col justify-between py-5 px-2",
+          className,
+        )}
         onPointerDownOutside={onClose}
         onEscapeKeyDown={onClose}
-        style={{
-          height: `calc(${maxHeight} - 10px)`,
-        }}
       >
-        <DialogHeader className="px-3">
-          <DialogTitle className="flex">{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <ScrollArea>{children}</ScrollArea>
+        <div
+          className="flex flex-col gap-2"
+          style={{
+            height: `calc(${maxHeight} - 10px)`,
+          }}
+        >
+          <DialogHeader className="px-3">
+            <DialogTitle className="flex">{title}</DialogTitle>
+            {description && (
+              <DialogDescription>{description}</DialogDescription>
+            )}
+          </DialogHeader>
+          <ScrollArea>{children}</ScrollArea>
+        </div>
         {(cancelText || confirmText) && (
           <DialogFooter className="flex gap-2 px-3">
             <Button variant="outline" onClick={onClose}>

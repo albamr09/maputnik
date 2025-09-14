@@ -59,12 +59,6 @@ const useShortcuts = () => {
         },
       },
       {
-        key: "e",
-        handler: () => {
-          dispatch(toggleModal("export"));
-        },
-      },
-      {
         key: "d",
         handler: () => {
           dispatch(toggleModal("sources"));

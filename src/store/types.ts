@@ -11,7 +11,6 @@ export type ModalStates = {
   sources: boolean;
   open: boolean;
   shortcuts: boolean;
-  export: boolean;
   debug: boolean;
 };
 
