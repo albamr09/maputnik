@@ -171,6 +171,7 @@ function stripSitumMetadata(mapStyle: StyleSpecification) {
   };
   delete changedMetadata["maputnik:situm-apikey"];
   delete changedMetadata["maputnik:situm-building-id"];
+  delete changedMetadata["maputnik:situm-env"];
 
   return {
     ...mapStyle,

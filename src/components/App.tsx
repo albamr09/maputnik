@@ -378,6 +378,8 @@ export default class App extends React.Component<any, AppState> {
   }
 
   async componentDidUpdate(_prevProps: any, prevState: AppState) {
+    const prevMetadataMapStyle = prevState.mapStyle.metadata;
+    const metadataMapStyle = this.state.mapStyle.metadata;
     const prevSelectedFloorId = prevState.selectedFloorId;
     const newSelectedFloorId = this.state.selectedFloorId;
     const prevFloorIds = prevState.floorIds;
@@ -417,6 +419,44 @@ export default class App extends React.Component<any, AppState> {
           console.error(`Could not set floors: ${e}`);
         });
     };
+
+    const loadSitumAuthData = (metadata: any) => {
+      // On first load, load profile information
+      const situmApiKey =
+        // @ts-ignore
+        metadata?.["maputnik:situm-apikey"];
+      const situmBuildingId =
+        // @ts-ignore
+        metadata?.["maputnik:situm-building-id"];
+      const situmEnvironment =
+        // @ts-ignore
+        metadata?.["maputnik:situm-env"];
+
+      this.setState({
+        situmApiKey,
+        situmBuildingId,
+        situmEnvironment,
+      });
+    };
+
+    if (newApiKey !== prevApiKey) {
+      this.onChangeMetadataProperty("maputnik:situm-apikey", newApiKey);
+    }
+
+    if (newBuildingID !== prevBuildingID) {
+      this.onChangeMetadataProperty(
+        "maputnik:situm-building-id",
+        newBuildingID,
+      );
+    }
+
+    if (newEnvironment !== prevEnvironment) {
+      this.onChangeMetadataProperty("maputnik:situm-env", newEnvironment);
+    }
+
+    if (!isEqual(prevMetadataMapStyle, metadataMapStyle)) {
+      loadSitumAuthData(metadataMapStyle);
+    }
 
     if (
       newApiKey &&
