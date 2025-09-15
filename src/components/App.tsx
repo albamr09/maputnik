@@ -435,7 +435,7 @@ export default class App extends React.Component<any, AppState> {
       this.setState({
         situmApiKey,
         situmBuildingId,
-        situmEnvironment,
+        situmEnvironment: situmEnvironment ?? "pro",
       });
     };
 
