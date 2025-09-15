@@ -20,6 +20,7 @@ import { supportedLanguages } from "../i18n";
 import { GrCubes } from "react-icons/gr";
 import { generateMapLibreLayers } from "../libs/geojson-theme";
 import style from "../libs/style";
+import { CgProfile } from "react-icons/cg";
 
 // This is required because of <https://stackoverflow.com/a/49846426>, there isn't another way to detect support that I'm aware of.
 const browser = detect();
@@ -311,6 +312,13 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
             >
               <MdSettings />
               <IconText>{t("Style Settings")}</IconText>
+            </ToolbarAction>
+            <ToolbarAction
+              wdKey="nav:profile"
+              onClick={this.props.onToggleModal.bind(this, "profile")}
+            >
+              <CgProfile />
+              <IconText>{t("Profile")}</IconText>
             </ToolbarAction>
 
             <ToolbarSelect wdKey="nav:inspect">

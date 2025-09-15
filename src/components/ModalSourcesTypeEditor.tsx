@@ -10,7 +10,6 @@ import FieldJson from "./FieldJson";
 import FieldCheckbox from "./FieldCheckbox";
 import { WithTranslation, withTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import SitumSDK from "@situm/sdk-js";
 
 export type EditorMode =
   | "video"
@@ -358,7 +357,7 @@ class PMTilesSourceEditor extends React.Component<PMTilesSourceEditorProps> {
 
 type ModalSourcesTypeEditorInternalProps = {
   mode: EditorMode;
-  situmSDK?: SitumSDK | null;
+  situmJWT?: string | null;
   source: any;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
@@ -370,9 +369,11 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
   }
 
   handleToggleUseSitumAuth = (checked: boolean) => {
-    const accessToken = this.props.situmSDK?.jwt;
     if (checked) {
-      this.props.onChange({ ...this.props.source, x_accessToken: accessToken });
+      this.props.onChange({
+        ...this.props.source,
+        x_accessToken: this.props.situmJWT,
+      });
     } else {
       this.props.onChange({ ...this.props.source, x_accessToken: "" });
     }
@@ -388,7 +389,7 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
       tReady: this.props.tReady,
     };
 
-    const accessTokenField = this.props.situmSDK && (
+    const accessTokenField = this.props.situmJWT && (
       <FieldCheckbox
         label={t("Use Situm Auth")}
         value={this.props.source.x_accessToken || ""}

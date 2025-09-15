@@ -63,6 +63,7 @@ import {
   removeFloorFilter,
 } from "../libs/floor-filter";
 import SitumSDK from "@situm/sdk-js";
+import ModalProfile from "./ModalProfile";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -151,6 +152,7 @@ type AppState = {
     settings: boolean;
     sources: boolean;
     open: boolean;
+    profile: boolean;
     shortcuts: boolean;
     export: boolean;
     debug: boolean;
@@ -159,6 +161,10 @@ type AppState = {
   selectedFloorId?: number;
   floorIds: number[];
   situmSDK: SitumSDK | null;
+  situmJWT: string | null;
+  situmApiKey: string | null;
+  situmEnvironment: "des" | "pre" | "pro";
+  situmBuildingId: string | null;
 };
 
 export default class App extends React.Component<any, AppState> {
@@ -262,7 +268,7 @@ export default class App extends React.Component<any, AppState> {
     if (
       styleUrl &&
       window.confirm(
-        "Load style from URL: " + styleUrl + " and discard current changes?"
+        "Load style from URL: " + styleUrl + " and discard current changes?",
       )
     ) {
       this.styleStore = new StyleStore();
@@ -278,7 +284,7 @@ export default class App extends React.Component<any, AppState> {
           this.styleStore = new StyleStore();
         }
         this.styleStore.latestStyle((mapStyle) =>
-          this.onStyleChanged(mapStyle, { initialLoad: true })
+          this.onStyleChanged(mapStyle, { initialLoad: true }),
         );
 
         if (Debug.enabled()) {
@@ -311,6 +317,7 @@ export default class App extends React.Component<any, AppState> {
       },
       isOpen: {
         settings: false,
+        profile: false,
         sources: false,
         open: false,
         shortcuts: false,
@@ -327,9 +334,14 @@ export default class App extends React.Component<any, AppState> {
         debugToolbox: false,
       },
       fileHandle: null,
+      // Situm
       selectedFloorId: undefined,
       floorIds: [],
       situmSDK: null,
+      situmJWT: null,
+      situmApiKey: null,
+      situmBuildingId: null,
+      situmEnvironment: "pro",
     };
 
     this.layerWatcher = new LayerWatcher({
@@ -365,21 +377,17 @@ export default class App extends React.Component<any, AppState> {
     window.removeEventListener("keydown", this.handleKeyPress);
   }
 
-  componentDidUpdate(_prevProps: any, prevState: AppState) {
+  async componentDidUpdate(_prevProps: any, prevState: AppState) {
     const prevSelectedFloorId = prevState.selectedFloorId;
     const newSelectedFloorId = this.state.selectedFloorId;
     const prevFloorIds = prevState.floorIds;
     const newFloorIds = this.state.floorIds;
-    // @ts-ignore
-    const prevApiKey = prevState.mapStyle?.metadata?.["maputnik:situm-apikey"];
-    // @ts-ignore
-    const newApiKey = this.state.mapStyle?.metadata?.["maputnik:situm-apikey"];
-    const prevBuildingID =
-      // @ts-ignore
-      prevState.mapStyle?.metadata?.["maputnik:situm-building-id"];
-    const newBuildingID =
-      // @ts-ignore
-      this.state.mapStyle?.metadata?.["maputnik:situm-building-id"];
+    const prevEnvironment = prevState.situmEnvironment;
+    const newEnvironment = this.state.situmEnvironment;
+    const prevApiKey = prevState.situmApiKey;
+    const newApiKey = this.state.situmApiKey;
+    const prevBuildingID = prevState.situmBuildingId;
+    const newBuildingID = this.state.situmBuildingId;
 
     if (prevSelectedFloorId !== newSelectedFloorId) {
       this.updateLayersForNewFloorId(newSelectedFloorId);
@@ -392,7 +400,7 @@ export default class App extends React.Component<any, AppState> {
 
     const loadInformationFromBuilding = (
       situmSDK: SitumSDK,
-      buildingID: number
+      buildingID: number,
     ) => {
       situmSDK.cartography
         .getBuildingById(buildingID)
@@ -411,22 +419,25 @@ export default class App extends React.Component<any, AppState> {
     };
 
     if (
-      prevApiKey !== newApiKey &&
       newApiKey &&
-      (newApiKey as string).trim().length > 0
+      ((prevApiKey !== newApiKey && (newApiKey as string).trim().length > 0) ||
+        prevEnvironment !== newEnvironment)
     ) {
       const situmSDK = new SitumSDK({
         auth: {
           apiKey: newApiKey,
         },
+        domain: `https://${newEnvironment}.situm.com`,
       });
+      await situmSDK.authSession;
       this.setState({
         situmSDK,
+        situmJWT: situmSDK.jwt,
       });
 
       // For first load, this maybe should not be here
       if (prevBuildingID !== newBuildingID && situmSDK && newBuildingID) {
-        loadInformationFromBuilding(situmSDK, newBuildingID);
+        loadInformationFromBuilding(situmSDK, Number(newBuildingID));
         return;
       }
     }
@@ -437,7 +448,7 @@ export default class App extends React.Component<any, AppState> {
       this.state.situmSDK &&
       newBuildingID
     ) {
-      loadInformationFromBuilding(this.state.situmSDK, newBuildingID);
+      loadInformationFromBuilding(this.state.situmSDK, Number(newBuildingID));
     } else if (
       (!newBuildingID || (newBuildingID as string).trim().length == 0) &&
       prevState.floorIds.length > 0
@@ -462,7 +473,7 @@ export default class App extends React.Component<any, AppState> {
 
       const newFilter = addFloorFilter(
         removeFloorFilter(existingFilter),
-        floorId
+        floorId,
       );
 
       return {
@@ -524,7 +535,7 @@ export default class App extends React.Component<any, AppState> {
 
   onStyleChanged = (
     newStyle: StyleSpecification & { id: string },
-    opts: OnStyleChangedOpts = {}
+    opts: OnStyleChangedOpts = {},
   ) => {
     opts = {
       save: true,
@@ -564,7 +575,7 @@ export default class App extends React.Component<any, AppState> {
       newStyle.layers.forEach((layer, index) => {
         if (layer.id === "" && foundLayers.has(layer.id)) {
           const error = new Error(
-            `layers[${index}]: duplicate layer id [empty_string], previously used`
+            `layers[${index}]: duplicate layer id [empty_string], previously used`,
           );
           layerErrors.push(error);
         }
@@ -575,7 +586,7 @@ export default class App extends React.Component<any, AppState> {
     const mappedErrors = layerErrors.concat(errors).map((error) => {
       // Special case: Duplicate layer id
       const dupMatch = error.message.match(
-        /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/
+        /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/,
       );
       if (dupMatch) {
         const [, index, message] = dupMatch;
@@ -594,7 +605,7 @@ export default class App extends React.Component<any, AppState> {
 
       // Special case: Invalid source
       const invalidSourceMatch = error.message.match(
-        /layers\[(\d+)\]: (source "(?:.*)" not found)/
+        /layers\[(\d+)\]: (source "(?:.*)" not found)/,
       );
       if (invalidSourceMatch) {
         const [, index, message] = invalidSourceMatch;
@@ -612,7 +623,7 @@ export default class App extends React.Component<any, AppState> {
       }
 
       const layerMatch = error.message.match(
-        /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/
+        /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/,
       );
       if (layerMatch) {
         const [, index, group, property, message] = layerMatch;
@@ -677,7 +688,7 @@ export default class App extends React.Component<any, AppState> {
       () => {
         this.fetchSources();
         this.setStateInUrl();
-      }
+      },
     );
   };
 
@@ -809,7 +820,7 @@ export default class App extends React.Component<any, AppState> {
       {
         mapState: newState,
       },
-      this.setStateInUrl
+      this.setStateInUrl,
     );
   };
 
@@ -832,7 +843,7 @@ export default class App extends React.Component<any, AppState> {
 
   openStyle = (
     styleObj: StyleSpecification & { id: string },
-    fileHandle: FileSystemFileHandle | null
+    fileHandle: FileSystemFileHandle | null,
   ) => {
     this.setState({ fileHandle: fileHandle });
     styleObj = this.setDefaultValues(styleObj);
@@ -871,7 +882,7 @@ export default class App extends React.Component<any, AppState> {
             {},
             {
               [key]: this.state.sources[key],
-            }
+            },
           );
 
           for (const layer of json.vector_layers) {
@@ -1081,7 +1092,7 @@ export default class App extends React.Component<any, AppState> {
         selectedLayerIndex: index,
         selectedLayerOriginalId: this.state.mapStyle.layers[index].id,
       },
-      this.setStateInUrl
+      this.setStateInUrl,
     );
   };
 
@@ -1093,7 +1104,7 @@ export default class App extends React.Component<any, AppState> {
           [modalName]: value,
         },
       },
-      this.setStateInUrl
+      this.setStateInUrl,
     );
   }
 
@@ -1107,7 +1118,7 @@ export default class App extends React.Component<any, AppState> {
 
   onChangeOpenlayersDebug = (
     key: keyof AppState["openlayersDebugOptions"],
-    value: boolean
+    value: boolean,
   ) => {
     this.setState({
       openlayersDebugOptions: {
@@ -1119,7 +1130,7 @@ export default class App extends React.Component<any, AppState> {
 
   onChangeMaplibreGlDebug = (
     key: keyof AppState["maplibreGlDebugOptions"],
-    value: any
+    value: any,
   ) => {
     this.setState({
       maplibreGlDebugOptions: {
@@ -1238,9 +1249,31 @@ export default class App extends React.Component<any, AppState> {
           onOpenToggle={this.toggleModal.bind(this, "open")}
           fileHandle={this.state.fileHandle}
         />
+        <ModalProfile
+          situmApiKey={this.state.situmApiKey || undefined}
+          situmBuildingId={this.state.situmBuildingId || undefined}
+          situmEnvironment={this.state.situmEnvironment || undefined}
+          isOpen={this.state.isOpen.profile}
+          onOpenToggle={this.toggleModal.bind(this, "profile")}
+          onChangeProperty={(key, value) => {
+            if (key == "apikey") {
+              this.setState({
+                situmApiKey: value as string,
+              });
+            } else if (key == "building-id") {
+              this.setState({
+                situmBuildingId: value as string,
+              });
+            } else if (key == "environment") {
+              this.setState({
+                situmEnvironment: value as typeof this.state.situmEnvironment,
+              });
+            }
+          }}
+        />
         <ModalSources
           mapStyle={this.state.mapStyle}
-          situmSDK={this.state.situmSDK}
+          situmJWT={this.state.situmJWT}
           onStyleChanged={this.onStyleChanged}
           isOpen={this.state.isOpen.sources}
           onOpenToggle={this.toggleModal.bind(this, "sources")}
