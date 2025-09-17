@@ -1,11 +1,13 @@
 import ModalMetadata from "@/components/organisms/modal-metadata";
 import ModalDatasources from "@/components/organisms/modal-datasources";
+import ModalImport from "./modal-import";
 
 const ModalManager = () => {
   return (
     <>
       <ModalMetadata />
       <ModalDatasources />
+      <ModalImport />
     </>
   );
 };
@@ -29,20 +31,6 @@ export default ModalManager;
 //          onChangeMetadataProperty={onChangeMetadataProperty}
 //          isOpen={modalsState.settings}
 //          onOpenToggle={() => toggleModalHandler("settings")}
-//        />
-//        <ModalExport
-//          mapStyle={mapStyle}
-//          onStyleChanged={onStyleChanged}
-//          isOpen={modalsState.export}
-//          onOpenToggle={() => toggleModalHandler("export")}
-//          fileHandle={fileHandle}
-//          onSetFileHandle={onSetFileHandle}
-//        />
-//        <ModalOpen
-//          isOpen={modalsState.open}
-//          onStyleOpen={openStyle}
-//          onOpenToggle={() => toggleModalHandler("open")}
-//          fileHandle={fileHandle}
 //        />
 //        <ModalSources
 //          mapStyle={mapStyle}

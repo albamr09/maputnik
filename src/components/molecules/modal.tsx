@@ -70,13 +70,13 @@ export const Modal: React.FC<ModalProps> = ({
         onEscapeKeyDown={onClose}
       >
         <div
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-5"
           style={{
             height: `calc(${maxHeight} - 10px)`,
           }}
         >
           <DialogHeader className="px-3">
-            <DialogTitle className="flex">{title}</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             {description && (
               <DialogDescription>{description}</DialogDescription>
             )}

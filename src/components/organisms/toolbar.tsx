@@ -58,7 +58,7 @@ const Toolbar = () => {
                 dispach(toggleModal("import"));
               }}
             >
-              {t("Open File...")}
+              {t("Import style...")}
             </MenubarItem>
             <MenubarItem
               onClick={() => {
@@ -72,7 +72,7 @@ const Toolbar = () => {
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
-              <MenubarSubTrigger>{t("Export as...")}</MenubarSubTrigger>
+              <MenubarSubTrigger>{t("Export style...")}</MenubarSubTrigger>
               <MenubarSubContent>
                 <MenubarItem
                   onClick={() => {
