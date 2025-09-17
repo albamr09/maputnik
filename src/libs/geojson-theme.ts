@@ -54,13 +54,21 @@ const createFilterForFeatureTypeAndCategory = (
   }
 
   if (themeEntryName.startsWith(".")) {
-    // Only category is present: ".bar"
+    // Only category is present
     const category = themeEntryName.substring(1);
-    return ["==", ["get", "category"], category];
+    return [
+      "all",
+      ["!", ["has", "feature_type"]],
+      ["==", ["get", "category"], category],
+    ];
   }
 
-  // Only feature_type is present: "foo"
-  return ["==", ["get", "feature_type"], themeEntryName];
+  // Only feature_type is present
+  return [
+    "all",
+    ["!", ["has", "category"]],
+    ["==", ["get", "feature_type"], themeEntryName],
+  ];
 };
 
 // Create MapLibre expression for mapping categories to property values
@@ -119,31 +127,32 @@ const getThemeEntriesForOpacity = (
   defaultProps: ThemeEntryProperties,
   opacityLevel: number,
 ): string[] => {
-  const themeEntries: string[] = [];
+  return Object.entries(theme).reduce(
+    (acc, [themeEntryName, themeEntryProps]) => {
+      if (themeEntryName === "default" || !themeEntryProps) {
+        return acc;
+      }
 
-  for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (themeEntryName === "default" || !themeEntryProps) {
-      continue;
-    }
+      const effectiveOpacity = getEffectiveValue(
+        themeEntryProps,
+        defaultProps,
+        "fillOpacity",
+        1.0,
+      );
 
-    const effectiveOpacity = getEffectiveValue(
-      themeEntryProps,
-      defaultProps,
-      "fillOpacity",
-      1.0,
-    );
+      // Round to 1 decimal place
+      const roundedOpacity =
+        Math.round(parseFloat(effectiveOpacity as any) * 10) / 10;
 
-    // Round to 1 decimal place
-    const roundedOpacity =
-      Math.round(parseFloat(effectiveOpacity as any) * 10) / 10;
+      if (roundedOpacity === opacityLevel) {
+        // Store the full category name for proper filtering
+        acc.push(themeEntryName);
+      }
 
-    if (roundedOpacity === opacityLevel) {
-      // Store the full category name for proper filtering
-      themeEntries.push(themeEntryName);
-    }
-  }
-
-  return themeEntries;
+      return acc;
+    },
+    [] as string[],
+  );
 };
 
 // Create opacity filter for features
