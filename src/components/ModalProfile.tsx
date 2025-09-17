@@ -36,7 +36,7 @@ class ModalProfileInternal extends React.Component<ModalProfileInternalProps> {
           title={t("Profile")}
         >
           <p>{t("Set up your Situm Account Authentication.")}</p>
-          <div className="modal:settings">
+          <div className="modal-settings">
             <FieldString
               label={t("Situm API Key")}
               fieldSpec={{

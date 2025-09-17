@@ -64,6 +64,7 @@ import {
 } from "../libs/floor-filter";
 import SitumSDK from "@situm/sdk-js";
 import ModalProfile from "./ModalProfile";
+import ModalProcesses from "./ModalProcesses";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -153,6 +154,7 @@ type AppState = {
     sources: boolean;
     open: boolean;
     profile: boolean;
+    processes: boolean;
     shortcuts: boolean;
     export: boolean;
     debug: boolean;
@@ -318,6 +320,7 @@ export default class App extends React.Component<any, AppState> {
       isOpen: {
         settings: false,
         profile: false,
+        processes: false,
         sources: false,
         open: false,
         shortcuts: false,
@@ -1189,14 +1192,11 @@ export default class App extends React.Component<any, AppState> {
       <AppToolbar
         renderer={this._getRenderer()}
         mapState={this.state.mapState}
-        mapStyle={this.state.mapStyle}
         inspectModeEnabled={this.state.mapState === "inspect"}
         sources={this.state.sources}
         onStyleChanged={this.onStyleChanged}
-        onStyleOpen={this.onStyleChanged}
         onSetMapState={this.setMapState}
         onToggleModal={this.toggleModal.bind(this)}
-        selectedFloorId={this.state.selectedFloorId ?? 0}
       />
     );
 
@@ -1310,6 +1310,13 @@ export default class App extends React.Component<any, AppState> {
               });
             }
           }}
+        />
+        <ModalProcesses
+          isOpen={this.state.isOpen.processes}
+          onOpenToggle={this.toggleModal.bind(this, "processes")}
+          onStyleChanged={this.openStyle}
+          mapStyle={this.state.mapStyle}
+          selectedFloorId={this.state.selectedFloorId ?? 0}
         />
         <ModalSources
           mapStyle={this.state.mapStyle}

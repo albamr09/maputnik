@@ -75,12 +75,14 @@
 }
 
 .maputnik-modal-header-space {
-  @extend .maputnik-space !optional; /* stylelint-disable-line */
+  @extend .maputnik-space !optional;
+  /* stylelint-disable-line */
 }
 
 //OPEN MODAL
 .maputnik-upload-button {
-  @extend .maputnik-big-button !optional; /* stylelint-disable-line */
+  @extend .maputnik-big-button !optional;
+  /* stylelint-disable-line */
 }
 
 .maputnik-style-gallery-container {
@@ -142,12 +144,14 @@
 }
 
 .maputnik-add-layer {
-  @extend .clearfix !optional; /* stylelint-disable-line */
+  @extend .clearfix !optional;
+  /* stylelint-disable-line */
 }
 
 //ADD MODAL
 .maputnik-add-layer-button {
-  @extend .maputnik-big-button !optional; /* stylelint-disable-line */
+  @extend .maputnik-big-button !optional;
+  /* stylelint-disable-line */
 
   margin-right: vars.$margin-3;
   float: right;
@@ -224,7 +228,8 @@
 }
 
 .maputnik-add-source {
-  @extend .clearfix !optional; /* stylelint-disable-line */
+  @extend .clearfix !optional;
+  /* stylelint-disable-line */
 
   .maputnik-input-block-label {
     width: 30%;
@@ -236,7 +241,8 @@
 }
 
 .maputnik-add-source-button {
-  @extend .maputnik-big-button !optional; /* stylelint-disable-line */
+  @extend .maputnik-big-button !optional;
+  /* stylelint-disable-line */
 
   display: inline-block;
   margin-top: 0;
@@ -313,6 +319,9 @@
 
 .modal-settings {
   width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .maputnik-modal-export-buttons {

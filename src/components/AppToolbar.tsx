@@ -18,9 +18,8 @@ import maputnikLogo from "maputnik-design/logos/logo-color.svg?inline";
 import { withTranslation, WithTranslation } from "react-i18next";
 import { supportedLanguages } from "../i18n";
 import { GrCubes } from "react-icons/gr";
-import { generateMapLibreLayers } from "../libs/geojson-theme";
-import style from "../libs/style";
 import { CgProfile } from "react-icons/cg";
+import { RiRobot2Fill } from "react-icons/ri";
 
 // This is required because of <https://stackoverflow.com/a/49846426>, there isn't another way to detect support that I'm aware of.
 const browser = detect();
@@ -104,12 +103,8 @@ export type MapState =
   | "filter-tritanopia";
 
 type AppToolbarInternalProps = {
-  mapStyle: object;
-  selectedFloorId: number;
   inspectModeEnabled: boolean;
   onStyleChanged(...args: unknown[]): unknown;
-  // A new style has been uploaded
-  onStyleOpen(...args: unknown[]): unknown;
   // A dict of source id's and the available source layers
   sources: object;
   children?: React.ReactNode;
@@ -149,40 +144,6 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
       ) as HTMLButtonElement;
       el.focus();
     }
-  };
-
-  onFileChanged = async (_: any, files: Result[]) => {
-    const [, file] = files[0];
-    const reader = new FileReader();
-
-    reader.readAsText(file, "UTF-8");
-    reader.onload = (e) => {
-      try {
-        const geojsonTheme = JSON.parse(e.target?.result as string);
-        const generatedLayers = generateMapLibreLayers(
-          geojsonTheme,
-          this.props.selectedFloorId,
-        );
-        // @ts-ignore
-        const filteredSitumLayers = (this.props.mapStyle?.layers || []).filter(
-          // @ts-ignore
-          (layer) => {
-            return !layer.id.includes("situm-geojson");
-          },
-        );
-        const newStyle = {
-          ...this.props.mapStyle,
-          layers: [...filteredSitumLayers, ...generatedLayers],
-        };
-        // @ts-ignore
-        const mapStyle = style.ensureStyleValidity(newStyle);
-        this.props.onStyleOpen(mapStyle);
-      } catch (err) {
-        console.error(err);
-        return;
-      }
-    };
-    reader.onerror = (e) => console.log(e.target);
   };
 
   render() {
@@ -292,12 +253,12 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
               <MdSave />
               <IconText>{t("Save")}</IconText>
             </ToolbarAction>
-            <ToolbarAction wdKey="nav:geojson-process">
-              {/*@ts-ignore*/}
-              <FileReaderInput onChange={this.onFileChanged} tabIndex={-1}>
-                <GrCubes />
-                <IconText>{t("Process GeoJSON Theme")}</IconText>
-              </FileReaderInput>
+            <ToolbarAction
+              wdKey="nav:processes"
+              onClick={this.props.onToggleModal.bind(this, "processes")}
+            >
+              <RiRobot2Fill />
+              <IconText>{t("Processes")}</IconText>
             </ToolbarAction>
             <ToolbarAction
               wdKey="nav:sources"
