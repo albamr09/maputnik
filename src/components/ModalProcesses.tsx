@@ -7,6 +7,7 @@ import Modal from "./Modal";
 import { generateMapLibreLayers } from "../libs/geojson-theme";
 import { StyleSpecification } from "maplibre-gl";
 import { GrCubes } from "react-icons/gr";
+import style from "../libs/style";
 
 type ModalProcessesInternalProps = {
   isOpen: boolean;
@@ -48,7 +49,6 @@ class ModalProcessesInternal extends React.Component<ModalProcessesInternalProps
           ...this.props.mapStyle,
           layers: [...filteredSitumLayers, ...generatedLayers],
         };
-        // @ts-ignore
         const mapStyle = style.ensureStyleValidity(newStyle);
         this.props.onStyleChanged(mapStyle);
       } catch (err) {
