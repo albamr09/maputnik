@@ -62,23 +62,6 @@ class ModalProcessesInternal extends React.Component<ModalProcessesInternalProps
     reader.onerror = (e) => console.log(e.target);
   };
 
-  on3DModelImport = async (_: any, files: Result[]) => {
-    const [, file] = files[0];
-    const reader = new FileReader();
-
-    reader.readAsText(file, "UTF-8");
-    reader.onload = (e) => {
-      try {
-        // TODO ALBA: apply compression
-        console.log(e);
-      } catch (err) {
-        console.error(err);
-        return;
-      }
-    };
-    reader.onerror = (e) => console.log(e.target);
-  };
-
   render() {
     const t = this.props.t;
 
@@ -109,23 +92,6 @@ class ModalProcessesInternal extends React.Component<ModalProcessesInternalProps
               >
                 <GrCubes />
                 {t("Process GeoJSON Theme")}
-              </FileReaderInput>
-            </button>
-            <button>
-              {/*@ts-ignore*/}
-              <FileReaderInput
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: 10,
-                }}
-                onChange={this.onGeoJSONThemeImport}
-                tabIndex={-1}
-              >
-                <TbHexagon3D size={15} />
-                {t("Compress 3D model")}
               </FileReaderInput>
             </button>
           </div>
