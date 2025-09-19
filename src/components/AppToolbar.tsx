@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { detect } from "detect-browser";
-import FileReaderInput, { Result } from "react-file-reader-input";
 
 import {
   MdOpenInBrowser,
@@ -17,7 +16,6 @@ import pkgJson from "../../package.json";
 import maputnikLogo from "maputnik-design/logos/logo-color.svg?inline";
 import { withTranslation, WithTranslation } from "react-i18next";
 import { supportedLanguages } from "../i18n";
-import { GrCubes } from "react-icons/gr";
 import { CgProfile } from "react-icons/cg";
 import { RiRobot2Fill } from "react-icons/ri";
 

@@ -4,12 +4,9 @@ import FileReaderInput, { Result } from "react-file-reader-input";
 
 import Modal from "./Modal";
 
-import FieldString from "./FieldString";
-import FieldEnum from "./FieldEnum";
 import { generateMapLibreLayers } from "../libs/geojson-theme";
 import { StyleSpecification } from "maplibre-gl";
 import { GrCubes } from "react-icons/gr";
-import { TbHexagon3D } from "react-icons/tb";
 
 type ModalProcessesInternalProps = {
   isOpen: boolean;
