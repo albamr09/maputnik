@@ -15,7 +15,7 @@ import {
 } from "@/store/slices/uiCoreSlice";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/atoms/scroll-area";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import FileDropZone from "@/components/molecules/file-dropzone";
 import { readFileAsJSON } from "@/libs/file";
 import useStyleEdition from "@/hooks/useStyleEdition";
@@ -23,11 +23,11 @@ import { ExtendedStyleSpecification } from "@/store/types";
 import SectionTitle from "@/components/atoms/section-title";
 import PreviewCard from "@/components/molecules/preview-card";
 import FieldURL from "@/components/molecules/field/field-url";
+import { showError, showSuccess } from "@/libs/toast";
 
 const ModalOpen = () => {
   const dispatch = useAppDispatch();
   const modalsState = useAppSelector(selectModalsState);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const { t } = useTranslation();
   const { onStyleChanged } = useStyleEdition();
@@ -37,17 +37,25 @@ const ModalOpen = () => {
       .then((parsedStyle) => {
         onStyleChanged(parsedStyle);
         dispatch(toggleModal("import"));
+        showSuccess({
+          title: t("Style loaded successfully"),
+        });
       })
       .catch((e) => {
-        // TODO ALBA: show error somewhere
-        console.error(e);
+        showError({
+          title: t("Could not load style"),
+          description: `${t("There was an error:")} ${e.message}`,
+        });
       });
   }, []);
 
   const onOpenStyleURL = useCallback(
     (url: string | undefined) => {
       if (!url) {
-        // TODO ALBA: show error somewhere
+        showError({
+          title: t("Could not load style"),
+          description: t("The URL you are trying to load is empty!"),
+        });
         return;
       }
       fetch(url)
@@ -57,10 +65,15 @@ const ModalOpen = () => {
         .then((parsedStyle) => {
           onStyleChanged(parsedStyle);
           dispatch(toggleModal("import"));
+          showSuccess({
+            title: t("Style loaded successfully"),
+          });
         })
         .catch((e) => {
-          // TODO ALBA: show error somewhere
-          console.log("here", e);
+          showError({
+            title: t("Could not load style"),
+            description: `${t("There was an error:")} ${e.message}`,
+          });
         });
     },
     [onStyleChanged],
@@ -105,7 +118,7 @@ const ModalOpen = () => {
             subtitle={t("Enter a URL to load a style from the web")}
             placeHolder="https://example.com/style.json"
             buttonText={t("Load Style")}
-            onClick={() => onOpenStyleURL(inputRef.current?.value)}
+            onClick={(value) => onOpenStyleURL(value)}
           />
         </TabsContent>
 
