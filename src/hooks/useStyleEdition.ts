@@ -99,9 +99,9 @@ const useStyleEdition = () => {
       return {
         ...spec,
         $root: {
-          ...spec.$root,
+          ...spec?.$root,
           [fieldName]: {
-            ...spec.$root[fieldName],
+            ...spec?.$root[fieldName],
             values: newValues,
           },
         },
