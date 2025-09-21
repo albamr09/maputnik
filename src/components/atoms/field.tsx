@@ -1,5 +1,5 @@
 import { Label } from "@/components/atoms/label";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/shadcn-utils";
 import { Info } from "lucide-react";
 import {
   Tooltip,

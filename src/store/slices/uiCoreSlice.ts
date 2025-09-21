@@ -13,9 +13,9 @@ const initialState: UICoreState = {
   // UI
   mapViewMode: "map",
   modalsState: {
-    settings: false,
+    metadata: false,
     sources: false,
-    open: false,
+    import: false,
     shortcuts: false,
     debug: false,
   },

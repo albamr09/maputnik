@@ -13,7 +13,7 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
-    "utils": "@/lib/utils",
+    "utils": "@/libs/shadcn-utils",
     "ui": "@/components/atoms",
     "lib": "@/lib",
     "hooks": "@/hooks"

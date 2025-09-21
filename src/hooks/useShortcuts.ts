@@ -55,7 +55,7 @@ const useShortcuts = () => {
       {
         key: "o",
         handler: () => {
-          dispatch(toggleModal("open"));
+          dispatch(toggleModal("import"));
         },
       },
       {

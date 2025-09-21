@@ -58,7 +58,7 @@ const Toolbar = () => {
                 dispach(toggleModal("import"));
               }}
             >
-              {t("Import style...")}
+              {t("Open style...")}
             </MenubarItem>
             <MenubarItem
               onClick={() => {

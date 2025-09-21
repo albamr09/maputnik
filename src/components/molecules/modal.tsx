@@ -9,7 +9,7 @@ import {
 } from "@/components/atoms/dialog";
 import { Button } from "@/components/atoms/button";
 import { ScrollArea } from "@/components/atoms/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/shadcn-utils";
 
 interface ModalProps {
   isOpen: boolean;

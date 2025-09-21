@@ -1,6 +1,6 @@
 import { Button } from "@/components/atoms/button";
 import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/shadcn-utils";
 
 export interface FieldColorProps
   extends Omit<FieldProps, "children">,
