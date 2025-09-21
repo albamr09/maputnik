@@ -27,8 +27,7 @@ const FieldURL: React.FC<FieldURLProps> = ({
         onSubmit={(e) => e.preventDefault()}
         className="flex gap-2 w-full items-center"
       >
-        <Input ref={inputRef} className="flex-1" placeholder={placeHolder} />
-
+        <Input ref={inputRef} placeholder={placeHolder} type="url" />
         <Button onClick={() => onClick(inputRef.current?.value)} type="submit">
           {buttonText}
         </Button>
