@@ -8,7 +8,7 @@ import {
 import { FileText, GalleryThumbnails } from "lucide-react";
 import Modal from "@/components/molecules/modal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { closeModal, selectModalsState } from "@/store/slices/uiSlice";
+import { closeModal, selectModalOpenName } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/atoms/scroll-area";
 import { useCallback } from "react";
@@ -23,7 +23,7 @@ import { showError, showSuccess } from "@/libs/toast";
 
 const ModalOpen = () => {
   const dispatch = useAppDispatch();
-  const modalsState = useAppSelector(selectModalsState);
+  const modalOpenName = useAppSelector(selectModalOpenName);
 
   const { t } = useTranslation();
   const { onStyleChanged } = useStyleEdition();
@@ -32,7 +32,7 @@ const ModalOpen = () => {
     readFileAsJSON<ExtendedStyleSpecification>(file)
       .then((parsedStyle) => {
         onStyleChanged(parsedStyle);
-        dispatch(closeModal("import"));
+        dispatch(closeModal());
         showSuccess({
           title: t("Style loaded successfully"),
         });
@@ -60,7 +60,7 @@ const ModalOpen = () => {
         })
         .then((parsedStyle) => {
           onStyleChanged(parsedStyle);
-          dispatch(closeModal("import"));
+          dispatch(closeModal());
           showSuccess({
             title: t("Style loaded successfully"),
           });
@@ -77,8 +77,8 @@ const ModalOpen = () => {
 
   return (
     <Modal
-      isOpen={modalsState.import}
-      onClose={() => dispatch(closeModal("import"))}
+      isOpen={modalOpenName == "import"}
+      onClose={() => dispatch(closeModal())}
       title={t("Open Style")}
       description={t(
         "Load your JSON style locally or remotely. You can also choose between a set of pre-defined styles.",

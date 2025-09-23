@@ -5,7 +5,7 @@ import {
   selectApiKey,
   selectBuildingId,
   selectEnvironment,
-  selectModalsState,
+  selectModalOpenName,
   setApiKey,
   setBuildingId,
   setEnvironment,
@@ -24,7 +24,7 @@ import {
 
 const ModalProfile = () => {
   const dispatch = useAppDispatch();
-  const modalsState = useAppSelector(selectModalsState);
+  const modalOpenName = useAppSelector(selectModalOpenName);
   const apiKey = useAppSelector(selectApiKey);
   const buildingId = useAppSelector(selectBuildingId);
   const environment = useAppSelector(selectEnvironment);
@@ -34,8 +34,8 @@ const ModalProfile = () => {
 
   return (
     <Modal
-      isOpen={modalsState.profile}
-      onClose={() => dispatch(closeModal("profile"))}
+      isOpen={modalOpenName == "profile"}
+      onClose={() => dispatch(closeModal())}
       title={t("Profile")}
       description={t("Set up your Situm Account Authentication")}
       cancelText={t("Close")}

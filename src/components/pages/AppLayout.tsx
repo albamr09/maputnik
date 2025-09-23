@@ -67,59 +67,11 @@ const _AppLayout = () => {
   } = useLayerEdition();
 
   // TODO ALBA: Most of these functions should be inside of each component
-  // const toggleModalHandler = useCallback(
-  //   (modalName: keyof typeof modalsState) => {
-  //     dispatch(toggleModal(modalName));
-  //   },
-  //   [dispatch],
-  // );
-
   // const onChangeMaplibreGlDebug = useCallback(
   //   (key: keyof typeof maplibreGlDebugOptions, value: any) => {
   //     dispatch(setMaplibreGlDebugOptions({ [key]: value }));
   //   },
   //   [dispatch],
-  // );
-
-  // const onSetFileHandle = useCallback(
-  //   (fileHandle: FileSystemFileHandle | null) => {
-  //     dispatch(setFileHandle(fileHandle));
-  //   },
-  //   [dispatch],
-  // );
-
-  // const onChangeMetadataProperty = useCallback(
-  //   (property: string, value: any) => {
-  //     // If we're changing renderer reset the map state.
-  //     if (
-  //       property === "maputnik:renderer" &&
-  //       value !== get(mapStyle, ["metadata", "maputnik:renderer"], "mlgljs")
-  //     ) {
-  //       dispatch(setMapState("map"));
-  //     }
-
-  //     const changedStyle = {
-  //       ...mapStyle,
-  //       metadata: {
-  //         ...(mapStyle as any).metadata,
-  //         [property]: value,
-  //       },
-  //     };
-
-  //     onStyleChanged(changedStyle);
-  //   },
-  //   [mapStyle, dispatch],
-  // );
-
-  // const openStyle = useCallback(
-  //   (
-  //     styleObj: ExtendedStyleSpecification,
-  //     fileHandle: FileSystemFileHandle | null,
-  //   ) => {
-  //     dispatch(setFileHandle(fileHandle));
-  //     onStyleChanged(styleObj);
-  //   },
-  //   [dispatch, onStyleChanged],
   // );
 
   const onMapChange = useCallback(

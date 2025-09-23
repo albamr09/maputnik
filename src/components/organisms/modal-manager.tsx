@@ -21,24 +21,24 @@ export default ModalManager;
 //        <ModalDebug
 //          maplibreGlDebugOptions={maplibreGlDebugOptions}
 //          onChangeMaplibreGlDebug={onChangeMaplibreGlDebug}
-//          isOpen={modalsState.debug}
+//          isOpen={modalOpenName == "debug"}
 //          onOpenToggle={() => toggleModalHandler("debug")}
 //          mapView={mapView}
 //        />
 //        <ModalShortcuts
-//          isOpen={modalsState.shortcuts}
+//          isOpen={modalOpenName == "shortcuts"}
 //          onOpenToggle={() => toggleModalHandler("shortcuts")}
 //        />
 //        <ModalSettings
 //          mapStyle={mapStyle}
 //          onStyleChanged={onStyleChanged}
 //          onChangeMetadataProperty={onChangeMetadataProperty}
-//          isOpen={modalsState.settings}
+//          isOpen={modalOpenName == "settings"}
 //          onOpenToggle={() => toggleModalHandler("settings")}
 //        />
 //        <ModalSources
 //          mapStyle={mapStyle}
 //          onStyleChanged={onStyleChanged}
-//          isOpen={modalsState.sources}
+//          isOpen={modalOpenName == "sources"}
 //          onOpenToggle={() => toggleModalHandler("sources")}
 //        />

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
-  selectModalsState,
+  selectModalOpenName,
   selectMapViewMode,
   toggleModal,
   addInfo,
@@ -18,7 +18,7 @@ const useShortcuts = () => {
   const dispatch = useAppDispatch();
 
   const mapViewMode = useAppSelector(selectMapViewMode);
-  const modalsState = useAppSelector(selectModalsState);
+  const modalOpenName = useAppSelector(selectModalOpenName);
   const mapStyle = useAppSelector(selectMapStyle);
 
   // Hooks
@@ -97,7 +97,7 @@ const useShortcuts = () => {
         (e.target as HTMLElement).blur();
         document.body.focus();
       } else if (
-        modalsState.shortcuts ||
+        modalOpenName == "shortcuts" ||
         document.activeElement === document.body
       ) {
         const shortcut = shortcuts.find((shortcut) => {
@@ -138,7 +138,7 @@ const useShortcuts = () => {
       document.body.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [modalsState.shortcuts, mapViewMode, redo]);
+  }, [modalOpenName, mapViewMode, redo]);
 };
 
 export default useShortcuts;

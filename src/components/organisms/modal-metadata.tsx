@@ -1,7 +1,7 @@
 import Modal from "@/components/molecules/modal";
 import latest from "@maplibre/maplibre-gl-style-spec/dist/latest.json";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { closeModal, selectModalsState } from "@/store/slices/uiSlice";
+import { closeModal, selectModalOpenName } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 import FieldString from "@/components/molecules/field/field-string";
 import {
@@ -19,7 +19,7 @@ import useChangeStyleProperty from "@/hooks/useChangeStyleProperties";
 
 const ModalMetadata = () => {
   const dispatch = useAppDispatch();
-  const modalsState = useAppSelector(selectModalsState);
+  const modalOpenName = useAppSelector(selectModalOpenName);
   const mapStyle = useAppSelector(selectMapStyle);
   const mapStyleTerrain = useAppSelector(selectMapStyleTerrain);
   const mapStyleLight = useAppSelector(selectMapStyleLight);
@@ -35,8 +35,8 @@ const ModalMetadata = () => {
 
   return (
     <Modal
-      isOpen={modalsState.metadata}
-      onClose={() => dispatch(closeModal("metadata"))}
+      isOpen={modalOpenName == "metadata"}
+      onClose={() => dispatch(closeModal())}
       title={t("Style Metadata")}
       description={t("Change additional data about your map style.")}
       cancelText={t("Close")}

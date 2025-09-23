@@ -1,18 +1,18 @@
 import Modal from "@/components/molecules/modal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { closeModal, selectModalsState } from "@/store/slices/uiSlice";
+import { closeModal, selectModalOpenName } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 
 const ModalDatasources = () => {
   const dispatch = useAppDispatch();
-  const modalsState = useAppSelector(selectModalsState);
+  const modalOpenName = useAppSelector(selectModalOpenName);
 
   const { t } = useTranslation();
 
   return (
     <Modal
-      isOpen={modalsState.sources}
-      onClose={() => dispatch(closeModal("sources"))}
+      isOpen={modalOpenName == "sources"}
+      onClose={() => dispatch(closeModal())}
       title={t("Data Sources")}
       description={t("Define which sources to use while styling your map.")}
       cancelText={t("Close")}

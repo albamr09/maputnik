@@ -6,14 +6,13 @@ import type {
 
 export type MapViewMode = "map" | "inspect";
 
-export type ModalStates = {
-  metadata: boolean;
-  sources: boolean;
-  import: boolean;
-  profile: boolean;
-  shortcuts: boolean;
-  debug: boolean;
-};
+export type ModalName =
+  | "metadata"
+  | "sources"
+  | "import"
+  | "profile"
+  | "shortcuts"
+  | "debug";
 
 export type MapView = {
   zoom: number;
@@ -72,7 +71,7 @@ export type SitumEnvironmentType = (typeof SitumEnvironment)[number];
 export interface UICoreState {
   // UI-related state
   mapViewMode: MapViewMode;
-  modalsState: ModalStates;
+  modalOpenName?: ModalName;
 
   // Situm
   apikey?: string;

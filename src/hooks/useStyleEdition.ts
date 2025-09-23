@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import {
   ExtendedStyleSpecification,
   MapViewMode,
-  ModalStates,
+  ModalName,
 } from "@/store/types";
 import style from "@/libs/style";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -25,7 +25,7 @@ import {
 import {
   addError,
   clearErrors,
-  selectModalsState,
+  selectModalOpenName,
   selectMapViewMode,
   toggleModal,
   setMapViewMode,
@@ -54,7 +54,7 @@ const useStyleEdition = () => {
   const sources = useAppSelector(selectSources);
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const mapViewMode = useAppSelector(selectMapViewMode);
-  const modalsState = useAppSelector(selectModalsState);
+  const modalOpenName = useAppSelector(selectModalOpenName);
 
   // Hooks
   const { addRevision } = useRevisionStore();
@@ -152,7 +152,7 @@ const useStyleEdition = () => {
         // Update modal states
         Object.entries(modalObj).forEach(([modalName, isOpen]) => {
           if (isOpen) {
-            dispatch(toggleModal(modalName as keyof ModalStates));
+            dispatch(toggleModal(modalName as ModalName));
           }
         });
       }
@@ -278,12 +278,8 @@ const useStyleEdition = () => {
     const hashVal = hash(JSON.stringify(mapStyle));
     url.searchParams.set("layer", `${hashVal}~${selectedLayerIndex}`);
 
-    const openModals = Object.entries(modalsState)
-      .map(([key, val]) => (val === true ? key : null))
-      .filter((val) => val !== null);
-
-    if (openModals.length > 0) {
-      url.searchParams.set("modal", openModals.join(","));
+    if (modalOpenName) {
+      url.searchParams.set("modal", modalOpenName);
     } else {
       url.searchParams.delete("modal");
     }
@@ -295,7 +291,7 @@ const useStyleEdition = () => {
     }
 
     history.replaceState({ selectedLayerIndex }, "Maputnik", url.href);
-  }, [mapStyle, selectedLayerIndex, modalsState, mapViewMode]);
+  }, [mapStyle, selectedLayerIndex, modalOpenName, mapViewMode]);
 
   const onStyleChanged = useCallback(
     (newStyle: ExtendedStyleSpecification, opts: OnStyleChangedOpts = {}) => {

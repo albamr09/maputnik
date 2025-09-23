@@ -1,19 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppState } from "@/store/index";
-import type { ModalStates, UICoreState } from "@/store/types";
+import { AppState } from "../index";
+import type { ModalName, UICoreState } from "../types";
 import { createSelector } from "reselect";
 
 const initialState: UICoreState = {
   // UI
   mapViewMode: "map",
-  modalsState: {
-    metadata: false,
-    sources: false,
-    import: false,
-    profile: false,
-    shortcuts: false,
-    debug: false,
-  },
+  modalOpenName: undefined,
 
   // Situm
   apikey: undefined,
@@ -41,22 +34,18 @@ const uiSlice = createSlice({
   initialState,
   reducers: {
     // UI actions
-    toggleModal: (state, action: PayloadAction<keyof ModalStates>) => {
-      const modalName = action.payload;
-      state.modalsState[modalName] = !state.modalsState[modalName];
+    toggleModal: (state, action: PayloadAction<ModalName>) => {
+      if (action.payload !== state.modalOpenName) {
+        state.modalOpenName = action.payload;
+      } else {
+        state.modalOpenName = undefined;
+      }
     },
-    openModal: (state, action: PayloadAction<keyof ModalStates>) => {
-      const modalName = action.payload;
-      state.modalsState[modalName] = true;
+    openModal: (state, action: PayloadAction<ModalName>) => {
+      state.modalOpenName = action.payload;
     },
-    closeModal: (state, action: PayloadAction<keyof ModalStates>) => {
-      const modalName = action.payload;
-      state.modalsState[modalName] = false;
-    },
-    closeAllModals: (state) => {
-      Object.keys(state.modalsState).forEach((key) => {
-        state.modalsState[key as keyof ModalStates] = false;
-      });
+    closeModal: (state) => {
+      state.modalOpenName = undefined;
     },
 
     // Situm actions
@@ -136,9 +125,9 @@ export const selectMapViewMode = createSelector(
   (slice: UICoreState) => slice.mapViewMode,
 );
 
-export const selectModalsState = createSelector(
+export const selectModalOpenName = createSelector(
   sliceState,
-  (slice: UICoreState) => slice.modalsState,
+  (slice: UICoreState) => slice.modalOpenName,
 );
 
 export const selectFloorIds = createSelector(
@@ -187,7 +176,6 @@ export const {
   toggleModal,
   openModal,
   closeModal,
-  closeAllModals,
 
   // Situm actions
   setApiKey,
