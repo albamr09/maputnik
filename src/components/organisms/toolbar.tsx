@@ -64,13 +64,10 @@ const Toolbar = () => {
             </MenubarItem>
             <MenubarItem
               onClick={() => {
-                dispach(toggleModal("import"));
+                dispach(toggleModal("geojson-theme"));
               }}
             >
-              {
-                // TODO ALBA: open modal to select options
-                t("Import GeoJSON Theme")
-              }
+              {t("Import GeoJSON Theme")}
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>

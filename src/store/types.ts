@@ -11,6 +11,7 @@ export type ModalName =
   | "sources"
   | "import"
   | "profile"
+  | "geojson-theme"
   | "shortcuts"
   | "debug";
 

@@ -18,7 +18,7 @@ interface ThemeEntryProperties {
   poiId?: string;
 }
 
-interface Theme {
+export interface Theme {
   default?: ThemeEntryProperties;
   [categoryName: string]: ThemeEntryProperties | undefined;
 }

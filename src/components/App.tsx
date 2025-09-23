@@ -5,7 +5,7 @@ import {
   latest,
 } from "@maplibre/maplibre-gl-style-spec";
 
-import AppLayout from "./pages/AppLayout";
+import AppLayout from "./pages/layout";
 
 import {
   initialStyleUrl,

@@ -12,8 +12,8 @@ import SectionTitle from "@/components/atoms/section-title";
 import { cn } from "@/libs/shadcn-utils";
 
 interface FileDropZoneProps {
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
   onFilesUploaded: (files: FileList) => void;
   description?: string;
   multiple?: boolean;
@@ -54,7 +54,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
 
   return (
     <div className="flex flex-col gap-5">
-      <SectionTitle title={title} subtitle={subtitle} />
+      {title && <SectionTitle title={title} subtitle={subtitle} />}
       <Card
         onClick={handleClick}
         onDrop={handleDrop}
