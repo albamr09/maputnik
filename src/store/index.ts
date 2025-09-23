@@ -1,15 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { RootState } from './types';
 
-import styleCoreReducer from './slices/styleCoreSlice';
-import uiCoreReducer from './slices/uiCoreSlice';
-import styleStoreReducer from "./slices/styleStoreSlice";
+import styleReducer from '@/store/slices/styleSlice';
+import uiReducer from '@/store/slices/uiSlice';
+import styleStoreReducer from "@/store/slices/styleStoreSlice";
 
 // Configure the store
 export const store = configureStore({
   reducer: {
-    styleCore: styleCoreReducer,
-    uiCore: uiCoreReducer,
+    style: styleReducer,
+    ui: uiReducer,
     styleStore: styleStoreReducer
   },
   // Enable Redux DevTools in development

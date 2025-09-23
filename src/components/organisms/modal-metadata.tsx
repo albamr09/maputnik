@@ -1,7 +1,7 @@
 import Modal from "@/components/molecules/modal";
 import latest from "@maplibre/maplibre-gl-style-spec/dist/latest.json";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { closeModal, selectModalsState } from "@/store/slices/uiCoreSlice";
+import { closeModal, selectModalsState } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 import FieldString from "@/components/molecules/field/field-string";
 import {
@@ -9,7 +9,7 @@ import {
   selectMapStyleLight,
   selectMapStyleTerrain,
   selectMapStyleTransition,
-} from "@/store/slices/styleCoreSlice";
+} from "@/store/slices/styleSlice";
 import { Separator } from "@/components/atoms/separator";
 import FieldNumber from "@/components/molecules/field/field-number";
 import FieldColor from "@/components/molecules/field/field-color";

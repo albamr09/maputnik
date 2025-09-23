@@ -3,9 +3,9 @@ import {
   ExtendedStyleSpecification,
   MapViewMode,
   ModalStates,
-} from "../store/types";
-import style from "../libs/style";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+} from "@/store/types";
+import style from "@/libs/style";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import hash from "string-hash";
 import { ValidationError } from "maplibre-gl";
 import cloneDeep from "lodash.clonedeep";
@@ -21,7 +21,7 @@ import {
   selectSelectedLayerIndex,
   setSelectedLayerIndex,
   setSelectedLayerOriginalId,
-} from "../store/slices/styleCoreSlice";
+} from "@/store/slices/styleSlice";
 import {
   addError,
   clearErrors,
@@ -29,16 +29,16 @@ import {
   selectMapViewMode,
   toggleModal,
   setMapViewMode,
-} from "../store/slices/uiCoreSlice";
+} from "@/store/slices/uiSlice";
 import { PMTiles } from "pmtiles";
 import {
   downloadGlyphsMetadata,
   downloadSpriteMetadata,
-} from "../libs/metadata";
-import tokens from "../config/tokens.json";
+} from "@/libs/metadata";
+import tokens from "@/config/tokens.json";
 import { validateStyleMin } from "@maplibre/maplibre-gl-style-spec";
-import useRevisionStore from "./useRevisionStore";
-import useStyleStore from "./useStyleStore";
+import useRevisionStore from "@/hooks/useRevisionStore";
+import useStyleStore from "@/hooks/useStyleStore";
 
 type OnStyleChangedOpts = {
   save?: boolean;

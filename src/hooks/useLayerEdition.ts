@@ -1,18 +1,18 @@
 import { clamp } from "lodash";
 import cloneDeep from "lodash.clonedeep";
 import { useCallback } from "react";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   addFloorFilter,
   hasFloorFilter,
   removeFloorFilter,
-} from "../libs/floor-filter";
+} from "@/libs/floor-filter";
 import {
   selectMapStyle,
   selectSelectedLayerIndex,
   setSelectedLayerIndex,
   setSelectedLayerOriginalId,
-} from "../store/slices/styleCoreSlice";
+} from "@/store/slices/styleSlice";
 import { arrayMoveMutable } from "array-move";
 import { SortEnd } from "react-sortable-hoc";
 import {
@@ -21,7 +21,7 @@ import {
   LegacyFilterSpecification,
 } from "maplibre-gl";
 import useStyleEdition from "./useStyleEdition";
-import { selectSelectedFloorId } from "../store/slices/uiCoreSlice";
+import { selectSelectedFloorId } from "@/store/slices/uiSlice";
 
 const useLayerEdition = () => {
   const dispatch = useAppDispatch();

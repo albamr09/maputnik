@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectModalsState,
   selectMapViewMode,
@@ -7,12 +7,12 @@ import {
   addInfo,
   clearInfos,
   setMapViewMode,
-} from "../store/slices/uiCoreSlice";
-import { redoMessages, undoMessages } from "../libs/diffmessage";
-import useStyleEdition from "./useStyleEdition";
-import { selectMapStyle } from "../store/slices/styleCoreSlice";
-import useRevisionStore from "./useRevisionStore";
-import useRefListener from "./useRefListener";
+} from "@/store/slices/uiSlice";
+import { redoMessages, undoMessages } from "@/libs/diffmessage";
+import useStyleEdition from "@/hooks/useStyleEdition";
+import { selectMapStyle } from "@/store/slices/styleSlice";
+import useRevisionStore from "@/hooks/useRevisionStore";
+import useRefListener from "@/hooks/useRefListener";
 
 const useShortcuts = () => {
   const dispatch = useAppDispatch();

@@ -6,7 +6,7 @@ import { withTranslation } from "react-i18next";
 import LayerList from "../LayerList";
 import FloorSelector from "../FloorSelector";
 import MessagePanel from "../AppMessagePanel";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectErrorMessages,
   selectFloorIds,
@@ -15,7 +15,7 @@ import {
   selectSelectedFloorId,
   setMapView,
   setSelectedFloorId,
-} from "../../store/slices/uiCoreSlice";
+} from "@/store/slices/uiSlice";
 import {
   selectMaplibreGlDebugOptions,
   selectMapStyle,
@@ -27,11 +27,11 @@ import {
   selectSources,
   selectStyleSpec,
   selectVectorLayers,
-} from "../../store/slices/styleCoreSlice";
-import useStyleEdition from "../../hooks/useStyleEdition";
+} from "@/store/slices/styleSlice";
+import useStyleEdition from "@/hooks/useStyleEdition";
 import LayerEditor from "../LayerEditor";
-import useLayerEdition from "../../hooks/useLayerEdition";
-import style from "../../libs/style";
+import useLayerEdition from "@/hooks/useLayerEdition";
+import style from "@/libs/style";
 import Toolbar from "@/components/organisms/toolbar";
 import ModalManager from "@/components/organisms/modal-manager";
 

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppState } from "../index";
-import type { ModalStates, UICoreState } from "../types";
+import { AppState } from "@/store/index";
+import type { ModalStates, UICoreState } from "@/store/types";
 import { createSelector } from "reselect";
 
 const initialState: UICoreState = {
@@ -36,8 +36,8 @@ const initialState: UICoreState = {
   },
 };
 
-const uiCoreSlice = createSlice({
-  name: "uiCore",
+const uiSlice = createSlice({
+  name: "ui",
   initialState,
   reducers: {
     // UI actions
@@ -128,7 +128,7 @@ const uiCoreSlice = createSlice({
   },
 });
 
-const sliceState = (state: AppState) => state.uiCore;
+const sliceState = (state: AppState) => state.ui;
 
 // Selectors
 export const selectMapViewMode = createSelector(
@@ -206,6 +206,6 @@ export const {
   // MapView actions
   setMapView,
   setMapViewMode,
-} = uiCoreSlice.actions;
+} = uiSlice.actions;
 
-export default uiCoreSlice.reducer;
+export default uiSlice.reducer;

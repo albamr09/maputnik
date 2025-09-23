@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import SitumSDK, { Building } from "@situm/sdk-js";
 import { useAppSelector } from "../store/hooks";
-import { selectApiKey, selectEnvironment } from "@/store/slices/uiCoreSlice";
+import { selectApiKey, selectEnvironment } from "@/store/slices/uiSlice";
 
 interface SitumSDKContextType {
   isAuthenticated: boolean;

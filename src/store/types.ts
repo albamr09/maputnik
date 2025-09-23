@@ -100,7 +100,7 @@ export interface StyleStoreState {
 
 // Root State Type
 export interface RootState {
-  styleCore: StyleCoreState;
+  style: StyleCoreState;
   styleStore: StyleStoreState;
-  uiCore: UICoreState;
+  ui: UICoreState;
 }

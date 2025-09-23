@@ -17,13 +17,13 @@ import {
   selectMapViewMode,
   setMapViewMode,
   toggleModal,
-} from "@/store/slices/uiCoreSlice";
+} from "@/store/slices/uiSlice";
 import { supportedLanguages } from "@/i18n";
 import { useTranslation } from "react-i18next";
 import pkgJson from "../../../package.json";
 import { Badge } from "@/components/atoms/badge";
 import { createMapStyleHTML, saveMapStyle } from "@/libs/export";
-import { selectMapStyle } from "@/store/slices/styleCoreSlice";
+import { selectMapStyle } from "@/store/slices/styleSlice";
 import { Avatar, AvatarFallback } from "@/components/atoms/avatar";
 import { User } from "lucide-react";
 

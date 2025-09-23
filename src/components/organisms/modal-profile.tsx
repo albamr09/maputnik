@@ -9,7 +9,7 @@ import {
   setApiKey,
   setBuildingId,
   setEnvironment,
-} from "@/store/slices/uiCoreSlice";
+} from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 import FieldString from "@/components/molecules/field/field-string";
 import FieldToggleGroup from "../molecules/field/field-toggle-group";

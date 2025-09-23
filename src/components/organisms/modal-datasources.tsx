@@ -1,6 +1,6 @@
 import Modal from "@/components/molecules/modal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { closeModal, selectModalsState } from "@/store/slices/uiCoreSlice";
+import { closeModal, selectModalsState } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 
 const ModalDatasources = () => {

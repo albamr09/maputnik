@@ -12,7 +12,7 @@ import {
   selectMapStyleLight,
   selectMapStyleTerrain,
   selectMapStyleTransition,
-} from "@/store/slices/styleCoreSlice";
+} from "@/store/slices/styleSlice";
 import useStyleEdition from "@/hooks/useStyleEdition";
 
 const useChangeStyleProperty = () => {

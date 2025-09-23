@@ -8,7 +8,7 @@ import {
 import { FileText, GalleryThumbnails } from "lucide-react";
 import Modal from "@/components/molecules/modal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { closeModal, selectModalsState } from "@/store/slices/uiCoreSlice";
+import { closeModal, selectModalsState } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/atoms/scroll-area";
 import { useCallback } from "react";

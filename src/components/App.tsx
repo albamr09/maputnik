@@ -25,7 +25,7 @@ import {
   setSpec,
   selectMapStyle,
   setVectorLayers,
-} from "../store/slices/styleCoreSlice";
+} from "@/store/slices/styleSlice";
 import {
   setSelectedFloorId,
   setFloorIds,
@@ -37,7 +37,7 @@ import {
   selectEnvironment,
   setApiKey,
   setEnvironment,
-} from "../store/slices/uiCoreSlice";
+} from "@/store/slices/uiSlice";
 import useStyleEdition from "../hooks/useStyleEdition";
 import useShortcuts from "../hooks/useShortcuts";
 import useStyleStore from "../hooks/useStyleStore";

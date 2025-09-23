@@ -3,9 +3,9 @@ import type {
   ExtendedStyleSpecification,
   MaplibreGlDebugOptions,
   StyleCoreState,
-} from "../types";
-import style from "../../libs/style";
-import { AppState } from "../index";
+} from "@/store/types";
+import style from "@/libs/style";
+import { AppState } from "@/store/index";
 import { createSelector } from "reselect";
 import { SourceSpecification } from "maplibre-gl";
 
@@ -32,8 +32,8 @@ const initialState: StyleCoreState = {
   },
 };
 
-const styleCoreSlice = createSlice({
-  name: "styleCore",
+const styleSlice = createSlice({
+  name: "style",
   initialState,
   reducers: {
     // Style actions
@@ -103,7 +103,7 @@ const styleCoreSlice = createSlice({
   },
 });
 
-const sliceData = (state: AppState) => state.styleCore;
+const sliceData = (state: AppState) => state.style;
 
 // Selectors
 export const selectMapStyle = createSelector(
@@ -204,6 +204,6 @@ export const {
   // Debug actions
   setMaplibreGlDebugOptions,
   resetDebugOptions,
-} = styleCoreSlice.actions;
+} = styleSlice.actions;
 
-export default styleCoreSlice.reducer;
+export default styleSlice.reducer;
