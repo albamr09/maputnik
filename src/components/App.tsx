@@ -165,6 +165,10 @@ const App = () => {
     }
 
     if (storedEnvironment !== environment) {
+      if (storedEnvironment == null || storedEnvironment == undefined) {
+        dispatch(setEnvironment("pro"));
+        return;
+      }
       dispatch(setEnvironment(storedEnvironment));
     }
   }, [

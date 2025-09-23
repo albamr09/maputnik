@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import SitumSDK, { Building } from "@situm/sdk-js";
 import { useAppSelector } from "../store/hooks";
-import { selectApiKey } from "@/store/slices/uiCoreSlice";
+import { selectApiKey, selectEnvironment } from "@/store/slices/uiCoreSlice";
 
 interface SitumSDKContextType {
   isAuthenticated: boolean;
@@ -24,6 +24,7 @@ export const SitumSDKProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   // Redux
   const apiKey = useAppSelector(selectApiKey);
+  const environment = useAppSelector(selectEnvironment);
 
   // State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,13 +38,14 @@ export const SitumSDKProvider: React.FC<{ children: React.ReactNode }> = ({
       auth: {
         apiKey,
       },
+      domain: `https://${environment}.situm.com`,
     });
 
     // Authenticate: only needed so JWT is not null
     situmSDK.authSession;
 
     return situmSDK;
-  }, [apiKey]);
+  }, [apiKey, environment]);
 
   const getBuildingById: SitumSDKContextType["getBuildingById"] = useCallback(
     (id) => {
