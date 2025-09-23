@@ -24,6 +24,8 @@ import pkgJson from "../../../package.json";
 import { Badge } from "@/components/atoms/badge";
 import { createMapStyleHTML, saveMapStyle } from "@/libs/export";
 import { selectMapStyle } from "@/store/slices/styleCoreSlice";
+import { Avatar, AvatarFallback, AvatarImage } from "../atoms/avatar";
+import { User } from "lucide-react";
 
 const Toolbar = () => {
   const { t, i18n } = useTranslation();
@@ -133,24 +135,14 @@ const Toolbar = () => {
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-          <MenubarTrigger>{t("Settings")}</MenubarTrigger>
-          <MenubarContent>
-            <MenubarRadioGroup value={i18n?.language}>
-              {Object.entries(supportedLanguages).map(([code, name]) => {
-                return (
-                  <MenubarRadioItem
-                    key={code}
-                    value={code}
-                    onClick={() => {
-                      i18n?.changeLanguage(code);
-                    }}
-                  >
-                    {name}
-                  </MenubarRadioItem>
-                );
-              })}
-            </MenubarRadioGroup>
-            <MenubarSeparator />
+          <MenubarTrigger className="p-0">
+            <Avatar className="h-6 w-6">
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </MenubarTrigger>
+          <MenubarContent align="end">
             <MenubarItem
               onClick={() => {
                 dispach(toggleModal("profile"));
@@ -158,6 +150,26 @@ const Toolbar = () => {
             >
               {t("Profile")}
             </MenubarItem>
+            <MenubarSub>
+              <MenubarSubTrigger>{t("Language")}</MenubarSubTrigger>
+              <MenubarSubContent>
+                <MenubarRadioGroup value={i18n?.language}>
+                  {Object.entries(supportedLanguages).map(([code, name]) => {
+                    return (
+                      <MenubarRadioItem
+                        key={code}
+                        value={code}
+                        onClick={() => {
+                          i18n?.changeLanguage(code);
+                        }}
+                      >
+                        {name}
+                      </MenubarRadioItem>
+                    );
+                  })}
+                </MenubarRadioGroup>
+              </MenubarSubContent>
+            </MenubarSub>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
