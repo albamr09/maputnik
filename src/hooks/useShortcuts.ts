@@ -3,10 +3,10 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   selectModalsState,
   selectMapViewMode,
-  setMapState,
   toggleModal,
   addInfo,
   clearInfos,
+  setMapViewMode,
 } from "../store/slices/uiCoreSlice";
 import { redoMessages, undoMessages } from "../libs/diffmessage";
 import useStyleEdition from "./useStyleEdition";
@@ -73,7 +73,7 @@ const useShortcuts = () => {
       {
         key: "i",
         handler: () => {
-          dispatch(setMapState(mapViewMode === "map" ? "inspect" : "map"));
+          dispatch(setMapViewMode(mapViewMode === "map" ? "inspect" : "map"));
         },
       },
       {

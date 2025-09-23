@@ -10,6 +10,7 @@ export type ModalStates = {
   metadata: boolean;
   sources: boolean;
   import: boolean;
+  profile: boolean;
   shortcuts: boolean;
   debug: boolean;
 };
@@ -65,12 +66,20 @@ export interface StyleCoreState {
   maplibreGlDebugOptions: MaplibreGlDebugOptions;
 }
 
+export const SitumEnvironment = ["pro", "pre", "des"] as const;
+export type SitumEnvironmentType = (typeof SitumEnvironment)[number];
+
 export interface UICoreState {
   // UI-related state
   mapViewMode: MapViewMode;
   modalsState: ModalStates;
+
+  // Situm
+  apikey?: string;
+  buildingId?: number;
   selectedFloorId?: number;
   floorIds: number[];
+  environment: SitumEnvironmentType;
 
   // Errors-related state
   errors: MappedError[];

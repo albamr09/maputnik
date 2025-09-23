@@ -1,7 +1,13 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import SitumSDK, { Building } from "@situm/sdk-js";
 import { useAppSelector } from "../store/hooks";
-import { selectMapStyle } from "../store/slices/styleCoreSlice";
+import { selectApiKey } from "@/store/slices/uiCoreSlice";
 
 interface SitumSDKContextType {
   isAuthenticated: boolean;
@@ -10,28 +16,26 @@ interface SitumSDKContextType {
 }
 
 const SitumSDKContext = createContext<SitumSDKContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const SitumSDKProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   // Redux
-  const mapStyle = useAppSelector(selectMapStyle);
+  const apiKey = useAppSelector(selectApiKey);
 
   // State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const situmAPI = useMemo(() => {
-    // @ts-ignore
-    const apiKey = mapStyle?.metadata?.["maputnik:situm-apikey"];
     if (!apiKey) return;
 
     setIsAuthenticated(true);
 
     const situmSDK = new SitumSDK({
       auth: {
-        apiKey: apiKey,
+        apiKey,
       },
     });
 
@@ -39,34 +43,33 @@ export const SitumSDKProvider: React.FC<{ children: React.ReactNode }> = ({
     situmSDK.authSession;
 
     return situmSDK;
-  }, [mapStyle?.metadata]);
+  }, [apiKey]);
 
   const getBuildingById: SitumSDKContextType["getBuildingById"] = useCallback(
     (id) => {
       if (!situmAPI) {
         return new Promise((_resolve, reject) =>
-          reject("Situm API has not been initialized")
+          reject("Situm API has not been initialized"),
         );
       }
 
       return situmAPI.cartography.getBuildingById(id);
     },
-    [situmAPI]
+    [situmAPI],
   );
 
-  const getJWT: SitumSDKContextType["getJWT"] = useCallback(
-    () => {
-      if (!situmAPI) {
-        return;
-      }
+  const getJWT: SitumSDKContextType["getJWT"] = useCallback(() => {
+    if (!situmAPI) {
+      return;
+    }
 
-      return situmAPI.jwt;
-    },
-    [situmAPI]
-  );
+    return situmAPI.jwt;
+  }, [situmAPI]);
 
   return (
-    <SitumSDKContext.Provider value={{ isAuthenticated, getBuildingById, getJWT }}>
+    <SitumSDKContext.Provider
+      value={{ isAuthenticated, getBuildingById, getJWT }}
+    >
       {children}
     </SitumSDKContext.Provider>
   );

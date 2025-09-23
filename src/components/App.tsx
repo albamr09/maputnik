@@ -18,9 +18,9 @@ import {
   hasFloorFilter,
   removeFloorFilter,
 } from "../libs/floor-filter";
-import { useSitumSDK } from "../providers/SitumSDKProvider";
+import { useSitumSDK } from "@/providers/SitumSDKProvider";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   setSpec,
   selectMapStyle,
@@ -31,11 +31,22 @@ import {
   setFloorIds,
   selectSelectedFloorId,
   selectFloorIds,
+  selectBuildingId,
+  setBuildingId,
+  selectApiKey,
+  selectEnvironment,
+  setApiKey,
+  setEnvironment,
 } from "../store/slices/uiCoreSlice";
 import useStyleEdition from "../hooks/useStyleEdition";
 import useShortcuts from "../hooks/useShortcuts";
 import useStyleStore from "../hooks/useStyleStore";
 import useLayerEdition from "../hooks/useLayerEdition";
+import {
+  APIKEY_METADATA_KEY,
+  BUILDING_ID_METADATA_KEY,
+  ENVIRONMENT_METADATA_KEY,
+} from "@/constants";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-styleSpec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -46,6 +57,9 @@ const App = () => {
   const mapStyle = useAppSelector(selectMapStyle);
   const selectedFloorId = useAppSelector(selectSelectedFloorId);
   const floorIds = useAppSelector(selectFloorIds);
+  const buildingId = useAppSelector(selectBuildingId);
+  const apiKey = useAppSelector(selectApiKey);
+  const environment = useAppSelector(selectEnvironment);
 
   // Refs for stores and watchers
   const layerWatcherRef = useRef<LayerWatcher>();
@@ -71,7 +85,9 @@ const App = () => {
       removeStyleQuerystring();
     } else {
       console.log("Falling back to local storage for storing styles");
-      styleUrl && removeStyleQuerystring();
+      if (styleUrl) {
+        removeStyleQuerystring();
+      }
       loadLatestStoredStyle((mapStyle) => {
         onStyleChanged(mapStyle, { initialLoad: true });
       });
@@ -131,13 +147,39 @@ const App = () => {
     [mapStyle.layers],
   );
 
-  // Floor and SitumSDK effects
+  // Sync between style metadata and situm data
   useEffect(() => {
     // @ts-ignore
-    const buildingID = mapStyle?.metadata?.["maputnik:situm-building-id"];
+    const storedBuildingId = mapStyle?.metadata?.[BUILDING_ID_METADATA_KEY];
+    // @ts-ignore
+    const storedApiKey = mapStyle?.metadata?.[APIKEY_METADATA_KEY];
+    // @ts-ignore
+    const storedEnvironment = mapStyle?.metadata?.[ENVIRONMENT_METADATA_KEY];
 
-    if (buildingID) {
-      getBuildingById(buildingID as number)
+    if (storedBuildingId !== buildingId) {
+      dispatch(setBuildingId(storedBuildingId));
+    }
+
+    if (storedApiKey !== apiKey) {
+      dispatch(setApiKey(storedApiKey));
+    }
+
+    if (storedEnvironment !== environment) {
+      dispatch(setEnvironment(storedEnvironment));
+    }
+  }, [
+    //@ts-ignore
+    mapStyle?.metadata?.[BUILDING_ID_METADATA_KEY],
+    //@ts-ignore
+    mapStyle?.metadata?.[APIKEY_METADATA_KEY],
+    //@ts-ignore
+    mapStyle?.metadata?.[ENVIRONMENT_METADATA_KEY],
+  ]);
+
+  // Load situm building data
+  useEffect(() => {
+    if (buildingId) {
+      getBuildingById(buildingId as number)
         .then((building) => {
           const floorIds = building.floors
             .slice()
@@ -151,7 +193,7 @@ const App = () => {
     } else if (floorIds.length > 0) {
       dispatch(setFloorIds([]));
     }
-  }, [mapStyle.metadata, dispatch, floorIds.length]);
+  }, [buildingId, dispatch, floorIds.length]);
 
   return <AppLayout />;
 };

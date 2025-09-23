@@ -8,11 +8,7 @@ import {
 import { FileText, GalleryThumbnails } from "lucide-react";
 import Modal from "@/components/molecules/modal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  closeModal,
-  selectModalsState,
-  toggleModal,
-} from "@/store/slices/uiCoreSlice";
+import { closeModal, selectModalsState } from "@/store/slices/uiCoreSlice";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/atoms/scroll-area";
 import { useCallback } from "react";
@@ -36,7 +32,7 @@ const ModalOpen = () => {
     readFileAsJSON<ExtendedStyleSpecification>(file)
       .then((parsedStyle) => {
         onStyleChanged(parsedStyle);
-        dispatch(toggleModal("import"));
+        dispatch(closeModal("import"));
         showSuccess({
           title: t("Style loaded successfully"),
         });
@@ -64,7 +60,7 @@ const ModalOpen = () => {
         })
         .then((parsedStyle) => {
           onStyleChanged(parsedStyle);
-          dispatch(toggleModal("import"));
+          dispatch(closeModal("import"));
           showSuccess({
             title: t("Style loaded successfully"),
           });

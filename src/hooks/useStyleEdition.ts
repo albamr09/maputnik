@@ -27,8 +27,8 @@ import {
   clearErrors,
   selectModalsState,
   selectMapViewMode,
-  setMapState,
   toggleModal,
+  setMapViewMode,
 } from "../store/slices/uiCoreSlice";
 import { PMTiles } from "pmtiles";
 import {
@@ -159,7 +159,7 @@ const useStyleEdition = () => {
 
       const view = url.searchParams.get("view");
       if (view && view !== "") {
-        dispatch(setMapState(view as MapViewMode));
+        dispatch(setMapViewMode(view as MapViewMode));
       }
 
       const path = url.searchParams.get("layer");

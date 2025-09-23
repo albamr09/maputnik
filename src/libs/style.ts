@@ -6,6 +6,11 @@ import type {
 } from "maplibre-gl";
 import tokens from "../config/tokens.json";
 import { hasFloorFilter, removeFloorFilter } from "./floor-filter";
+import {
+  APIKEY_METADATA_KEY,
+  BUILDING_ID_METADATA_KEY,
+  ENVIRONMENT_METADATA_KEY,
+} from "@/constants";
 
 // Empty style is always used if no style could be restored or fetched
 const emptyStyle = ensureStyleValidity({
@@ -169,8 +174,9 @@ function stripSitumMetadata(mapStyle: StyleSpecification) {
   const changedMetadata = {
     ...(mapStyle.metadata as any),
   };
-  delete changedMetadata["maputnik:situm-apikey"];
-  delete changedMetadata["maputnik:situm-building-id"];
+  delete changedMetadata[APIKEY_METADATA_KEY];
+  delete changedMetadata[BUILDING_ID_METADATA_KEY];
+  delete changedMetadata[ENVIRONMENT_METADATA_KEY];
 
   return {
     ...mapStyle,

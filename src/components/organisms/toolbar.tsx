@@ -151,11 +151,12 @@ const Toolbar = () => {
               })}
             </MenubarRadioGroup>
             <MenubarSeparator />
-            <MenubarItem>
-              {
-                // TODO ALBA: open modal to authenticate
-                t("Profile")
-              }
+            <MenubarItem
+              onClick={() => {
+                dispach(toggleModal("profile"));
+              }}
+            >
+              {t("Profile")}
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
