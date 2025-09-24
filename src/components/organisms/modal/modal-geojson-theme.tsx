@@ -6,7 +6,7 @@ import {
   selectSelectedFloorId,
 } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
-import FileDropZone from "../molecules/file-dropzone";
+import FileDropZone from "@/components/molecules/file-dropzone";
 import { useCallback } from "react";
 import { readFileAsJSON } from "@/libs/file";
 import { generateMapLibreLayers, Theme } from "@/libs/geojson-theme";
@@ -14,7 +14,7 @@ import {
   selectMapStyle,
   selectMapStyleLayers,
 } from "@/store/slices/styleSlice";
-import useStyleEdition from "@/hooks/useStyleEdition";
+import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import { showError, showSuccess } from "@/libs/toast";
 
 const ModalGeoJSONTheme = () => {
@@ -25,7 +25,7 @@ const ModalGeoJSONTheme = () => {
   const selectedFloorId = useAppSelector(selectSelectedFloorId);
 
   const { t } = useTranslation();
-  const { onStyleChanged } = useStyleEdition();
+  const { patchMapStyle } = useStyleEdition();
 
   const onGeoJSONThemeImported = useCallback(
     (file: File) => {
@@ -43,8 +43,7 @@ const ModalGeoJSONTheme = () => {
           });
 
           // Update style with new layers
-          onStyleChanged({
-            ...mapStyle,
+          patchMapStyle({
             layers: [...filteredLayers, ...generatedLayers],
           });
 

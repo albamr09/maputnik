@@ -8,6 +8,7 @@ import style from "@/libs/style";
 import { AppState } from "@/store/index";
 import { createSelector } from "reselect";
 import { SourceSpecification } from "maplibre-gl";
+import { merge } from "lodash";
 
 const initialState: StyleCoreState = {
   // Style
@@ -15,9 +16,6 @@ const initialState: StyleCoreState = {
   dirtyMapStyle: undefined,
   spec: null,
   fileHandle: null,
-
-  // Sources
-  sources: {},
 
   // Layers
   selectedLayerIndex: 0,
@@ -51,26 +49,31 @@ const styleSlice = createSlice({
     setSpec: (state, action: PayloadAction<any>) => {
       state.spec = action.payload;
     },
-    setFileHandle: (
-      state,
-      action: PayloadAction<FileSystemFileHandle | null>,
-    ) => {
-      state.fileHandle = action.payload;
-    },
 
     // Sources actions
     setSources: (
       state,
       action: PayloadAction<{ [key: string]: SourceSpecification }>,
     ) => {
-      state.sources = action.payload;
+      state.mapStyle.sources = action.payload;
     },
-    addSource: (
+    setSource: (
       state,
       action: PayloadAction<{ id: string; source: SourceSpecification }>,
     ) => {
       const { id, source } = action.payload;
-      state.sources[id] = source;
+      state.mapStyle.sources[id] = source;
+    },
+    updateSource: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        source: Partial<SourceSpecification>;
+      }>,
+    ) => {
+      const { id, source } = action.payload;
+      const currentSource = state.mapStyle.sources[id];
+      state.mapStyle.sources[id] = merge(currentSource, source);
     },
 
     // Layers actions
@@ -146,9 +149,9 @@ export const selectFileHandle = createSelector(
   (slice: StyleCoreState) => slice.fileHandle,
 );
 
-export const selectSources = createSelector(
+export const selectStyleSources = createSelector(
   sliceData,
-  (slice: StyleCoreState) => slice.sources,
+  (slice: StyleCoreState) => slice.mapStyle.sources,
 );
 
 export const selectSelectedLayerIndex = createSelector(
@@ -190,11 +193,11 @@ export const {
   setMapStyle,
   setDirtyMapStyle,
   setSpec,
-  setFileHandle,
 
   // Sources actions
   setSources,
-  addSource,
+  setSource,
+  updateSource,
 
   // Layers actions
   setSelectedLayerIndex,

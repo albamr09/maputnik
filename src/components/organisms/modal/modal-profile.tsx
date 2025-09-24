@@ -12,10 +12,10 @@ import {
 } from "@/store/slices/uiSlice";
 import { useTranslation } from "react-i18next";
 import FieldString from "@/components/molecules/field/field-string";
-import FieldToggleGroup from "../molecules/field/field-toggle-group";
+import FieldToggleGroup from "@/components/molecules/field/field-toggle-group";
 import { SitumEnvironment, SitumEnvironmentType } from "@/store/types";
 import FieldNumber from "@/components/molecules/field/field-number";
-import useChangeStyleProperty from "@/hooks/useChangeStyleProperties";
+import useStylePropertyEdition from "@/hooks/edition/useStylePropertyEdition";
 import {
   APIKEY_METADATA_KEY,
   BUILDING_ID_METADATA_KEY,
@@ -30,7 +30,7 @@ const ModalProfile = () => {
   const environment = useAppSelector(selectEnvironment);
 
   const { t } = useTranslation();
-  const { changeMetadataProperty } = useChangeStyleProperty();
+  const { changeMetadataProperty } = useStylePropertyEdition();
 
   return (
     <Modal

@@ -9,7 +9,7 @@ import {
   setMapViewMode,
 } from "@/store/slices/uiSlice";
 import { redoMessages, undoMessages } from "@/libs/diffmessage";
-import useStyleEdition from "@/hooks/useStyleEdition";
+import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import { selectMapStyle } from "@/store/slices/styleSlice";
 import useRevisionStore from "@/hooks/useRevisionStore";
 import useRefListener from "@/hooks/useRefListener";
@@ -22,26 +22,26 @@ const useShortcuts = () => {
   const mapStyle = useAppSelector(selectMapStyle);
 
   // Hooks
-  const { onStyleChanged } = useStyleEdition();
+  const { setMapStyle } = useStyleEdition();
   const { undo, redo } = useRevisionStore();
 
   const onUndo = useRefListener(() => {
     const previousStyle = undo();
     if (!previousStyle) return;
     const messages = undoMessages(mapStyle, previousStyle);
-    onStyleChanged(previousStyle, { addRevision: false });
+    setMapStyle(previousStyle, { addRevision: false });
     dispatch(clearInfos());
     messages.forEach((info) => dispatch(addInfo(info)));
-  }, [mapStyle, onStyleChanged, undo]);
+  }, [mapStyle, setMapStyle, undo]);
 
   const onRedo = useRefListener(() => {
     const nextStyle = redo();
     if (!nextStyle) return;
     const messages = redoMessages(mapStyle, nextStyle);
-    onStyleChanged(nextStyle, { addRevision: false });
+    setMapStyle(nextStyle, { addRevision: false });
     dispatch(clearInfos());
     messages.forEach((info) => dispatch(addInfo(info)));
-  }, [mapStyle, onStyleChanged, redo]);
+  }, [mapStyle, setMapStyle, redo]);
 
   // Keyboard shortcuts
   useEffect(() => {

@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/atoms/scroll-area";
 import { useCallback } from "react";
 import FileDropZone from "@/components/molecules/file-dropzone";
 import { readFileAsJSON } from "@/libs/file";
-import useStyleEdition from "@/hooks/useStyleEdition";
+import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import { ExtendedStyleSpecification } from "@/store/types";
 import SectionTitle from "@/components/atoms/section-title";
 import PreviewCard from "@/components/molecules/preview-card";
@@ -26,12 +26,12 @@ const ModalOpen = () => {
   const modalOpenName = useAppSelector(selectModalOpenName);
 
   const { t } = useTranslation();
-  const { onStyleChanged } = useStyleEdition();
+  const { setMapStyle } = useStyleEdition();
 
   const onOpenStyleFile = useCallback((file: File) => {
     readFileAsJSON<ExtendedStyleSpecification>(file)
       .then((parsedStyle) => {
-        onStyleChanged(parsedStyle);
+        setMapStyle(parsedStyle);
         dispatch(closeModal());
         showSuccess({
           title: t("Style loaded successfully"),
@@ -59,7 +59,7 @@ const ModalOpen = () => {
           return response.json();
         })
         .then((parsedStyle) => {
-          onStyleChanged(parsedStyle);
+          setMapStyle(parsedStyle);
           dispatch(closeModal());
           showSuccess({
             title: t("Style loaded successfully"),
@@ -72,7 +72,7 @@ const ModalOpen = () => {
           });
         });
     },
-    [onStyleChanged],
+    [setMapStyle],
   );
 
   return (

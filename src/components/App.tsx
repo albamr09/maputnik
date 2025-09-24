@@ -38,10 +38,10 @@ import {
   setApiKey,
   setEnvironment,
 } from "@/store/slices/uiSlice";
-import useStyleEdition from "../hooks/useStyleEdition";
-import useShortcuts from "../hooks/useShortcuts";
-import useStyleStore from "../hooks/useStyleStore";
-import useLayerEdition from "../hooks/useLayerEdition";
+import useStyleEdition from "@/hooks/edition/useStyleEdition";
+import useShortcuts from "@/hooks/useShortcuts";
+import useStyleStore from "@/hooks/useStyleStore";
+import useLayerEdition from "@/hooks/edition/useLayerEdition";
 import {
   APIKEY_METADATA_KEY,
   BUILDING_ID_METADATA_KEY,
@@ -65,7 +65,7 @@ const App = () => {
   const layerWatcherRef = useRef<LayerWatcher>();
 
   // Hooks
-  const { onStyleChanged } = useStyleEdition();
+  const { setMapStyle } = useStyleEdition();
   const { onLayersChange } = useLayerEdition();
   useShortcuts();
   const { initializeStoredStyles, loadLatestStoredStyle } = useStyleStore();
@@ -81,7 +81,7 @@ const App = () => {
         "Load style from URL: " + styleUrl + " and discard current changes?",
       )
     ) {
-      loadStyleUrl(styleUrl, (mapStyle) => onStyleChanged(mapStyle));
+      loadStyleUrl(styleUrl, (mapStyle) => setMapStyle(mapStyle));
       removeStyleQuerystring();
     } else {
       console.log("Falling back to local storage for storing styles");
@@ -89,7 +89,7 @@ const App = () => {
         removeStyleQuerystring();
       }
       loadLatestStoredStyle((mapStyle) => {
-        onStyleChanged(mapStyle, { initialLoad: true });
+        setMapStyle(mapStyle, { initialLoad: true });
       });
     }
 

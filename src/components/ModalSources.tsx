@@ -18,7 +18,6 @@ import FieldSelect from "./FieldSelect";
 import ModalSourcesTypeEditor, { EditorMode } from "./ModalSourcesTypeEditor";
 
 import style from "../libs/style";
-import { deleteSource, addSource, changeSource } from "../libs/source";
 import publicSources from "../config/tilesets.json";
 
 type PublicSourceProps = {
@@ -342,12 +341,8 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
           key={sourceId}
           sourceId={sourceId}
           source={source}
-          onChange={(src: SourceSpecification) =>
-            this.props.onStyleChanged(changeSource(mapStyle, sourceId, src))
-          }
-          onDelete={() =>
-            this.props.onStyleChanged(deleteSource(mapStyle, sourceId))
-          }
+          onChange={(_src: SourceSpecification) => {}}
+          onDelete={() => {}}
           {...i18nProps}
         />
       );
@@ -365,11 +360,7 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
             id={sourceId}
             type={source.type}
             title={source.title}
-            onSelect={() =>
-              this.props.onStyleChanged(
-                addSource(mapStyle, sourceId, this.stripTitle(source)),
-              )
-            }
+            onSelect={() => {}}
           />
         );
       });
@@ -402,9 +393,7 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
             )}
           </p>
           <AddSource
-            onAdd={(sourceId: string, source: SourceSpecification) =>
-              this.props.onStyleChanged(addSource(mapStyle, sourceId, source))
-            }
+            onAdd={(_sourceId: string, _source: SourceSpecification) => {}}
             {...i18nProps}
           />
         </section>

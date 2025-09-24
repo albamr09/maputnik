@@ -4,27 +4,23 @@ import {
   MapViewMode,
   ModalName,
 } from "@/store/types";
-import style from "@/libs/style";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import hash from "string-hash";
-import { ValidationError } from "maplibre-gl";
 import cloneDeep from "lodash.clonedeep";
 import { isEqual, unset } from "lodash";
 import {
   selectMapStyle,
   selectStyleSpec,
   setDirtyMapStyle,
-  setMapStyle,
   setSpec,
-  selectSources,
+  selectStyleSources,
   setSources,
   selectSelectedLayerIndex,
   setSelectedLayerIndex,
   setSelectedLayerOriginalId,
+  setMapStyle as _setMapStyle,
 } from "@/store/slices/styleSlice";
 import {
-  addError,
-  clearErrors,
   selectModalOpenName,
   selectMapViewMode,
   toggleModal,
@@ -36,9 +32,16 @@ import {
   downloadSpriteMetadata,
 } from "@/libs/metadata";
 import tokens from "@/config/tokens.json";
-import { validateStyleMin } from "@maplibre/maplibre-gl-style-spec";
 import useRevisionStore from "@/hooks/useRevisionStore";
 import useStyleStore from "@/hooks/useStyleStore";
+import {
+  getMapStyleErrors,
+  getUpdatedRootSpec,
+  mergeAndRemoveNulls,
+  setFetchAccessToken,
+  setStateInUrl,
+} from "@/libs/style-edition";
+import { DeepPartial } from "@/types";
 
 type OnStyleChangedOpts = {
   save?: boolean;
@@ -51,7 +54,7 @@ const useStyleEdition = () => {
   const dispatch = useAppDispatch();
   const mapStyle = useAppSelector(selectMapStyle);
   const styleSpec = useAppSelector(selectStyleSpec);
-  const sources = useAppSelector(selectSources);
+  const sources = useAppSelector(selectStyleSources);
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const mapViewMode = useAppSelector(selectMapViewMode);
   const modalOpenName = useAppSelector(selectModalOpenName);
@@ -61,55 +64,6 @@ const useStyleEdition = () => {
   const { save } = useStyleStore();
 
   // Helpers
-  const setFetchAccessToken = useCallback(
-    (url: string, mapStyle: ExtendedStyleSpecification) => {
-      const matchesTilehosting = url.match(/\.tilehosting\.com/);
-      const matchesMaptiler = url.match(/\.maptiler\.com/);
-      const matchesThunderforest = url.match(/\.thunderforest\.com/);
-      if (matchesTilehosting || matchesMaptiler) {
-        const accessToken = style.getAccessToken("openmaptiles", mapStyle, {
-          allowFallback: true,
-        });
-        if (accessToken) {
-          return url.replace("{key}", accessToken);
-        }
-      } else if (matchesThunderforest) {
-        const accessToken = style.getAccessToken("thunderforest", mapStyle, {
-          allowFallback: true,
-        });
-        if (accessToken) {
-          return url.replace("{key}", accessToken);
-        }
-      } else {
-        return url;
-      }
-    },
-    [],
-  );
-
-  const saveStyle = useCallback(
-    (snapshotStyle: ExtendedStyleSpecification) => {
-      save(snapshotStyle);
-    },
-    [save],
-  );
-
-  const updateRootSpec = useCallback(
-    (spec: any, fieldName: string, newValues: any) => {
-      return {
-        ...spec,
-        $root: {
-          ...spec?.$root,
-          [fieldName]: {
-            ...spec?.$root[fieldName],
-            values: newValues,
-          },
-        },
-      };
-    },
-    [],
-  );
-
   const updateFonts = useCallback(
     (urlTemplate: string) => {
       const metadata: { [key: string]: string } =
@@ -122,7 +76,7 @@ const useStyleEdition = () => {
           ? urlTemplate.replace("{key}", accessToken)
           : urlTemplate;
       downloadGlyphsMetadata(glyphUrl, (fonts) => {
-        dispatch(setSpec(updateRootSpec(styleSpec, "glyphs", fonts)));
+        dispatch(setSpec(getUpdatedRootSpec(styleSpec, "glyphs", fonts)));
       });
     },
     [mapStyle.metadata, styleSpec],
@@ -131,7 +85,7 @@ const useStyleEdition = () => {
   const updateIcons = useCallback(
     (baseUrl: string) => {
       downloadSpriteMetadata(baseUrl, (icons) => {
-        dispatch(setSpec(updateRootSpec(styleSpec, "sprite", icons)));
+        dispatch(setSpec(getUpdatedRootSpec(styleSpec, "sprite", icons)));
       });
     },
     [styleSpec],
@@ -273,27 +227,7 @@ const useStyleEdition = () => {
     }
   }, [mapStyle.sources, fetchSources]);
 
-  const setStateInUrl = useCallback(() => {
-    const url = new URL(location.href);
-    const hashVal = hash(JSON.stringify(mapStyle));
-    url.searchParams.set("layer", `${hashVal}~${selectedLayerIndex}`);
-
-    if (modalOpenName) {
-      url.searchParams.set("modal", modalOpenName);
-    } else {
-      url.searchParams.delete("modal");
-    }
-
-    if (mapViewMode === "map") {
-      url.searchParams.delete("view");
-    } else if (mapViewMode === "inspect") {
-      url.searchParams.set("view", "inspect");
-    }
-
-    history.replaceState({ selectedLayerIndex }, "Maputnik", url.href);
-  }, [mapStyle, selectedLayerIndex, modalOpenName, mapViewMode]);
-
-  const onStyleChanged = useCallback(
+  const setMapStyle = useCallback(
     (newStyle: ExtendedStyleSpecification, opts: OnStyleChangedOpts = {}) => {
       opts = {
         save: true,
@@ -305,7 +239,6 @@ const useStyleEdition = () => {
 
       // For the style object, find the urls that has "{key}" and insert the correct API keys
       // Without this, going from e.g. MapTiler to OpenLayers and back will lose the maptlier key.
-
       if (mutableStyle.glyphs && typeof mutableStyle.glyphs === "string") {
         mutableStyle.glyphs = setFetchAccessToken(
           mutableStyle.glyphs,
@@ -330,93 +263,13 @@ const useStyleEdition = () => {
         getInitialStateFromUrl(mutableStyle);
       }
 
-      const errors: ValidationError[] = validateStyleMin(mutableStyle) || [];
-
-      // The validate function doesn't give us errors for duplicate error with
-      // empty string for layer.id, manually deal with that here.
-      const layerErrors: (Error | ValidationError)[] = [];
-      if (mutableStyle && mutableStyle.layers) {
-        const foundLayers = new global.Map();
-        mutableStyle.layers.forEach((layer, index) => {
-          if (layer.id === "" && foundLayers.has(layer.id)) {
-            const error = new Error(
-              `layers[${index}]: duplicate layer id [empty_string], previously used`,
-            );
-            layerErrors.push(error);
-          }
-          foundLayers.set(layer.id, true);
-        });
-      }
-
-      const mappedErrors = layerErrors.concat(errors).map((error) => {
-        // Special case: Duplicate layer id
-        const dupMatch = error.message.match(
-          /layers\[(\d+)\]: (duplicate layer id "?(.*)"?, previously used)/,
-        );
-        if (dupMatch) {
-          const [, index, message] = dupMatch;
-          return {
-            message: error.message,
-            parsed: {
-              type: "layer",
-              data: {
-                index: parseInt(index, 10),
-                key: "id",
-                message,
-              },
-            },
-          };
-        }
-
-        // Special case: Invalid source
-        const invalidSourceMatch = error.message.match(
-          /layers\[(\d+)\]: (source "(?:.*)" not found)/,
-        );
-        if (invalidSourceMatch) {
-          const [, index, message] = invalidSourceMatch;
-          return {
-            message: error.message,
-            parsed: {
-              type: "layer",
-              data: {
-                index: parseInt(index, 10),
-                key: "source",
-                message,
-              },
-            },
-          };
-        }
-
-        const layerMatch = error.message.match(
-          /layers\[(\d+)\]\.(?:(\S+)\.)?(\S+): (.*)/,
-        );
-        if (layerMatch) {
-          const [, index, group, property, message] = layerMatch;
-          const key =
-            group && property ? [group, property].join(".") : property;
-          return {
-            message: error.message,
-            parsed: {
-              type: "layer",
-              data: {
-                index: parseInt(index, 10),
-                key,
-                message,
-              },
-            },
-          };
-        } else {
-          return {
-            message: error.message,
-          };
-        }
-      });
+      const mapStyleErrors = getMapStyleErrors(mutableStyle);
 
       let dirtyMapStyle: ExtendedStyleSpecification | undefined = undefined;
-      if (errors.length > 0) {
+      if (mapStyleErrors.length > 0) {
         dirtyMapStyle = cloneDeep(mutableStyle);
 
-        errors.forEach((error) => {
+        mapStyleErrors.forEach((error) => {
           const { message } = error;
           if (message) {
             try {
@@ -442,23 +295,37 @@ const useStyleEdition = () => {
         addRevision(mutableStyle);
       }
       if (opts.save) {
-        saveStyle(mutableStyle as ExtendedStyleSpecification);
+        save(mutableStyle as ExtendedStyleSpecification);
       }
 
-      dispatch(setMapStyle(mutableStyle));
+      dispatch(_setMapStyle(mutableStyle));
       if (dirtyMapStyle) {
         dispatch(setDirtyMapStyle(dirtyMapStyle));
       }
-      dispatch(clearErrors());
-      mappedErrors.forEach((error) => dispatch(addError(error)));
 
       // Update URL after state update
-      setStateInUrl();
+      setStateInUrl({
+        mapStyle: mutableStyle,
+        selectedLayerIndex,
+        mapViewMode,
+        modalOpenName,
+      });
     },
-    [mapStyle, updateFonts, updateIcons, saveStyle],
+    [mapStyle, updateFonts, updateIcons],
   );
 
-  return { onStyleChanged, fetchSources, setStateInUrl };
+  /**
+   * Allows for partial updates on the style
+   */
+  const patchMapStyle = useCallback(
+    (partialStylePatch: DeepPartial<ExtendedStyleSpecification>) => {
+      const mergedStyle = mergeAndRemoveNulls(mapStyle, partialStylePatch);
+      setMapStyle(mergedStyle);
+    },
+    [mapStyle, setMapStyle],
+  );
+
+  return { setMapStyle, patchMapStyle, fetchSources };
 };
 
 export default useStyleEdition;

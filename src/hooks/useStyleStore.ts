@@ -62,7 +62,7 @@ const useStyleStore = () => {
     (cb: (style: ExtendedStyleSpecification) => void) => {
       loadStyleUrl(defaultStyleUrl, cb);
     },
-    []
+    [],
   );
 
   // Find the last edited style
@@ -85,7 +85,7 @@ const useStyleStore = () => {
 
       loadDefaultStyle(cb);
     },
-    [loadDefaultStyle]
+    [loadDefaultStyle],
   );
 
   const initializeStoredStyles = useCallback(() => {
@@ -138,7 +138,7 @@ const useStyleStore = () => {
       }
       return validStyle;
     },
-    [storedStyles]
+    [storedStyles],
   );
 
   return {

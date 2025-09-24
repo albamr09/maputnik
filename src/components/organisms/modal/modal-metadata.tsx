@@ -15,7 +15,8 @@ import FieldNumber from "@/components/molecules/field/field-number";
 import FieldColor from "@/components/molecules/field/field-color";
 import FieldToggleGroup from "@/components/molecules/field/field-toggle-group";
 import FieldArray from "@/components/molecules/field/field-array";
-import useChangeStyleProperty from "@/hooks/useChangeStyleProperties";
+import useStylePropertyEdition from "@/hooks/edition/useStylePropertyEdition";
+import { LightSpecification } from "maplibre-gl";
 
 const ModalMetadata = () => {
   const dispatch = useAppDispatch();
@@ -31,7 +32,7 @@ const ModalMetadata = () => {
     changeLightProperty,
     changeTerrainProperty,
     changeTransitionProperty,
-  } = useChangeStyleProperty();
+  } = useStylePropertyEdition();
 
   return (
     <Modal
@@ -127,7 +128,10 @@ const ModalMetadata = () => {
             mapStyleLight?.anchor?.toString() || latest.light.anchor.default
           }
           onChange={(value) => {
-            changeLightProperty("anchor", value);
+            changeLightProperty(
+              "anchor",
+              value as LightSpecification["anchor"],
+            );
           }}
           options={Object.keys(latest.light.anchor.values).map((key) => ({
             value: key,
@@ -162,7 +166,10 @@ const ModalMetadata = () => {
           }
           description={latest.light.position.doc}
           onChange={(value) => {
-            changeLightProperty("position", value);
+            changeLightProperty(
+              "position",
+              value as LightSpecification["position"],
+            );
           }}
           Component={FieldNumber}
           getDefaultValue={() => 0}

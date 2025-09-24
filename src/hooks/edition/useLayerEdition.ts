@@ -20,16 +20,23 @@ import {
   ExpressionSpecification,
   LegacyFilterSpecification,
 } from "maplibre-gl";
-import useStyleEdition from "./useStyleEdition";
-import { selectSelectedFloorId } from "@/store/slices/uiSlice";
+import useStyleEdition from "@/hooks/edition/useStyleEdition";
+import {
+  selectMapViewMode,
+  selectModalOpenName,
+  selectSelectedFloorId,
+} from "@/store/slices/uiSlice";
+import { setStateInUrl } from "@/libs/style-edition";
 
 const useLayerEdition = () => {
   const dispatch = useAppDispatch();
   const mapStyle = useAppSelector(selectMapStyle);
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const selectedFloorId = useAppSelector(selectSelectedFloorId);
+  const mapViewMode = useAppSelector(selectMapViewMode);
+  const modalOpenName = useAppSelector(selectModalOpenName);
 
-  const { onStyleChanged, setStateInUrl } = useStyleEdition();
+  const { setMapStyle } = useStyleEdition();
 
   const onMoveLayer = useCallback(
     (move: SortEnd) => {
@@ -47,7 +54,7 @@ const useLayerEdition = () => {
       arrayMoveMutable(layers, oldIndex, newIndex);
       onLayersChange(layers);
     },
-    [mapStyle.layers, selectedLayerIndex, dispatch]
+    [mapStyle.layers, selectedLayerIndex, dispatch],
   );
 
   const onLayersChange = useCallback(
@@ -56,9 +63,9 @@ const useLayerEdition = () => {
         ...mapStyle,
         layers: changedLayers,
       };
-      onStyleChanged(changedStyle);
+      setMapStyle(changedStyle);
     },
-    [mapStyle, onStyleChanged]
+    [mapStyle, setMapStyle],
   );
 
   const onLayerSelect = useCallback(
@@ -67,9 +74,14 @@ const useLayerEdition = () => {
       if (mapStyle.layers[index]) {
         dispatch(setSelectedLayerOriginalId(mapStyle.layers[index].id));
       }
-      setStateInUrl();
+      setStateInUrl({
+        mapStyle,
+        selectedLayerIndex,
+        mapViewMode,
+        modalOpenName,
+      });
     },
-    [dispatch, mapStyle.layers, setStateInUrl]
+    [dispatch, mapStyle.layers, selectedLayerIndex, mapViewMode, modalOpenName],
   );
 
   const onLayerChanged = useCallback(
@@ -79,7 +91,7 @@ const useLayerEdition = () => {
 
       onLayersChange(changedLayers);
     },
-    [mapStyle.layers, onLayersChange]
+    [mapStyle.layers, onLayersChange],
   );
 
   const onLayerDestroy = useCallback(
@@ -89,7 +101,7 @@ const useLayerEdition = () => {
       remainingLayers.splice(index, 1);
       onLayersChange(remainingLayers);
     },
-    [mapStyle.layers, onLayersChange]
+    [mapStyle.layers, onLayersChange],
   );
 
   const onLayerCopy = useCallback(
@@ -102,7 +114,7 @@ const useLayerEdition = () => {
       changedLayers.splice(index, 0, clonedLayer);
       onLayersChange(changedLayers);
     },
-    [mapStyle.layers, onLayersChange]
+    [mapStyle.layers, onLayersChange],
   );
 
   const onLayerVisibilityToggle = useCallback(
@@ -119,7 +131,7 @@ const useLayerEdition = () => {
       changedLayers[index] = layer;
       onLayersChange(changedLayers);
     },
-    [mapStyle.layers, onLayersChange]
+    [mapStyle.layers, onLayersChange],
   );
 
   const onLayerIdChange = useCallback(
@@ -132,7 +144,7 @@ const useLayerEdition = () => {
 
       onLayersChange(changedLayers);
     },
-    [mapStyle.layers, onLayersChange]
+    [mapStyle.layers, onLayersChange],
   );
 
   const onLayerFloorFilterToggle = useCallback(
@@ -165,7 +177,7 @@ const useLayerEdition = () => {
       changedLayers[index] = layer;
       onLayersChange(changedLayers);
     },
-    [mapStyle.layers, selectedFloorId, onLayersChange]
+    [mapStyle.layers, selectedFloorId, onLayersChange],
   );
 
   return {

@@ -25,10 +25,10 @@ const FieldToggleGroup: React.FC<FieldToggleGroupProps> = ({
         }}
         orientation={orientation}
       >
-        {options.map((option) => (
-          <ToggleGroupItem key={option.value} value={option.value}>
-            {option.icon && <span>{option.icon}</span>}
-            <span className="capitalize">{option.label}</span>
+        {options.map(({ value, label, icon }) => (
+          <ToggleGroupItem key={value} value={value}>
+            {icon && <span>{icon}</span>}
+            <span className="capitalize">{label}</span>
           </ToggleGroupItem>
         ))}
       </ToggleGroup>

@@ -4,6 +4,21 @@ import type {
   MapOptions,
 } from "maplibre-gl";
 
+export const SourceTypes = [
+  "video",
+  "image",
+  "tilejson_vector",
+  "tile_raster",
+  "tilejson_raster",
+  "tilexyz_raster-dem",
+  "tilejson_raster-dem",
+  "pmtiles_vector",
+  "tile_vector",
+  "geojson_url",
+  "geojson_json",
+] as const;
+export type SourceTypesType = (typeof SourceTypes)[number];
+
 export type MapViewMode = "map" | "inspect";
 
 export type ModalName =
@@ -47,15 +62,16 @@ export type ExtendedStyleSpecification = StyleSpecification & {
   owner?: string;
 };
 
+export type GeoJSONURLSourceSpecification = SourceSpecification & {
+  url: string;
+};
+
 export interface StyleCoreState {
   // Style-related state
   mapStyle: ExtendedStyleSpecification;
   dirtyMapStyle?: ExtendedStyleSpecification;
   spec: any;
   fileHandle: FileSystemFileHandle | null;
-
-  // Sources-related state
-  sources: { [key: string]: SourceSpecification };
 
   // Layers-related state
   selectedLayerIndex: number;

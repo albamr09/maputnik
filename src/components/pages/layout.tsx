@@ -24,16 +24,16 @@ import {
   selectSelectedLayer,
   selectSelectedLayerIndex,
   selectSelectedLayerOriginalId,
-  selectSources,
+  selectStyleSources,
   selectStyleSpec,
   selectVectorLayers,
 } from "@/store/slices/styleSlice";
-import useStyleEdition from "@/hooks/useStyleEdition";
+import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import LayerEditor from "../LayerEditor";
-import useLayerEdition from "@/hooks/useLayerEdition";
+import useLayerEdition from "@/hooks/edition/useLayerEdition";
 import style from "@/libs/style";
 import Toolbar from "@/components/organisms/toolbar";
-import ModalManager from "@/components/organisms/modal-manager";
+import ModalManager from "@/components/organisms/modal/modal-manager";
 
 const _AppLayout = () => {
   const dispatch = useAppDispatch();
@@ -46,7 +46,7 @@ const _AppLayout = () => {
   const selectedLayerIndex = useAppSelector(selectSelectedLayerIndex);
   const selectedLayer = useAppSelector(selectSelectedLayer);
   const selectedLayerOriginalId = useAppSelector(selectSelectedLayerOriginalId);
-  const sources = useAppSelector(selectSources);
+  const sources = useAppSelector(selectStyleSources);
   const vectorLayers = useAppSelector(selectVectorLayers);
   const styleSpec = useAppSelector(selectStyleSpec);
   const mapStyleLayers = useAppSelector(selectMapStyleLayers);
