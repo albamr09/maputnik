@@ -8,7 +8,6 @@ import style from "@/libs/style";
 import { AppState } from "@/store/index";
 import { createSelector } from "reselect";
 import { SourceSpecification } from "maplibre-gl";
-import { merge } from "lodash";
 
 const initialState: StyleCoreState = {
   // Style
