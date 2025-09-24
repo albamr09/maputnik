@@ -57,24 +57,6 @@ const styleSlice = createSlice({
     ) => {
       state.mapStyle.sources = action.payload;
     },
-    setSource: (
-      state,
-      action: PayloadAction<{ id: string; source: SourceSpecification }>,
-    ) => {
-      const { id, source } = action.payload;
-      state.mapStyle.sources[id] = source;
-    },
-    updateSource: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        source: Partial<SourceSpecification>;
-      }>,
-    ) => {
-      const { id, source } = action.payload;
-      const currentSource = state.mapStyle.sources[id];
-      state.mapStyle.sources[id] = merge(currentSource, source);
-    },
 
     // Layers actions
     setSelectedLayerIndex: (state, action: PayloadAction<number>) => {
@@ -196,8 +178,6 @@ export const {
 
   // Sources actions
   setSources,
-  setSource,
-  updateSource,
 
   // Layers actions
   setSelectedLayerIndex,
