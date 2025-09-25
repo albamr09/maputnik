@@ -12,9 +12,10 @@ import SectionTitle from "@/components/atoms/section-title";
 import { Button } from "@/components/atoms/button";
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import SourceEditor from "@/components/organisms/sources/editor";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
+import { getSourceType } from "@/libs/source";
 interface ActiveSourceProps {
   id: string;
   source: SourceSpecification;
@@ -22,13 +23,37 @@ interface ActiveSourceProps {
 
 const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [localSource, setLocalSource] = useState(source);
 
   const { t } = useTranslation();
-  const { deleteSource } = useSourceEdition();
+  const { deleteSource, patchLocalSource } = useSourceEdition();
 
   const toggleEdition = useCallback(() => {
     setIsEditing((p) => !p);
   }, []);
+
+  const onChange = useCallback(
+    <K extends keyof SourceSpecification>(
+      key: K,
+      value: SourceSpecification[K],
+    ) => {
+      if (!source) return;
+
+      const newSource = patchLocalSource({
+        source,
+        diffSource: { [key]: value },
+      });
+
+      setLocalSource(newSource);
+    },
+    [source],
+  );
+
+  const sourceType = useMemo(() => {
+    return getSourceType(localSource);
+  }, [localSource]);
+
+  if (!sourceType) return;
 
   return (
     <Card key={id}>
@@ -36,12 +61,13 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CardTitle className="text-base"># {id}</CardTitle>
-            <Badge variant="secondary">{source.type}</Badge>
+            <Badge variant="secondary">{localSource.type}</Badge>
           </div>
 
           <div className="flex gap-1">
             <Button
               size="sm"
+              variant="outline"
               onClick={() => toggleEdition()}
               title={isEditing ? t("Leave changes") : t("Edit source")}
             >
@@ -60,7 +86,11 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
       </CardHeader>
       {isEditing && (
         <CardContent>
-          <SourceEditor id={id} source={source} />
+          <SourceEditor
+            sourceType={sourceType}
+            source={localSource}
+            onChange={onChange}
+          />
         </CardContent>
       )}
     </Card>

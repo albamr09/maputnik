@@ -73,7 +73,6 @@ const ModalGeoJSONTheme = () => {
       )}
       cancelText={t("Close")}
       size="xl"
-      maxHeight="25vh"
     >
       <FileDropZone
         accept=".json"

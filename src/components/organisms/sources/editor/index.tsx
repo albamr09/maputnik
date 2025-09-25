@@ -1,47 +1,38 @@
-import { selectSourceType } from "@/libs/source";
-import { GeoJSONSourceSpecification, SourceSpecification } from "maplibre-gl";
-import { useMemo } from "react";
-import GeoJSONURLSource from "@/components/organisms/sources/editor/geojson-url-source";
-import { GeoJSONURLSourceSpecification } from "@/store/types";
-import GeoJSONSource from "@/components/organisms/sources/editor/geojson-source";
+import { SourceTypeMap, SourceTypesType } from "@/store/types";
+import GeoJSONURLEditor from "./geojson-url-source";
+import GeoJSONSourceEditor from "./geojson-source";
+import { SourceOnChange } from "./types";
 
-interface SourceEditorProps {
-  id: string;
-  source: SourceSpecification;
-  newSource?: boolean;
+interface SourceEditorProps<K extends SourceTypesType> {
+  sourceType: K;
+  source: SourceTypeMap[K];
+  onChange: SourceOnChange<SourceTypeMap[K]>;
 }
 
-const SourceEditor: React.FC<SourceEditorProps> = ({
-  id,
+const SourceEditor = <K extends SourceTypesType>({
   source,
-  newSource,
-}) => {
-  const sourceType = useMemo(() => {
-    return selectSourceType(source);
-  }, [source]);
-
-  switch (sourceType) {
-  case "geojson_url":
+  sourceType,
+  onChange,
+}: SourceEditorProps<K>) => {
+  if (sourceType === "geojson_url") {
     return (
-      <GeoJSONURLSource
-        type={sourceType}
-        id={id}
-        source={source as GeoJSONURLSourceSpecification}
-        newSource={newSource}
+      <GeoJSONURLEditor
+        source={source as SourceTypeMap["geojson_url"]}
+        onChange={onChange as SourceOnChange<SourceTypeMap["geojson_url"]>}
       />
     );
-  case "geojson_json":
-    return (
-      <GeoJSONSource
-        type={sourceType}
-        id={id}
-        source={source as GeoJSONSourceSpecification}
-        newSource={newSource}
-      />
-    );
-  default:
-    return <></>;
   }
+
+  if (sourceType === "geojson_json") {
+    return (
+      <GeoJSONSourceEditor
+        source={source as SourceTypeMap["geojson_json"]}
+        onChange={onChange as SourceOnChange<SourceTypeMap["geojson_json"]>}
+      />
+    );
+  }
+
+  return null;
 };
 
 export default SourceEditor;

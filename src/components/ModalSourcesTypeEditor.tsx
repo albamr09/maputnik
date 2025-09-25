@@ -140,11 +140,11 @@ class TileURLSourceEditor extends React.Component<TileURLSourceEditorProps> {
 const createCornerLabels: (t: TFunction) => { label: string; key: string }[] = (
   t,
 ) => [
-    { label: t("Coord top left"), key: "top left" },
-    { label: t("Coord top right"), key: "top right" },
-    { label: t("Coord bottom right"), key: "bottom right" },
-    { label: t("Coord bottom left"), key: "bottom left" },
-  ];
+  { label: t("Coord top left"), key: "top left" },
+  { label: t("Coord top right"), key: "top right" },
+  { label: t("Coord bottom right"), key: "bottom right" },
+  { label: t("Coord bottom left"), key: "bottom left" },
+];
 
 type ImageSourceEditorProps = {
   source: {
@@ -362,12 +362,14 @@ type ModalSourcesTypeEditorInternalProps = {
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
 
-const ModalSourcesTypeEditorInternal: React.FC<ModalSourcesTypeEditorInternalProps> = ({ mode, source, onChange, t, i18n, tReady }) => {
+const ModalSourcesTypeEditorInternal: React.FC<
+  ModalSourcesTypeEditorInternalProps
+> = ({ mode, source, onChange, t, i18n, tReady }) => {
   const { isAuthenticated: hasSitumAuth, getJWT: getSitumJWT } = useSitumSDK();
 
   const handleToggleUseSitumAuth = (checked: boolean) => {
     const accessToken = getSitumJWT();
-    
+
     if (checked) {
       onChange({ ...source, x_accessToken: accessToken });
     } else {
@@ -393,132 +395,127 @@ const ModalSourcesTypeEditorInternal: React.FC<ModalSourcesTypeEditorInternalPro
   );
 
   switch (mode) {
-    case "geojson_url":
-      return (
-        <div>
-          <GeoJSONSourceUrlEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "geojson_json":
-      return (
-        <div>
-          <GeoJSONSourceFieldJsonEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "tilejson_vector":
-      return (
-        <div>
-          <TileJSONSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "tile_vector":
-      return (
-        <div>
-          <TileURLSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "tilejson_raster":
-      return (
-        <div>
-          <TileJSONSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "tile_raster":
-      return (
-        <div>
-          <TileURLSourceEditor {...commonProps}>
-            <FieldNumber
-              label={t("Tile Size")}
-              fieldSpec={latest.source_raster.tileSize}
-              onChange={(tileSize) =>
-                onChange({
-                  ...source,
-                  tileSize: tileSize,
-                })
-              }
-              value={
-                source.tileSize ||
-                latest.source_raster.tileSize.default
-              }
-              data-wd-key="modal:sources.add.tile_size"
-            />
-          </TileURLSourceEditor>
-          {accessTokenField}
-        </div>
-      );
-    case "tilejson_raster-dem":
-      return (
-        <div>
-          <TileJSONSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "tilexyz_raster-dem":
-      return (
-        <div>
-          <TileURLSourceEditor {...commonProps}>
-            <FieldNumber
-              label={t("Tile Size")}
-              fieldSpec={latest.source_raster_dem.tileSize}
-              onChange={(tileSize) =>
-                onChange({
-                  ...source,
-                  tileSize: tileSize,
-                })
-              }
-              value={
-                source.tileSize ||
-                latest.source_raster_dem.tileSize.default
-              }
-              data-wd-key="modal:sources.add.tile_size"
-            />
-            <FieldSelect
-              label={t("Encoding")}
-              fieldSpec={latest.source_raster_dem.encoding}
-              options={Object.keys(latest.source_raster_dem.encoding.values)}
-              onChange={(encoding) =>
-                onChange({
-                  ...source,
-                  encoding: encoding,
-                })
-              }
-              value={
-                source.encoding ||
-                latest.source_raster_dem.encoding.default
-              }
-            />
-          </TileURLSourceEditor>
-          {accessTokenField}
-        </div>
-      );
-    case "pmtiles_vector":
-      return (
-        <div>
-          <PMTilesSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "image":
-      return (
-        <div>
-          <ImageSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    case "video":
-      return (
-        <div>
-          <VideoSourceEditor {...commonProps} />
-          {accessTokenField}
-        </div>
-      );
-    default:
-      return accessTokenField;
+  case "geojson_url":
+    return (
+      <div>
+        <GeoJSONSourceUrlEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "geojson_json":
+    return (
+      <div>
+        <GeoJSONSourceFieldJsonEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "tilejson_vector":
+    return (
+      <div>
+        <TileJSONSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "tile_vector":
+    return (
+      <div>
+        <TileURLSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "tilejson_raster":
+    return (
+      <div>
+        <TileJSONSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "tile_raster":
+    return (
+      <div>
+        <TileURLSourceEditor {...commonProps}>
+          <FieldNumber
+            label={t("Tile Size")}
+            fieldSpec={latest.source_raster.tileSize}
+            onChange={(tileSize) =>
+              onChange({
+                ...source,
+                tileSize: tileSize,
+              })
+            }
+            value={source.tileSize || latest.source_raster.tileSize.default}
+            data-wd-key="modal:sources.add.tile_size"
+          />
+        </TileURLSourceEditor>
+        {accessTokenField}
+      </div>
+    );
+  case "tilejson_raster-dem":
+    return (
+      <div>
+        <TileJSONSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "tilexyz_raster-dem":
+    return (
+      <div>
+        <TileURLSourceEditor {...commonProps}>
+          <FieldNumber
+            label={t("Tile Size")}
+            fieldSpec={latest.source_raster_dem.tileSize}
+            onChange={(tileSize) =>
+              onChange({
+                ...source,
+                tileSize: tileSize,
+              })
+            }
+            value={
+              source.tileSize || latest.source_raster_dem.tileSize.default
+            }
+            data-wd-key="modal:sources.add.tile_size"
+          />
+          <FieldSelect
+            label={t("Encoding")}
+            fieldSpec={latest.source_raster_dem.encoding}
+            options={Object.keys(latest.source_raster_dem.encoding.values)}
+            onChange={(encoding) =>
+              onChange({
+                ...source,
+                encoding: encoding,
+              })
+            }
+            value={
+              source.encoding || latest.source_raster_dem.encoding.default
+            }
+          />
+        </TileURLSourceEditor>
+        {accessTokenField}
+      </div>
+    );
+  case "pmtiles_vector":
+    return (
+      <div>
+        <PMTilesSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "image":
+    return (
+      <div>
+        <ImageSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  case "video":
+    return (
+      <div>
+        <VideoSourceEditor {...commonProps} />
+        {accessTokenField}
+      </div>
+    );
+  default:
+    return accessTokenField;
   }
 };
 

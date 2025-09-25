@@ -85,7 +85,6 @@ const ModalOpen = () => {
       )}
       cancelText={t("Close")}
       size="xl"
-      maxHeight="55vh"
     >
       <Tabs defaultValue="custom" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
@@ -124,8 +123,11 @@ const ModalOpen = () => {
               title={t("Style Gallery")}
               subtitle={t("Choose from pre-made styles to get started")}
             />
-            <ScrollArea className="h-[310px]">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ScrollArea>
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                style={{ maxHeight: "22vh" }}
+              >
                 {publicStyles.map((style) => (
                   <PreviewCard
                     key={style.id}

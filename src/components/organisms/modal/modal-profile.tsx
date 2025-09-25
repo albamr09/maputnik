@@ -40,7 +40,6 @@ const ModalProfile = () => {
       description={t("Set up your Situm Account Authentication")}
       cancelText={t("Close")}
       size="xl"
-      maxHeight="25vh"
     >
       <div className="flex flex-col gap-4">
         <FieldString

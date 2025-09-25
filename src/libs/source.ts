@@ -1,7 +1,7 @@
 import { SourceTypesType } from "@/store/types";
 import type { SourceSpecification } from "maplibre-gl";
 
-export const selectSourceType = (
+export const getSourceType = (
   source: SourceSpecification,
 ): SourceTypesType | null => {
   if (source.type === "raster") {

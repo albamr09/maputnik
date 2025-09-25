@@ -1,7 +1,13 @@
+import { DeepPartial } from "@/types";
 import type {
   StyleSpecification,
-  SourceSpecification,
   MapOptions,
+  GeoJSONSourceSpecification,
+  ImageSourceSpecification,
+  RasterDEMSourceSpecification,
+  RasterSourceSpecification,
+  VectorSourceSpecification,
+  VideoSourceSpecification,
 } from "maplibre-gl";
 
 export const SourceTypes = [
@@ -18,6 +24,28 @@ export const SourceTypes = [
   "geojson_json",
 ] as const;
 export type SourceTypesType = (typeof SourceTypes)[number];
+
+export type SourceTypeMap = {
+  geojson_url: GeoJSONSourceSpecification;
+  geojson_json: GeoJSONSourceSpecification;
+  // TODO ALBA: is this the correct type?
+  pmtiles_vector: VectorSourceSpecification;
+  tilejson_vector: VectorSourceSpecification;
+  tile_vector: VectorSourceSpecification;
+  tilejson_raster: RasterSourceSpecification;
+  tile_raster: RasterSourceSpecification;
+  "tilejson_raster-dem": RasterDEMSourceSpecification;
+  "tilexyz_raster-dem": RasterDEMSourceSpecification;
+  image: ImageSourceSpecification;
+  video: VideoSourceSpecification;
+};
+
+export type SourceTypeRelationship<T extends boolean = true> = {
+  [K in SourceTypesType]: {
+    sourceType: K;
+    source: T extends true ? SourceTypeMap[K] : DeepPartial<SourceTypeMap[K]>;
+  };
+}[SourceTypesType];
 
 export type MapViewMode = "map" | "inspect";
 
@@ -60,10 +88,6 @@ export type MappedError = {
 export type ExtendedStyleSpecification = StyleSpecification & {
   id: string;
   owner?: string;
-};
-
-export type GeoJSONURLSourceSpecification = SourceSpecification & {
-  url: string;
 };
 
 export interface StyleCoreState {

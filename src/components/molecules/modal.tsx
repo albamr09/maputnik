@@ -29,7 +29,7 @@ interface ModalProps {
     | "secondary"
     | "ghost"
     | "link";
-  maxHeight?: string;
+  maxHeight?: React.CSSProperties['maxHeight'];
 }
 
 const sizeClasses = {
@@ -51,7 +51,7 @@ export const Modal: React.FC<ModalProps> = ({
   cancelText = null,
   className = "",
   confirmVariant = "default",
-  maxHeight = "80vh",
+  maxHeight = "70vh",
 }) => {
   const handleConfirm = () => {
     onConfirm?.();
@@ -71,9 +71,6 @@ export const Modal: React.FC<ModalProps> = ({
       >
         <div
           className="flex flex-col gap-5"
-          style={{
-            height: `calc(${maxHeight} - 10px)`,
-          }}
         >
           <DialogHeader className="px-3">
             <DialogTitle>{title}</DialogTitle>
@@ -81,7 +78,11 @@ export const Modal: React.FC<ModalProps> = ({
               <DialogDescription>{description}</DialogDescription>
             )}
           </DialogHeader>
-          <ScrollArea>{children}</ScrollArea>
+          <ScrollArea>
+            <div style={{ maxHeight }}>
+              {children}
+            </div>
+          </ScrollArea>
         </div>
         {(cancelText || confirmText) && (
           <DialogFooter className="flex gap-2 px-3">
