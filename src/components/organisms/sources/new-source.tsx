@@ -11,6 +11,7 @@ import SourceEditor from "./editor";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { SourceSpecification } from "maplibre-gl";
 import { uuidV4 } from "@/libs/random";
+import useRefListener from "@/hooks/useRefListener";
 
 interface NewSourceProps {
   onAdd: ({ id, source }: { id: string; source: SourceSpecification }) => void;
@@ -27,8 +28,24 @@ const NewSource: React.FC<NewSourceProps> = ({ onAdd, onCancel }) => {
 
   const { createDefaultSource, patchLocalSource } = useSourceEdition();
 
+  const onEnterListener = useRefListener(() => {
+    onAdd({ id: sourceId, source: localSource! });
+  }, [sourceId, localSource]);
+
   useEffect(() => {
     setDefaultSource(sourceType);
+
+    const onKeyDown = (evt: KeyboardEvent) => {
+      if (evt.key == "Enter") {
+        onEnterListener.current();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   const onChange = useCallback(

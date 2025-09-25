@@ -67,7 +67,7 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
           <div className="flex gap-1">
             <Button
               size="sm"
-              variant="outline"
+              variant={isEditing ? "default" : "outline"}
               onClick={() => toggleEdition()}
               title={isEditing ? t("Leave changes") : t("Edit source")}
             >
