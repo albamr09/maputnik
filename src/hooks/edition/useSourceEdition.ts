@@ -43,7 +43,7 @@ const useSourceEdition = () => {
 					return {
 						type: "geojson",
 						cluster: source?.cluster || false,
-						data: "",
+						data: {},
 					};
 				case "tilejson_vector":
 					return {

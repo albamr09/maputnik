@@ -7,7 +7,7 @@ import FieldColor from "@/components/molecules/field/field-color";
 import FieldNumber from "@/components/molecules/field/field-number";
 import FieldString from "@/components/molecules/field/field-string";
 import FieldToggleGroup from "@/components/molecules/field/field-toggle-group";
-import Modal from "@/components/molecules/modal";
+import Modal from "@/components/molecules/layout/modal";
 import useStylePropertyEdition from "@/hooks/edition/useStylePropertyEdition";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {

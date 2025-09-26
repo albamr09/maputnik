@@ -1,14 +1,14 @@
 import { Check, X } from "lucide-react";
 import { SourceSpecification } from "maplibre-gl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
 import SectionTitle from "@/components/atoms/section-title";
 import FieldSelect from "@/components/molecules/field/field-select";
 import FieldString from "@/components/molecules/field/field-string";
+import Scrollable from "@/components/molecules/layout/scrollable";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
-import useRefListener from "@/hooks/useRefListener";
 import { uuidV4 } from "@/libs/random";
 import { SourceTypes, SourceTypesType } from "@/store/types";
 import SourceEditor from "./editor";
@@ -27,26 +27,6 @@ const NewSource: React.FC<NewSourceProps> = ({ onAdd, onCancel }) => {
 	>(undefined);
 
 	const { createDefaultSource, patchLocalSource } = useSourceEdition();
-
-	const onEnterListener = useRefListener(() => {
-		onAdd({ id: sourceId, source: localSource! });
-	}, [sourceId, localSource]);
-
-	useEffect(() => {
-		setDefaultSource(sourceType);
-
-		const onKeyDown = (evt: KeyboardEvent) => {
-			if (evt.key == "Enter") {
-				onEnterListener.current();
-			}
-		};
-
-		window.addEventListener("keydown", onKeyDown);
-
-		return () => {
-			window.removeEventListener("keydown", onKeyDown);
-		};
-	}, []);
 
 	const onChange = useCallback(
 		<K extends keyof SourceSpecification>(
@@ -78,41 +58,45 @@ const NewSource: React.FC<NewSourceProps> = ({ onAdd, onCancel }) => {
 		<div className="flex flex-col gap-5">
 			<SectionTitle title={t("New Source")} />
 			<Card>
-				<CardContent className="p-5 flex flex-col gap-5">
-					<FieldString
-						label={t("Source ID")}
-						required
-						description={t(
-							"Unique ID that identifies the source and is used in the layer to reference the source.",
-						)}
-						placeholder={t("Enter here the identifier for you source")}
-						value={sourceId}
-						onChange={(value) => {
-							setSourceId(value);
-						}}
-					/>
-					<FieldSelect
-						label={t("Source Type")}
-						required
-						description={t("The type of the source.")}
-						value={sourceType}
-						onChange={(value) => {
-							setSourceType(value as SourceTypesType);
-							setDefaultSource(value as SourceTypesType);
-						}}
-						options={SourceTypes.map((type) => ({
-							value: type,
-							label: type,
-						}))}
-					/>
+				<CardContent className="p-0">
+					<Scrollable maxHeight="300px">
+						<div className="p-3 flex flex-col gap-5">
+							<FieldString
+								label={t("Source ID")}
+								required
+								description={t(
+									"Unique ID that identifies the source and is used in the layer to reference the source.",
+								)}
+								placeholder={t("Enter here the identifier for you source")}
+								value={sourceId}
+								onChange={(value) => {
+									setSourceId(value);
+								}}
+							/>
+							<FieldSelect
+								label={t("Source Type")}
+								required
+								description={t("The type of the source.")}
+								value={sourceType}
+								onChange={(value) => {
+									setSourceType(value as SourceTypesType);
+									setDefaultSource(value as SourceTypesType);
+								}}
+								options={SourceTypes.map((type) => ({
+									value: type,
+									label: type,
+								}))}
+							/>
 
-					<SourceEditor
-						source={localSource!}
-						sourceType={sourceType}
-						onChange={onChange}
-					/>
+							<SourceEditor
+								source={localSource!}
+								sourceType={sourceType}
+								onChange={onChange}
+							/>
+						</div>
+					</Scrollable>
 
-					<div className="flex gap-2 justify-end">
+					<div className="flex p-3 gap-2 justify-end">
 						<Button
 							type="button"
 							size="sm"

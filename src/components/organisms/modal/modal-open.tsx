@@ -1,7 +1,6 @@
 import { FileText, GalleryThumbnails } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollArea } from "@/components/atoms/scroll-area";
 import SectionTitle from "@/components/atoms/section-title";
 import {
 	Tabs,
@@ -10,8 +9,9 @@ import {
 	TabsTrigger,
 } from "@/components/atoms/tabs";
 import FieldURL from "@/components/molecules/field/field-url";
-import FileDropZone from "@/components/molecules/file-dropzone";
-import Modal from "@/components/molecules/modal";
+import FileDropZone from "@/components/molecules/input/file-dropzone";
+import Modal from "@/components/molecules/layout/modal";
+import Scrollable from "@/components/molecules/layout/scrollable";
 import PreviewCard from "@/components/molecules/preview-card";
 import publicStyles from "@/config/styles.json";
 import useStyleEdition from "@/hooks/edition/useStyleEdition";
@@ -123,11 +123,8 @@ const ModalOpen = () => {
 							title={t("Style Gallery")}
 							subtitle={t("Choose from pre-made styles to get started")}
 						/>
-						<ScrollArea>
-							<div
-								className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-								style={{ maxHeight: "40vh" }}
-							>
+						<Scrollable maxHeight="40vh">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 								{publicStyles.map((style) => (
 									<PreviewCard
 										key={style.id}
@@ -137,7 +134,7 @@ const ModalOpen = () => {
 									/>
 								))}
 							</div>
-						</ScrollArea>
+						</Scrollable>
 					</div>
 				</TabsContent>
 			</Tabs>

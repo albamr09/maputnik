@@ -11,6 +11,7 @@ import {
 	CardTitle,
 } from "@/components/atoms/card";
 import SectionTitle from "@/components/atoms/section-title";
+import Scrollable from "@/components/molecules/layout/scrollable";
 import SourceEditor from "@/components/organisms/sources/editor";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { getSourceType } from "@/libs/source";
@@ -87,11 +88,15 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
 			</CardHeader>
 			{isEditing && (
 				<CardContent>
-					<SourceEditor
-						sourceType={sourceType}
-						source={localSource}
-						onChange={onChange}
-					/>
+					<Scrollable maxHeight="300px">
+						<div className="p-3 flex flex-col gap-5">
+							<SourceEditor
+								sourceType={sourceType}
+								source={localSource}
+								onChange={onChange}
+							/>
+						</div>
+					</Scrollable>
 				</CardContent>
 			)}
 		</Card>

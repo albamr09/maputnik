@@ -3,7 +3,7 @@ import { SourceSpecification } from "maplibre-gl";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/atoms/button";
-import Modal from "@/components/molecules/modal";
+import Modal from "@/components/molecules/layout/modal";
 import ActiveSources from "@/components/organisms/sources/active-sources";
 import NewSource from "@/components/organisms/sources/new-source";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";

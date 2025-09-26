@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import FileDropZone from "@/components/molecules/file-dropzone";
-import Modal from "@/components/molecules/modal";
+import FileDropZone from "@/components/molecules/input/file-dropzone";
+import Modal from "@/components/molecules/layout/modal";
 import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import { readFileAsJSON } from "@/libs/file";
 import { generateMapLibreLayers, Theme } from "@/libs/geojson-theme";

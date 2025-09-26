@@ -8,7 +8,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/atoms/dialog";
-import { ScrollArea } from "@/components/atoms/scroll-area";
+import Scrollable from "@/components/molecules/layout/scrollable";
 import { cn } from "@/libs/shadcn-utils";
 
 interface ModalProps {
@@ -76,9 +76,7 @@ export const Modal: React.FC<ModalProps> = ({
 							<DialogDescription>{description}</DialogDescription>
 						)}
 					</DialogHeader>
-					<ScrollArea>
-						<div style={{ maxHeight }}>{children}</div>
-					</ScrollArea>
+					<Scrollable maxHeight={maxHeight}>{children}</Scrollable>
 				</div>
 				{(cancelText || confirmText) && (
 					<DialogFooter className="flex gap-2 px-3">

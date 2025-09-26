@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import FieldNumber from "@/components/molecules/field/field-number";
 import FieldString from "@/components/molecules/field/field-string";
 import FieldToggleGroup from "@/components/molecules/field/field-toggle-group";
-import Modal from "@/components/molecules/modal";
+import Modal from "@/components/molecules/layout/modal";
 import {
 	APIKEY_METADATA_KEY,
 	BUILDING_ID_METADATA_KEY,
