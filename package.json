@@ -6,14 +6,15 @@
 	"main": "''",
 	"scripts": {
 		"start": "vite",
+		"format": "biome format",
+		"lint": "biome check",
+		"lint-fix": "biome check --write",
+		"prebuild": "biome check",
 		"build": "tsc && vite build",
 		"i18n:refresh": "i18next 'src/**/*.{ts,tsx,js,jsx}'",
-		"lint": "eslint",
-		"lint-fix": "eslint --fix",
 		"test": "cypress run",
 		"cy:open": "cypress open",
-		"lint-css": "stylelint \"src/styles/*.scss\"",
-		"sort-styles": "jq 'sort_by(.id)' src/config/styles.json > tmp.json && mv tmp.json src/config/styles.json"
+		"lint-css": "stylelint \"src/styles/*.scss\""
 	},
 	"repository": {
 		"type": "git",
@@ -23,7 +24,6 @@
 	"license": "MIT",
 	"homepage": "https://github.com/maplibre/maputnik#readme",
 	"dependencies": {
-		"@biomejs/biome": "^2.2.4",
 		"@mapbox/mapbox-gl-rtl-text": "^0.3.0",
 		"@maplibre/maplibre-gl-geocoder": "^1.9.0",
 		"@maplibre/maplibre-gl-inspect": "^1.7.1",
@@ -167,6 +167,7 @@
 		"typescript-eslint": "^8.38.0",
 		"uuid": "^11.1.0",
 		"vite": "^6.3.5",
-		"vite-plugin-istanbul": "^7.1.0"
+		"vite-plugin-istanbul": "^7.1.0",
+		"@biomejs/biome": "^2.2.4"
 	}
 }
