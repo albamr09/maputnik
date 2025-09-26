@@ -1,10 +1,10 @@
 {
-  "version": 8,
-  "name": "Empty Style",
-  "id": "0-empty-style",
-  "metadata": {},
-  "sources": {},
-  "sprite": "",
-  "glyphs": "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
-  "layers": []
+	"version": 8,
+	"name": "Empty Style",
+	"id": "0-empty-style",
+	"metadata": {},
+	"sources": {},
+	"sprite": "",
+	"glyphs": "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
+	"layers": []
 }
