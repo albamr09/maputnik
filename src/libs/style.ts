@@ -232,7 +232,7 @@ function stripAccessTokens(mapStyle: StyleSpecification) {
 						if (/^https?:\/\//.test(rest.url)) {
 							newUrl = urlObj.origin + newUrl;
 						}
-					} catch (e) {
+					} catch (_e) {
 						// If URL parsing fails, leave as is
 					}
 				}
