@@ -1,138 +1,138 @@
-import SectionTitle from "@/components/atoms/section-title";
-import { SourceTypes, SourceTypesType } from "@/store/types";
-import FieldString from "@/components/molecules/field/field-string";
-import { useTranslation } from "react-i18next";
-import FieldSelect from "@/components/molecules/field/field-select";
-import { useCallback, useEffect, useState } from "react";
-import { Button } from "@/components/atoms/button";
 import { Check, X } from "lucide-react";
-import { Card, CardContent } from "@/components/atoms/card";
-import SourceEditor from "./editor";
-import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { SourceSpecification } from "maplibre-gl";
-import { uuidV4 } from "@/libs/random";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/atoms/button";
+import { Card, CardContent } from "@/components/atoms/card";
+import SectionTitle from "@/components/atoms/section-title";
+import FieldSelect from "@/components/molecules/field/field-select";
+import FieldString from "@/components/molecules/field/field-string";
+import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import useRefListener from "@/hooks/useRefListener";
+import { uuidV4 } from "@/libs/random";
+import { SourceTypes, SourceTypesType } from "@/store/types";
+import SourceEditor from "./editor";
 
 interface NewSourceProps {
-  onAdd: ({ id, source }: { id: string; source: SourceSpecification }) => void;
-  onCancel: () => void;
+	onAdd: ({ id, source }: { id: string; source: SourceSpecification }) => void;
+	onCancel: () => void;
 }
 
 const NewSource: React.FC<NewSourceProps> = ({ onAdd, onCancel }) => {
-  const { t } = useTranslation();
-  const [sourceId, setSourceId] = useState(uuidV4());
-  const [sourceType, setSourceType] = useState<SourceTypesType>(SourceTypes[0]);
-  const [localSource, setLocalSource] = useState<
-    SourceSpecification | undefined
-  >(undefined);
+	const { t } = useTranslation();
+	const [sourceId, setSourceId] = useState(uuidV4());
+	const [sourceType, setSourceType] = useState<SourceTypesType>(SourceTypes[0]);
+	const [localSource, setLocalSource] = useState<
+		SourceSpecification | undefined
+	>(undefined);
 
-  const { createDefaultSource, patchLocalSource } = useSourceEdition();
+	const { createDefaultSource, patchLocalSource } = useSourceEdition();
 
-  const onEnterListener = useRefListener(() => {
-    onAdd({ id: sourceId, source: localSource! });
-  }, [sourceId, localSource]);
+	const onEnterListener = useRefListener(() => {
+		onAdd({ id: sourceId, source: localSource! });
+	}, [sourceId, localSource]);
 
-  useEffect(() => {
-    setDefaultSource(sourceType);
+	useEffect(() => {
+		setDefaultSource(sourceType);
 
-    const onKeyDown = (evt: KeyboardEvent) => {
-      if (evt.key == "Enter") {
-        onEnterListener.current();
-      }
-    };
+		const onKeyDown = (evt: KeyboardEvent) => {
+			if (evt.key == "Enter") {
+				onEnterListener.current();
+			}
+		};
 
-    window.addEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDown);
 
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, []);
+		return () => {
+			window.removeEventListener("keydown", onKeyDown);
+		};
+	}, []);
 
-  const onChange = useCallback(
-    <K extends keyof SourceSpecification>(
-      key: K,
-      value: SourceSpecification[K],
-    ) => {
-      if (!localSource) return;
+	const onChange = useCallback(
+		<K extends keyof SourceSpecification>(
+			key: K,
+			value: SourceSpecification[K],
+		) => {
+			if (!localSource) return;
 
-      const newSource = patchLocalSource({
-        source: localSource,
-        diffSource: { [key]: value },
-      });
+			const newSource = patchLocalSource({
+				source: localSource,
+				diffSource: { [key]: value },
+			});
 
-      setLocalSource(newSource);
-    },
-    [localSource],
-  );
+			setLocalSource(newSource);
+		},
+		[localSource],
+	);
 
-  const setDefaultSource = useCallback((sourceType: SourceTypesType) => {
-    setLocalSource(
-      createDefaultSource({
-        sourceType,
-        source: {},
-      }),
-    );
-  }, []);
+	const setDefaultSource = useCallback((sourceType: SourceTypesType) => {
+		setLocalSource(
+			createDefaultSource({
+				sourceType,
+				source: {},
+			}),
+		);
+	}, []);
 
-  return (
-    <div className="flex flex-col gap-5">
-      <SectionTitle title={t("New Source")} />
-      <Card>
-        <CardContent className="p-5 flex flex-col gap-5">
-          <FieldString
-            label={t("Source ID")}
-            required
-            description={t(
-              "Unique ID that identifies the source and is used in the layer to reference the source.",
-            )}
-            placeholder={t("Enter here the identifier for you source")}
-            value={sourceId}
-            onChange={(value) => {
-              setSourceId(value);
-            }}
-          />
-          <FieldSelect
-            label={t("Source Type")}
-            required
-            description={t("The type of the source.")}
-            value={sourceType}
-            onChange={(value) => {
-              setSourceType(value as SourceTypesType);
-              setDefaultSource(value as SourceTypesType);
-            }}
-            options={SourceTypes.map((type) => ({
-              value: type,
-              label: type,
-            }))}
-          />
+	return (
+		<div className="flex flex-col gap-5">
+			<SectionTitle title={t("New Source")} />
+			<Card>
+				<CardContent className="p-5 flex flex-col gap-5">
+					<FieldString
+						label={t("Source ID")}
+						required
+						description={t(
+							"Unique ID that identifies the source and is used in the layer to reference the source.",
+						)}
+						placeholder={t("Enter here the identifier for you source")}
+						value={sourceId}
+						onChange={(value) => {
+							setSourceId(value);
+						}}
+					/>
+					<FieldSelect
+						label={t("Source Type")}
+						required
+						description={t("The type of the source.")}
+						value={sourceType}
+						onChange={(value) => {
+							setSourceType(value as SourceTypesType);
+							setDefaultSource(value as SourceTypesType);
+						}}
+						options={SourceTypes.map((type) => ({
+							value: type,
+							label: type,
+						}))}
+					/>
 
-          <SourceEditor
-            source={localSource!}
-            sourceType={sourceType}
-            onChange={onChange}
-          />
+					<SourceEditor
+						source={localSource!}
+						sourceType={sourceType}
+						onChange={onChange}
+					/>
 
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => onAdd({ id: sourceId, source: localSource! })}
-            >
-              <Check className="h-3 w-3" />
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="destructive"
-              onClick={onCancel}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+					<div className="flex gap-2 justify-end">
+						<Button
+							type="button"
+							size="sm"
+							onClick={() => onAdd({ id: sourceId, source: localSource! })}
+						>
+							<Check className="h-3 w-3" />
+						</Button>
+						<Button
+							type="button"
+							size="sm"
+							variant="destructive"
+							onClick={onCancel}
+						>
+							<X className="h-3 w-3" />
+						</Button>
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
 };
 
 export default NewSource;

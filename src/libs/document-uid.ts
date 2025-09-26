@@ -3,7 +3,7 @@
  */
 let REF = 0;
 
-export default function generateUniqueId(prefix="") {
-  REF++;
-  return prefix+REF;
+export default function generateUniqueId(prefix = "") {
+	REF++;
+	return prefix + REF;
 }

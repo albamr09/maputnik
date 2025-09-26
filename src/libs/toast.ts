@@ -1,25 +1,25 @@
 import { toast } from "sonner";
 
 export const showError = ({
-  title,
-  description,
+	title,
+	description,
 }: {
-  title: string;
-  description?: string;
+	title: string;
+	description?: string;
 }) => {
-  toast.error(title, {
-    description,
-  });
+	toast.error(title, {
+		description,
+	});
 };
 
 export const showSuccess = ({
-  title,
-  description,
+	title,
+	description,
 }: {
-  title: string;
-  description?: string;
+	title: string;
+	description?: string;
 }) => {
-  toast.success(title, {
-    description,
-  });
+	toast.success(title, {
+		description,
+	});
 };

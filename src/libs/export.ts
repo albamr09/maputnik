@@ -1,37 +1,37 @@
 import { format } from "@maplibre/maplibre-gl-style-spec";
+import { saveAs } from "file-saver";
+import { t } from "i18next";
 import { version as MAPLIBRE_GL_VERSION } from "maplibre-gl/package.json";
+import Slugify from "slugify";
 import style from "@/libs/style";
 import { ExtendedStyleSpecification } from "@/store/types";
-import { t } from "i18next";
-import Slugify from "slugify";
-import { saveAs } from "file-saver";
 
 const cleanStyle = (mapStyle: ExtendedStyleSpecification) => {
-  return format(
-    style.stripSitumMetadata(
-      style.stripFloorFilter(
-        style.stripAccessTokens(style.replaceAccessTokens(mapStyle)),
-      ),
-    ),
-  );
+	return format(
+		style.stripSitumMetadata(
+			style.stripFloorFilter(
+				style.stripAccessTokens(style.replaceAccessTokens(mapStyle)),
+			),
+		),
+	);
 };
 
 const getMapStyleExportName = (mapStyle: ExtendedStyleSpecification) => {
-  if (mapStyle.name) {
-    return Slugify(mapStyle.name, {
-      replacement: "_",
-      remove: /[*\-+~.()'"!:]/g,
-      lower: true,
-    });
-  } else {
-    return mapStyle.id;
-  }
+	if (mapStyle.name) {
+		return Slugify(mapStyle.name, {
+			replacement: "_",
+			remove: /[*\-+~.()'"!:]/g,
+			lower: true,
+		});
+	} else {
+		return mapStyle.id;
+	}
 };
 
 export const createMapStyleHTML = (mapStyle: ExtendedStyleSpecification) => {
-  const cleanedStyle = cleanStyle(mapStyle);
-  const htmlTitle = mapStyle.name || t("Map");
-  const html = `<!DOCTYPE html>
+	const cleanedStyle = cleanStyle(mapStyle);
+	const htmlTitle = mapStyle.name || t("Map");
+	const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -57,18 +57,18 @@ export const createMapStyleHTML = (mapStyle: ExtendedStyleSpecification) => {
 </html>
 `;
 
-  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-  const exportName = getMapStyleExportName(mapStyle);
-  saveAs(blob, exportName + ".html");
+	const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+	const exportName = getMapStyleExportName(mapStyle);
+	saveAs(blob, exportName + ".html");
 };
 
 export const saveMapStyle = (mapStyle: ExtendedStyleSpecification) => {
-  const cleanedStyle = cleanStyle(mapStyle);
+	const cleanedStyle = cleanStyle(mapStyle);
 
-  const blob = new Blob([cleanedStyle], {
-    type: "application/json;charset=utf-8",
-  });
-  const exportName = getMapStyleExportName(mapStyle);
-  saveAs(blob, exportName + ".json");
-  return;
+	const blob = new Blob([cleanedStyle], {
+		type: "application/json;charset=utf-8",
+	});
+	const exportName = getMapStyleExportName(mapStyle);
+	saveAs(blob, exportName + ".json");
+	return;
 };

@@ -63,7 +63,7 @@
 						"noImportAssign": "error",
 						"noIrregularWhitespace": "error",
 						"noMisleadingCharacterClass": "error",
-						"noPrototypeBuiltins": "error",
+						"noPrototypeBuiltins": "off",
 						"noRedeclare": "error",
 						"noShadowRestrictedNames": "error",
 						"noSparseArray": "error",

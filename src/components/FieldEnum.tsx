@@ -1,21 +1,19 @@
-import InputEnum, {InputEnumProps} from './InputEnum'
-import Fieldset from './Fieldset';
-
+import Fieldset from "./Fieldset";
+import InputEnum, { InputEnumProps } from "./InputEnum";
 
 type FieldEnumProps = InputEnumProps & {
-  label?: string;
-  fieldSpec?: {
-    doc: string
-  }
+	label?: string;
+	fieldSpec?: {
+		doc: string;
+	};
 };
 
-
 const FieldEnum: React.FC<FieldEnumProps> = (props) => {
-  return (
-    <Fieldset label={props.label} fieldSpec={props.fieldSpec}>
-      <InputEnum {...props} />
-    </Fieldset>
-  );
+	return (
+		<Fieldset label={props.label} fieldSpec={props.fieldSpec}>
+			<InputEnum {...props} />
+		</Fieldset>
+	);
 };
 
 export default FieldEnum;

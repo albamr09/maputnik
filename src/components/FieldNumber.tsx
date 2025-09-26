@@ -1,21 +1,19 @@
-import InputNumber, {InputNumberProps} from './InputNumber'
-import Block from './Block'
-
+import Block from "./Block";
+import InputNumber, { InputNumberProps } from "./InputNumber";
 
 type FieldNumberProps = InputNumberProps & {
-  label?: string
-  fieldSpec?: {
-    doc: string
-  }
+	label?: string;
+	fieldSpec?: {
+		doc: string;
+	};
 };
 
-
 const FieldNumber: React.FC<FieldNumberProps> = (props) => {
-  return (
-    <Block label={props.label} fieldSpec={props.fieldSpec}>
-      <InputNumber {...props} />
-    </Block>
-  );
+	return (
+		<Block label={props.label} fieldSpec={props.fieldSpec}>
+			<InputNumber {...props} />
+		</Block>
+	);
 };
 
 export default FieldNumber;

@@ -1,18 +1,16 @@
-import Block from './Block'
-import InputAutocomplete, { InputAutocompleteProps } from './InputAutocomplete'
-
+import Block from "./Block";
+import InputAutocomplete, { InputAutocompleteProps } from "./InputAutocomplete";
 
 type FieldAutocompleteProps = InputAutocompleteProps & {
-  label?: string;
+	label?: string;
 };
 
-
 const FieldAutocomplete: React.FC<FieldAutocompleteProps> = (props) => {
-  return (
-    <Block label={props.label}>
-      <InputAutocomplete {...props} />
-    </Block>
-  );
+	return (
+		<Block label={props.label}>
+			<InputAutocomplete {...props} />
+		</Block>
+	);
 };
 
 export default FieldAutocomplete;
