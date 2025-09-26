@@ -1,12 +1,22 @@
-// https://gist.github.com/scwood/3bff42cc005cc20ab7ec98f0d8e1d59d
-export const uuidV4 = () => {
-	const uuid = new Array(36);
-	for (let i = 0; i < 36; i++) {
-		uuid[i] = Math.floor(Math.random() * 16);
+export const generateRandomString = (length = 8) => {
+	const chars =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let result = "";
+	for (let i = 0; i < length; i++) {
+		const randomIndex = Math.floor(Math.random() * chars.length);
+		result += chars[randomIndex];
 	}
-	uuid[14] = 4; // set bits 12-15 of time-high-and-version to 0100
-	uuid[19] = uuid[19] &= ~(1 << 2); // set bit 6 of clock-seq-and-reserved to zero
-	uuid[19] = uuid[19] |= 1 << 3; // set bit 7 of clock-seq-and-reserved to one
-	uuid[8] = uuid[13] = uuid[18] = uuid[23] = "-";
-	return uuid.map((x) => x.toString(16)).join("");
+	return result;
+};
+
+export const generateAndCheckRandomString = (
+	length = 8,
+	existingStrings: string[],
+) => {
+	let generatedString = generateRandomString(length);
+	while (existingStrings.includes(generatedString)) {
+		generatedString = generateRandomString(length);
+	}
+
+	return generatedString;
 };

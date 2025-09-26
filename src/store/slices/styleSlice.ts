@@ -135,6 +135,11 @@ export const selectStyleSources = createSelector(
 	(slice: StyleCoreState) => slice.mapStyle.sources,
 );
 
+export const selectStyleSourceIds = createSelector(
+	[selectStyleSources],
+	(styleSources) => Object.keys(styleSources),
+);
+
 export const selectSelectedLayerIndex = createSelector(
 	sliceData,
 	(slice: StyleCoreState) => slice.selectedLayerIndex,

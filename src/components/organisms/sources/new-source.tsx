@@ -9,7 +9,9 @@ import FieldSelect from "@/components/molecules/field/field-select";
 import FieldString from "@/components/molecules/field/field-string";
 import Scrollable from "@/components/molecules/layout/scrollable";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
-import { uuidV4 } from "@/libs/random";
+import { generateAndCheckRandomString } from "@/libs/random";
+import { useAppSelector } from "@/store/hooks";
+import { selectStyleSourceIds } from "@/store/slices/styleSlice";
 import { SourceTypes, SourceTypesType } from "@/store/types";
 import SourceEditor from "./editor";
 
@@ -19,13 +21,17 @@ interface NewSourceProps {
 }
 
 const NewSource: React.FC<NewSourceProps> = ({ onAdd, onCancel }) => {
-	const { t } = useTranslation();
-	const [sourceId, setSourceId] = useState(uuidV4());
+	const mapStyleSourcesIds = useAppSelector(selectStyleSourceIds);
+
+	const [sourceId, setSourceId] = useState(
+		generateAndCheckRandomString(8, mapStyleSourcesIds),
+	);
 	const [sourceType, setSourceType] = useState<SourceTypesType>(SourceTypes[0]);
 	const [localSource, setLocalSource] = useState<
 		SourceSpecification | undefined
 	>(undefined);
 
+	const { t } = useTranslation();
 	const { createDefaultSource, patchLocalSource } = useSourceEdition();
 
 	const onChange = useCallback(
