@@ -1,4 +1,4 @@
-import { SourceOnChange } from "./types";
+import { SourceOnChange } from "@/components/organisms/sources/editor/types";
 import { SourceTypeMap } from "@/store/types";
 
 interface GeoJSONSourceEditorProps {
