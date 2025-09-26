@@ -218,7 +218,7 @@ function stripAccessTokens(mapStyle: StyleSpecification) {
 		Object.entries(mapStyle.sources || {}).map(([sourceName, source]) => {
 			if (source && typeof source === "object") {
 				// Remove x_accessToken
-				const { x_accessToken, ...rest } = source as any;
+				const { x_accessToken: _, ...rest } = source as any;
 				// Remove access_token and api_key from url if present
 				let newUrl = rest.url;
 				if (typeof newUrl === "string") {

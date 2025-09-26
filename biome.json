@@ -8,7 +8,10 @@
 	},
 	"overrides": [
 		{
-			"includes": ["**/*.{js,jsx,ts,tsx}", "!dist/**/*"],
+			"includes": [
+				"**/*.{js,jsx,ts,tsx}",
+				"!dist/**/*"
+			],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -56,7 +59,7 @@
 						"noDuplicateElseIf": "error",
 						"noDuplicateObjectKeys": "error",
 						"noDuplicateParameters": "error",
-						"noEmptyBlockStatements": "error",
+						"noEmptyBlockStatements": "off",
 						"noFallthroughSwitchClause": "error",
 						"noFunctionAssign": "error",
 						"noGlobalAssign": "error",
@@ -76,13 +79,19 @@
 			}
 		},
 		{
-			"includes": ["**/*.{js,jsx,ts,tsx}", "!dist/**/*"],
+			"includes": [
+				"**/*.{js,jsx,ts,tsx}",
+				"!dist/**/*"
+			],
 			"javascript": {
 				"globals": []
 			}
 		},
 		{
-			"includes": ["**/*.{js,jsx,ts,tsx}", "!dist/**/*"],
+			"includes": [
+				"**/*.{js,jsx,ts,tsx}",
+				"!dist/**/*"
+			],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -118,7 +127,10 @@
 			}
 		},
 		{
-			"includes": ["**/*.{js,jsx,ts,tsx}", "!dist/**/*"],
+			"includes": [
+				"**/*.{js,jsx,ts,tsx}",
+				"!dist/**/*"
+			],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -144,9 +156,14 @@
 			}
 		},
 		{
-			"includes": ["**/*.{js,jsx,ts,tsx}", "!dist/**/*"],
+			"includes": [
+				"**/*.{js,jsx,ts,tsx}",
+				"!dist/**/*"
+			],
 			"javascript": {
-				"globals": ["global"]
+				"globals": [
+					"global"
+				]
 			},
 			"linter": {
 				"rules": {

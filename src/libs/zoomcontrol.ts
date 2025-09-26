@@ -1,13 +1,12 @@
-import { Map } from "maplibre-gl";
-
+import { Map as Maplibre } from "maplibre-gl";
 export default class ZoomControl {
-	_map: Map | undefined = undefined;
+	_map: Maplibre | undefined = undefined;
 	_container: HTMLDivElement | undefined = undefined;
 	_textEl: HTMLSpanElement | null = null;
 
 	constructor() {}
 
-	onAdd(map: Map) {
+	onAdd(map: Maplibre) {
 		this._map = map;
 		this._container = document.createElement("div");
 		this._container.className =

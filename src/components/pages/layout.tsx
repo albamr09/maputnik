@@ -1,4 +1,4 @@
-import { LngLat, Map, StyleSpecification } from "maplibre-gl";
+import { LngLat, Map as Maplibre, StyleSpecification } from "maplibre-gl";
 import { useCallback, useMemo } from "react";
 import { withTranslation } from "react-i18next";
 import ModalManager from "@/components/organisms/modal/modal-manager";
@@ -161,7 +161,7 @@ const _AppLayout = () => {
 									allowFallback: true,
 								});
 							}}
-							onDataChange={(_e: { map: Map }) => {
+							onDataChange={(_e: { map: Maplibre }) => {
 								// TODO ALBA: I should restore this some time
 								//layerWatcherRef.current?.analyzeMap(e.map);
 								fetchSources();

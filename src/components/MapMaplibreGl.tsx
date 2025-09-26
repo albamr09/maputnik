@@ -4,7 +4,7 @@ import Color from "color";
 import MapLibreGl, {
 	LayerSpecification,
 	LngLat,
-	Map,
+	Map as Maplibre,
 	MapOptions,
 	SourceSpecification,
 	StyleSpecification,
@@ -88,7 +88,7 @@ function buildInspectStyle(
 }
 
 type MapMaplibreGlInternalProps = {
-	onDataChange?(event: { map: Map | null }): unknown;
+	onDataChange?(event: { map: Maplibre | null }): unknown;
 	onLayerSelect(...args: unknown[]): unknown;
 	mapStyle: StyleSpecification;
 	inspectModeEnabled: boolean;
@@ -103,7 +103,7 @@ type MapMaplibreGlInternalProps = {
 } & WithTranslation;
 
 type MapMaplibreGlState = {
-	map: Map | null;
+	map: Maplibre | null;
 	inspect: MaplibreInspect | null;
 	geocoder: MaplibreGeocoder | null;
 	zoomControl: ZoomControl | null;
@@ -347,7 +347,7 @@ class MapMaplibreGlInternal extends React.Component<
 		this.props.onLayerSelect(index);
 	};
 
-	initGeocoder(map: Map) {
+	initGeocoder(map: Maplibre) {
 		const geocoderConfig = {
 			forwardGeocode: async (config: MaplibreGeocoderApiConfig) => {
 				const features = [];

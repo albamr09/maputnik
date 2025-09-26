@@ -1,7 +1,6 @@
 import isEqual from "lodash.isequal";
 import throttle from "lodash.throttle";
-import { Map } from "maplibre-gl";
-
+import { Map as Maplibre } from "maplibre-gl";
 export type LayerWatcherOptions = {
 	onSourcesChange?: (sources: { [sourceId: string]: string[] }) => void;
 	onVectorLayersChange?: (vectorLayers: {
@@ -44,7 +43,7 @@ export default class LayerWatcher {
 		);
 	}
 
-	analyzeMap(map: Map) {
+	analyzeMap(map: Maplibre) {
 		const previousSources = { ...this._sources };
 
 		Object.keys(map.style.sourceCaches).forEach((sourceId) => {
@@ -61,7 +60,7 @@ export default class LayerWatcher {
 		this.throttledAnalyzeVectorLayerFields(map);
 	}
 
-	analyzeVectorLayerFields(map: Map) {
+	analyzeVectorLayerFields(map: Maplibre) {
 		const previousVectorLayers = { ...this._vectorLayers };
 
 		Object.keys(this._sources).forEach((sourceId) => {
