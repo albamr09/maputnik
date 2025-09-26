@@ -1,146 +1,146 @@
-import { DeepPartial } from "@/types";
 import type {
-  StyleSpecification,
-  MapOptions,
-  GeoJSONSourceSpecification,
-  ImageSourceSpecification,
-  RasterDEMSourceSpecification,
-  RasterSourceSpecification,
-  VectorSourceSpecification,
-  VideoSourceSpecification,
+	GeoJSONSourceSpecification,
+	ImageSourceSpecification,
+	MapOptions,
+	RasterDEMSourceSpecification,
+	RasterSourceSpecification,
+	StyleSpecification,
+	VectorSourceSpecification,
+	VideoSourceSpecification,
 } from "maplibre-gl";
+import { DeepPartial } from "@/types";
 
 export const SourceTypes = [
-  "video",
-  "image",
-  "tilejson_vector",
-  "tile_raster",
-  "tilejson_raster",
-  "tilexyz_raster-dem",
-  "tilejson_raster-dem",
-  "pmtiles_vector",
-  "tile_vector",
-  "geojson_url",
-  "geojson_json",
+	"video",
+	"image",
+	"tilejson_vector",
+	"tile_raster",
+	"tilejson_raster",
+	"tilexyz_raster-dem",
+	"tilejson_raster-dem",
+	"pmtiles_vector",
+	"tile_vector",
+	"geojson_url",
+	"geojson_json",
 ] as const;
 export type SourceTypesType = (typeof SourceTypes)[number];
 
 export type SourceTypeMap = {
-  geojson_url: GeoJSONSourceSpecification;
-  geojson_json: GeoJSONSourceSpecification;
-  // TODO ALBA: is this the correct type?
-  pmtiles_vector: VectorSourceSpecification;
-  tilejson_vector: VectorSourceSpecification;
-  tile_vector: VectorSourceSpecification;
-  tilejson_raster: RasterSourceSpecification;
-  tile_raster: RasterSourceSpecification;
-  "tilejson_raster-dem": RasterDEMSourceSpecification;
-  "tilexyz_raster-dem": RasterDEMSourceSpecification;
-  image: ImageSourceSpecification;
-  video: VideoSourceSpecification;
+	geojson_url: GeoJSONSourceSpecification;
+	geojson_json: GeoJSONSourceSpecification;
+	// TODO ALBA: is this the correct type?
+	pmtiles_vector: VectorSourceSpecification;
+	tilejson_vector: VectorSourceSpecification;
+	tile_vector: VectorSourceSpecification;
+	tilejson_raster: RasterSourceSpecification;
+	tile_raster: RasterSourceSpecification;
+	"tilejson_raster-dem": RasterDEMSourceSpecification;
+	"tilexyz_raster-dem": RasterDEMSourceSpecification;
+	image: ImageSourceSpecification;
+	video: VideoSourceSpecification;
 };
 
 export type SourceTypeRelationship<T extends boolean = true> = {
-  [K in SourceTypesType]: {
-    sourceType: K;
-    source: T extends true ? SourceTypeMap[K] : DeepPartial<SourceTypeMap[K]>;
-  };
+	[K in SourceTypesType]: {
+		sourceType: K;
+		source: T extends true ? SourceTypeMap[K] : DeepPartial<SourceTypeMap[K]>;
+	};
 }[SourceTypesType];
 
 export type MapViewMode = "map" | "inspect";
 
 export type ModalName =
-  | "metadata"
-  | "sources"
-  | "import"
-  | "profile"
-  | "geojson-theme"
-  | "shortcuts"
-  | "debug";
+	| "metadata"
+	| "sources"
+	| "import"
+	| "profile"
+	| "geojson-theme"
+	| "shortcuts"
+	| "debug";
 
 export type MapView = {
-  zoom: number;
-  center: {
-    lng: number;
-    lat: number;
-  };
+	zoom: number;
+	center: {
+		lng: number;
+		lat: number;
+	};
 };
 
 type SafeMapOptions = Partial<Record<keyof MapOptions, unknown>>;
 export type MaplibreGlDebugOptions = Partial<SafeMapOptions> & {
-  showTileBoundaries: boolean;
-  showCollisionBoxes: boolean;
-  showOverdrawInspector: boolean;
+	showTileBoundaries: boolean;
+	showCollisionBoxes: boolean;
+	showOverdrawInspector: boolean;
 };
 
 export type MappedError = {
-  message: string;
-  parsed?: {
-    type: string;
-    data: {
-      index: number;
-      key: string;
-      message: string;
-    };
-  };
+	message: string;
+	parsed?: {
+		type: string;
+		data: {
+			index: number;
+			key: string;
+			message: string;
+		};
+	};
 };
 
 export type ExtendedStyleSpecification = StyleSpecification & {
-  id: string;
-  owner?: string;
+	id: string;
+	owner?: string;
 };
 
 export interface StyleCoreState {
-  // Style-related state
-  mapStyle: ExtendedStyleSpecification;
-  dirtyMapStyle?: ExtendedStyleSpecification;
-  spec: any;
-  fileHandle: FileSystemFileHandle | null;
+	// Style-related state
+	mapStyle: ExtendedStyleSpecification;
+	dirtyMapStyle?: ExtendedStyleSpecification;
+	spec: any;
+	fileHandle: FileSystemFileHandle | null;
 
-  // Layers-related state
-  selectedLayerIndex: number;
-  selectedLayerOriginalId?: string;
-  vectorLayers: {};
+	// Layers-related state
+	selectedLayerIndex: number;
+	selectedLayerOriginalId?: string;
+	vectorLayers: {};
 
-  // Debug-related state
-  maplibreGlDebugOptions: MaplibreGlDebugOptions;
+	// Debug-related state
+	maplibreGlDebugOptions: MaplibreGlDebugOptions;
 }
 
 export const SitumEnvironment = ["pro", "pre", "des"] as const;
 export type SitumEnvironmentType = (typeof SitumEnvironment)[number];
 
 export interface UICoreState {
-  // UI-related state
-  mapViewMode: MapViewMode;
-  modalOpenName?: ModalName;
+	// UI-related state
+	mapViewMode: MapViewMode;
+	modalOpenName?: ModalName;
 
-  // Situm
-  apikey?: string;
-  buildingId?: number;
-  selectedFloorId?: number;
-  floorIds: number[];
-  environment: SitumEnvironmentType;
+	// Situm
+	apikey?: string;
+	buildingId?: number;
+	selectedFloorId?: number;
+	floorIds: number[];
+	environment: SitumEnvironmentType;
 
-  // Errors-related state
-  errors: MappedError[];
-  infos: string[];
+	// Errors-related state
+	errors: MappedError[];
+	infos: string[];
 
-  // MapView-related state
-  mapView: MapView;
+	// MapView-related state
+	mapView: MapView;
 }
 
 export interface StyleStoreState {
-  // Revisions
-  revisions: ExtendedStyleSpecification[];
-  currentIdx: number;
+	// Revisions
+	revisions: ExtendedStyleSpecification[];
+	currentIdx: number;
 
-  // Style store
-  storedStyles: string[];
+	// Style store
+	storedStyles: string[];
 }
 
 // Root State Type
 export interface RootState {
-  style: StyleCoreState;
-  styleStore: StyleStoreState;
-  ui: UICoreState;
+	style: StyleCoreState;
+	styleStore: StyleStoreState;
+	ui: UICoreState;
 }
