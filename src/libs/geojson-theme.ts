@@ -58,7 +58,12 @@ const createFilterForFeatureTypeAndCategory = (
     const category = themeEntryName.substring(1);
     return [
       "all",
-      ["!", ["has", "feature_type"]],
+      [
+        // Does not have feature_type property or its value is empty
+        "any",
+        ["!", ["has", "feature_type"]],
+        ["==", ["get", "feature_type"], ""],
+      ],
       ["==", ["get", "category"], category],
     ];
   }
@@ -66,7 +71,12 @@ const createFilterForFeatureTypeAndCategory = (
   // Only feature_type is present
   return [
     "all",
-    ["!", ["has", "category"]],
+    [
+      // Does not have category property or its value is empty
+      "any",
+      ["!", ["has", "category"]],
+      ["==", ["get", "category"], ""],
+    ],
     ["==", ["get", "feature_type"], themeEntryName],
   ];
 };
