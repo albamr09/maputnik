@@ -43,6 +43,25 @@ const getEffectiveValue = <T>(
 const createFilterForFeatureTypeAndCategory = (
   themeEntryName: string,
 ): FilterSpecification => {
+  // Default means no feature_type or category
+  if (themeEntryName == "default") {
+    return [
+      "all",
+      [
+        // Does not have feature_type property or its value is empty
+        "any",
+        ["!", ["has", "feature_type"]],
+        ["==", ["get", "feature_type"], ""],
+      ],
+      [
+        // Does not have category property or its value is empty
+        "any",
+        ["!", ["has", "category"]],
+        ["==", ["get", "category"], ""],
+      ],
+    ];
+  }
+
   if (themeEntryName.includes(".") && !themeEntryName.startsWith(".")) {
     // Both feature_type and category are present: "foo.bar"
     const [featureType, category] = themeEntryName.split(".", 2);
@@ -90,7 +109,7 @@ const createThemeEntryExpression = (
 ): ExpressionSpecification => {
   // Extract and sort entries by specificity so conditinals are checked correctly
   const sortedEntries = Object.entries(theme)
-    .filter(([catName, catProps]) => catName !== "default" && catProps)
+    .filter(([_, catProps]) => catProps)
     .sort(([a], [b]) => {
       const score = (name: string) => {
         if (name.includes(".") && !name.startsWith(".")) return 0; // feature_type+category
@@ -139,7 +158,7 @@ const getThemeEntriesForOpacity = (
 ): string[] => {
   return Object.entries(theme).reduce(
     (acc, [themeEntryName, themeEntryProps]) => {
-      if (themeEntryName === "default" || !themeEntryProps) {
+      if (!themeEntryProps) {
         return acc;
       }
 
@@ -207,7 +226,7 @@ const getThemeEntriesWithExtrusion = (
   const themeEntriesWithExtrusion: string[] = [];
 
   for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (themeEntryName === "default" || !themeEntryProps) {
+    if (!themeEntryProps) {
       continue;
     }
 
@@ -238,7 +257,7 @@ const getThemeEntriesWithoutExtrusion = (
   const themeEntriesWithExtrusion: string[] = [];
 
   for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (themeEntryName === "default" || !themeEntryProps) {
+    if (!themeEntryProps) {
       continue;
     }
 
@@ -270,7 +289,7 @@ const getThemeEntriesThatShouldBeShown = (
   const themeEntriesThatShouldBeShown: string[] = [];
 
   for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (themeEntryName === "default" || !themeEntryProps) {
+    if (!themeEntryProps) {
       continue;
     }
 
