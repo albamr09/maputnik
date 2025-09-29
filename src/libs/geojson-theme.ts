@@ -479,7 +479,7 @@ const createShowFilter = (
     ["==", ["to-boolean", ["get", "show"]], true],
   ]);
 
-  // Condition 2: Feature doesn't have show defined and is true or is not defined on the theme
+  // Condition 2: Feature doesn't have show defined or is not defined on the theme
   if (themeEntriesThatShouldBeShown.length > 0) {
     const themeBasedConditions = themeEntriesThatShouldBeShown.reduce(
       (acc, themeEntryName) => {
