@@ -43,61 +43,61 @@ const getEffectiveValue = <T>(
 const createFilterForFeatureTypeAndCategory = (
 	themeEntryName: string,
 ): FilterSpecification => {
-  // Default means no feature_type or category
-  if (themeEntryName == "default") {
-    return [
-      "all",
-      [
-        // Does not have feature_type property or its value is empty
-        "any",
-        ["!", ["has", "feature_type"]],
-        ["==", ["get", "feature_type"], ""],
-      ],
-      [
-        // Does not have category property or its value is empty
-        "any",
-        ["!", ["has", "category"]],
-        ["==", ["get", "category"], ""],
-      ],
-    ];
-  }
+	// Default means no feature_type or category
+	if (themeEntryName == "default") {
+		return [
+			"all",
+			[
+				// Does not have feature_type property or its value is empty
+				"any",
+				["!", ["has", "feature_type"]],
+				["==", ["get", "feature_type"], ""],
+			],
+			[
+				// Does not have category property or its value is empty
+				"any",
+				["!", ["has", "category"]],
+				["==", ["get", "category"], ""],
+			],
+		];
+	}
 
-  if (themeEntryName.includes(".") && !themeEntryName.startsWith(".")) {
-    // Both feature_type and category are present: "foo.bar"
-    const [featureType, category] = themeEntryName.split(".", 2);
-    return [
-      "all",
-      ["==", ["get", "feature_type"], featureType],
-      ["==", ["get", "category"], category],
-    ];
-  }
+	if (themeEntryName.includes(".") && !themeEntryName.startsWith(".")) {
+		// Both feature_type and category are present: "foo.bar"
+		const [featureType, category] = themeEntryName.split(".", 2);
+		return [
+			"all",
+			["==", ["get", "feature_type"], featureType],
+			["==", ["get", "category"], category],
+		];
+	}
 
-  if (themeEntryName.startsWith(".")) {
-    // Only category is present
-    const category = themeEntryName.substring(1);
-    return [
-      "all",
-      [
-        // Does not have feature_type property or its value is empty
-        "any",
-        ["!", ["has", "feature_type"]],
-        ["==", ["get", "feature_type"], ""],
-      ],
-      ["==", ["get", "category"], category],
-    ];
-  }
+	if (themeEntryName.startsWith(".")) {
+		// Only category is present
+		const category = themeEntryName.substring(1);
+		return [
+			"all",
+			[
+				// Does not have feature_type property or its value is empty
+				"any",
+				["!", ["has", "feature_type"]],
+				["==", ["get", "feature_type"], ""],
+			],
+			["==", ["get", "category"], category],
+		];
+	}
 
-  // Only feature_type is present
-  return [
-    "all",
-    [
-      // Does not have category property or its value is empty
-      "any",
-      ["!", ["has", "category"]],
-      ["==", ["get", "category"], ""],
-    ],
-    ["==", ["get", "feature_type"], themeEntryName],
-  ];
+	// Only feature_type is present
+	return [
+		"all",
+		[
+			// Does not have category property or its value is empty
+			"any",
+			["!", ["has", "category"]],
+			["==", ["get", "category"], ""],
+		],
+		["==", ["get", "feature_type"], themeEntryName],
+	];
 };
 
 // Create MapLibre expression for mapping categories to property values
@@ -107,17 +107,17 @@ const createThemeEntryExpression = (
 	propertyName: keyof ThemeEntryProperties,
 	fallback: any,
 ): ExpressionSpecification => {
-  // Extract and sort entries by specificity so conditinals are checked correctly
-  const sortedEntries = Object.entries(theme)
-    .filter(([_, catProps]) => catProps)
-    .sort(([a], [b]) => {
-      const score = (name: string) => {
-        if (name.includes(".") && !name.startsWith(".")) return 0; // feature_type+category
-        if (name.startsWith(".")) return 1; // category only
-        return 2; // feature_type only
-      };
-      return score(a) - score(b);
-    }) as [string, ThemeEntryProperties][];
+	// Extract and sort entries by specificity so conditinals are checked correctly
+	const sortedEntries = Object.entries(theme)
+		.filter(([_, catProps]) => catProps)
+		.sort(([a], [b]) => {
+			const score = (name: string) => {
+				if (name.includes(".") && !name.startsWith(".")) return 0; // feature_type+category
+				if (name.startsWith(".")) return 1; // category only
+				return 2; // feature_type only
+			};
+			return score(a) - score(b);
+		}) as [string, ThemeEntryProperties][];
 
 	const cases = sortedEntries.reduce((acc, [catName, catProps]) => {
 		let value = getEffectiveValue(
@@ -156,32 +156,32 @@ const getThemeEntriesForOpacity = (
 	defaultProps: ThemeEntryProperties,
 	opacityLevel: number,
 ): string[] => {
-  return Object.entries(theme).reduce(
-    (acc, [themeEntryName, themeEntryProps]) => {
-      if (!themeEntryProps) {
-        return acc;
-      }
+	return Object.entries(theme).reduce(
+		(acc, [themeEntryName, themeEntryProps]) => {
+			if (!themeEntryProps) {
+				return acc;
+			}
 
-      const effectiveOpacity = getEffectiveValue(
-        themeEntryProps,
-        defaultProps,
-        "fillOpacity",
-        1.0,
-      );
+			const effectiveOpacity = getEffectiveValue(
+				themeEntryProps,
+				defaultProps,
+				"fillOpacity",
+				1.0,
+			);
 
-      // Round to 1 decimal place
-      const roundedOpacity =
-        Math.round(parseFloat(effectiveOpacity as any) * 10) / 10;
+			// Round to 1 decimal place
+			const roundedOpacity =
+				Math.round(parseFloat(effectiveOpacity as any) * 10) / 10;
 
-      if (roundedOpacity === opacityLevel) {
-        // Store the full category name for proper filtering
-        acc.push(themeEntryName);
-      }
+			if (roundedOpacity === opacityLevel) {
+				// Store the full category name for proper filtering
+				acc.push(themeEntryName);
+			}
 
-      return acc;
-    },
-    [] as string[],
-  );
+			return acc;
+		},
+		[] as string[],
+	);
 };
 
 // Create opacity filter for features
@@ -225,10 +225,10 @@ const getThemeEntriesWithExtrusion = (
 ): string[] => {
 	const themeEntriesWithExtrusion: string[] = [];
 
-  for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (!themeEntryProps) {
-      continue;
-    }
+	for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
+		if (!themeEntryProps) {
+			continue;
+		}
 
 		const effectiveExtrusion = getEffectiveValue(
 			themeEntryProps,
@@ -256,10 +256,10 @@ const getThemeEntriesWithoutExtrusion = (
 ): string[] => {
 	const themeEntriesWithExtrusion: string[] = [];
 
-  for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (!themeEntryProps) {
-      continue;
-    }
+	for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
+		if (!themeEntryProps) {
+			continue;
+		}
 
 		const effectiveExtrusion = getEffectiveValue(
 			themeEntryProps,
@@ -288,10 +288,10 @@ const getThemeEntriesThatShouldBeShown = (
 ): string[] => {
 	const themeEntriesThatShouldBeShown: string[] = [];
 
-  for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
-    if (!themeEntryProps) {
-      continue;
-    }
+	for (const [themeEntryName, themeEntryProps] of Object.entries(theme)) {
+		if (!themeEntryProps) {
+			continue;
+		}
 
 		const effectiveExtrusion = getEffectiveValue(
 			themeEntryProps,
@@ -479,15 +479,15 @@ const createShowFilter = (
 		["==", ["to-boolean", ["get", "show"]], true],
 	]);
 
-  // Condition 2: Feature doesn't have show defined or is not defined on the theme
-  if (themeEntriesThatShouldBeShown.length > 0) {
-    const themeBasedConditions = themeEntriesThatShouldBeShown.reduce(
-      (acc, themeEntryName) => {
-        acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
-        return acc;
-      },
-      [] as FilterSpecification[],
-    );
+	// Condition 2: Feature doesn't have show defined or is not defined on the theme
+	if (themeEntriesThatShouldBeShown.length > 0) {
+		const themeBasedConditions = themeEntriesThatShouldBeShown.reduce(
+			(acc, themeEntryName) => {
+				acc.push(createFilterForFeatureTypeAndCategory(themeEntryName));
+				return acc;
+			},
+			[] as FilterSpecification[],
+		);
 
 		conditions.push([
 			"all",
