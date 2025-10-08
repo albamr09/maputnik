@@ -6,17 +6,19 @@ import { useCallback, useState } from "react";
 interface JSONTextAreaProps<T> {
 	value?: T;
 	onChange?: (value: T) => void;
-  placeHoder?: string;
+	placeHoder?: string;
 	height?: string;
 }
 
 function JSONTextArea<T>({
 	value,
-  placeHoder,
+	placeHoder,
 	onChange = () => {},
 	height = "fit-content",
 }: JSONTextAreaProps<T>) {
-	const [text, setText] = useState(() => JSON.stringify(value ?? placeHoder, null, 2));
+	const [text, setText] = useState(() =>
+		JSON.stringify(value ?? placeHoder, null, 2),
+	);
 
 	const onRawValueChange = useCallback(
 		(newValue: string) => {

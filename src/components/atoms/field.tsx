@@ -96,9 +96,7 @@ export const Field: React.FC<FieldProps> = ({
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<Info
-										className="h-3 w-3 text-slate-400 hover:cursor-help"
-									/>
+									<Info className="h-3 w-3 text-slate-400 hover:cursor-help" />
 								</TooltipTrigger>
 								<TooltipContent className="max-w-xs">
 									{description}

@@ -15,17 +15,15 @@ const GeoJSONURLEditor: React.FC<GeoJSONURLEditorProps> = ({
 	const { t } = useTranslation();
 
 	return (
-		<>
-			<FieldString
-				label={t("GeoJSON URL")}
-				required
-				placeholder={t("Enter here the URL")}
-				value={source.data as string}
-				onChange={(value) => {
-					onChange("data", value);
-				}}
-			/>
-		</>
+		<FieldString
+			label={t("GeoJSON URL")}
+			required
+			placeholder={t("Enter here the URL")}
+			value={source.data as string}
+			onChange={(value) => {
+				onChange("data", value);
+			}}
+		/>
 	);
 };
 

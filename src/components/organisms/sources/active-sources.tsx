@@ -1,4 +1,4 @@
-import { Check, Pencil, Trash2 } from "lucide-react";
+import { ChevronUp, Pencil, Trash2 } from "lucide-react";
 import { SourceSpecification } from "maplibre-gl";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -21,18 +21,30 @@ import { selectStyleSources } from "@/store/slices/styleSlice";
 interface ActiveSourceProps {
 	id: string;
 	source: SourceSpecification;
+	isExpanded: boolean;
+	onSourceExpanded: (id: string) => void;
+	onSourceCollapsed: (id: string) => void;
 }
 
-const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
-	const [isEditing, setIsEditing] = useState(false);
+const ActiveSource: React.FC<ActiveSourceProps> = ({
+	id,
+	source,
+	isExpanded,
+	onSourceExpanded = () => {},
+	onSourceCollapsed = () => {},
+}) => {
 	const [localSource, setLocalSource] = useState(source);
 
 	const { t } = useTranslation();
 	const { deleteSource, patchLocalSource } = useSourceEdition();
 
 	const toggleEdition = useCallback(() => {
-		setIsEditing((p) => !p);
-	}, []);
+		if (!isExpanded) {
+			onSourceExpanded(id);
+		} else {
+			onSourceCollapsed(id);
+		}
+	}, [isExpanded]);
 
 	const onChange = useCallback(
 		<K extends keyof SourceSpecification>(
@@ -69,11 +81,11 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
 					<div className="flex gap-1">
 						<Button
 							size="sm"
-							variant={isEditing ? "default" : "outline"}
+							variant="outline"
 							onClick={() => toggleEdition()}
-							title={isEditing ? t("Leave changes") : t("Edit source")}
+							title={isExpanded ? t("Leave changes") : t("Edit source")}
 						>
-							{isEditing ? <Check /> : <Pencil />}
+							{isExpanded ? <ChevronUp /> : <Pencil />}
 						</Button>
 						<Button
 							variant="destructive"
@@ -86,7 +98,7 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
 					</div>
 				</div>
 			</CardHeader>
-			{isEditing && (
+			{isExpanded && (
 				<CardContent>
 					<Scrollable maxHeight="300px">
 						<div className="p-3 flex flex-col gap-5">
@@ -106,11 +118,23 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({ id, source }) => {
 const ActiveSources = () => {
 	const mapStyleSources = useAppSelector(selectStyleSources);
 	const { t } = useTranslation();
+
+	const [expandedSourceId, setExpandedSourceId] = useState<string | undefined>(
+		undefined,
+	);
+
 	return (
 		<div className="flex flex-col gap-5">
 			<SectionTitle title={t("Active Sources")} />
 			{Object.entries(mapStyleSources).map(([id, source]) => (
-				<ActiveSource key={id} id={id} source={source} />
+				<ActiveSource
+					key={id}
+					isExpanded={id == expandedSourceId}
+					onSourceExpanded={(id) => setExpandedSourceId(id)}
+					onSourceCollapsed={() => setExpandedSourceId(undefined)}
+					id={id}
+					source={source}
+				/>
 			))}
 		</div>
 	);
