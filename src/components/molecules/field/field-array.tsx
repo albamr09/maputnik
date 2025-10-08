@@ -76,7 +76,7 @@ function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
 								{...componentProps}
 								label={itemLabels?.[index]}
 								labelVariant="secondary"
-								sizeDistribution={itemLabels ? "label-sm" : "no-label"}
+								rowDistribution={itemLabels ? "label-sm" : "no-label"}
 								value={item as T["value"]}
 								onChange={(value: T["value"]) => {
 									updateItem(index, value);

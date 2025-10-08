@@ -1,5 +1,5 @@
 import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
-import JSONEditor from "@/components/molecules/input/json-editor";
+import JSONTextArea from "@/components/atoms/text-area-json";
 
 export interface FieldJSONProps<T>
 	extends Omit<FieldProps, "children">,
@@ -14,8 +14,8 @@ function FieldJSON<T>({
 	...fieldProps
 }: FieldJSONProps<T>) {
 	return (
-		<Field labelAlignment="start" {...fieldProps}>
-			<JSONEditor<T> value={value} onChange={onChange} />
+		<Field labelAlignment="start" layoutVariant="column" {...fieldProps}>
+			<JSONTextArea<T> value={value} placeHoder={placeholder} onChange={onChange} />
 		</Field>
 	);
 }

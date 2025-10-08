@@ -47,19 +47,21 @@ const ModalDatasources = () => {
 			size="xl"
 		>
 			<div className="flex flex-col gap-8">
-				<ActiveSources />
 				{!showAddNewSource && (
-					<Button
-						type="button"
-						size="sm"
-						onClick={() => {
-							setShowAddNewSource(true);
-						}}
-						className="flex"
-					>
-						{t("Add Source")}
-						<Plus className="h-3 w-3" />
-					</Button>
+					<>
+						<ActiveSources />
+						<Button
+							type="button"
+							size="sm"
+							onClick={() => {
+								setShowAddNewSource(true);
+							}}
+							className="flex"
+						>
+							{t("Add Source")}
+							<Plus className="h-3 w-3" />
+						</Button>
+					</>
 				)}
 				{showAddNewSource && (
 					<NewSource

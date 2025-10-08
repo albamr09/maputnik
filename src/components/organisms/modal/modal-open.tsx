@@ -9,7 +9,7 @@ import {
 	TabsTrigger,
 } from "@/components/atoms/tabs";
 import FieldURL from "@/components/molecules/field/field-url";
-import FileDropZone from "@/components/molecules/input/file-dropzone";
+import FileDropZone from "@/components/molecules/file-dropzone";
 import Modal from "@/components/molecules/layout/modal";
 import Scrollable from "@/components/molecules/layout/scrollable";
 import PreviewCard from "@/components/molecules/preview-card";

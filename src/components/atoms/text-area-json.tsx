@@ -3,18 +3,20 @@ import { linter, lintGutter } from "@codemirror/lint";
 import CodeMirror from "@uiw/react-codemirror";
 import { useCallback, useState } from "react";
 
-interface JSONEditorProps<T> {
+interface JSONTextAreaProps<T> {
 	value?: T;
 	onChange?: (value: T) => void;
+  placeHoder?: string;
 	height?: string;
 }
 
-function JSONEditor<T>({
+function JSONTextArea<T>({
 	value,
+  placeHoder,
 	onChange = () => {},
 	height = "fit-content",
-}: JSONEditorProps<T>) {
-	const [text, setText] = useState(() => JSON.stringify(value, null, 2));
+}: JSONTextAreaProps<T>) {
+	const [text, setText] = useState(() => JSON.stringify(value ?? placeHoder, null, 2));
 
 	const onRawValueChange = useCallback(
 		(newValue: string) => {
@@ -40,4 +42,4 @@ function JSONEditor<T>({
 	);
 }
 
-export default JSONEditor;
+export default JSONTextArea;
