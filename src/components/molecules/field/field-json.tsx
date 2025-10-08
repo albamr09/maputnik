@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/atoms/button";
 import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
 import JSONTextArea from "@/components/atoms/text-area-json";
-import { showError } from "@/libs/toast";
+import { showError, showSuccess } from "@/libs/toast";
 
 export interface FieldJSONProps<T>
 	extends Omit<FieldProps, "children">,
@@ -34,8 +34,9 @@ function FieldJSON<T>({
 				try {
 					const json = JSON.parse(event.target?.result as string);
 					onChange(json);
+					showSuccess({ title: `JSON file ${file.name} loaded successfully` });
 				} catch (error) {
-					showError({ title: "Could not load JSON" });
+					showError({ title: `Could not load JSON file ${file.name}` });
 				}
 			};
 			reader.readAsText(file);
@@ -50,7 +51,7 @@ function FieldJSON<T>({
 
 	return (
 		<Field labelAlignment="start" layoutVariant="column" {...fieldProps}>
-			<div className="space-y-2">
+			<>
 				<JSONTextArea<T>
 					value={value}
 					placeHoder={placeholder}
@@ -58,7 +59,7 @@ function FieldJSON<T>({
 				/>
 
 				{allowUpload && (
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+					<div className="flex justify-end">
 						<input
 							ref={fileInputRef}
 							type="file"
@@ -72,14 +73,14 @@ function FieldJSON<T>({
 							variant="outline"
 							size="sm"
 							onClick={() => fileInputRef.current?.click()}
-							className="gap-2"
+							className="gap-2 text-muted-foreground"
 						>
 							<Upload className="h-4 w-4" />
-							{t("Upload file")}
+              {t("Upload File")}
 						</Button>
 					</div>
 				)}
-			</div>
+			</>
 		</Field>
 	);
 }
