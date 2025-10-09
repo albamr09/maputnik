@@ -1,3 +1,4 @@
+import { Check, Plus } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/atoms/button";
@@ -12,10 +13,8 @@ import ActiveSources from "@/components/organisms/sources/active-sources";
 import NewSource, {
 	NewSourceRef,
 } from "@/components/organisms/sources/new-source";
-import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeModal, selectModalOpenName } from "@/store/slices/uiSlice";
-import { Check, Plus } from "lucide-react";
 
 const ModalDatasources = () => {
 	const dispatch = useAppDispatch();
