@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/atoms/button";
 import {
@@ -15,6 +15,7 @@ import NewSource, {
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeModal, selectModalOpenName } from "@/store/slices/uiSlice";
+import { Check, Plus } from "lucide-react";
 
 const ModalDatasources = () => {
 	const dispatch = useAppDispatch();
@@ -28,21 +29,24 @@ const ModalDatasources = () => {
 
 	const { t } = useTranslation();
 
+	const isActiveTab = tabSelected === "active-sources";
+
+	const handleFooterButtonClick = useCallback(() => {
+		if (isActiveTab) {
+			setTabSelected("new-source");
+		} else {
+			newSourceRef.current?.addSource();
+		}
+	}, [isActiveTab]);
+
 	return (
 		<Modal
 			isOpen={modalOpenName == "sources"}
 			onClose={() => dispatch(closeModal())}
 			footerButtons={
-				<Button
-					onClick={() => {
-						if (tabSelected == "active-sources") {
-							setTabSelected("new-source");
-						} else {
-							newSourceRef.current?.addSource();
-						}
-					}}
-				>
-					{tabSelected == "active-sources" ? t("Add New Source") : t("OK")}
+				<Button onClick={handleFooterButtonClick}>
+					{isActiveTab ? t("New") : t("Add")}
+					{isActiveTab ? <Plus /> : <Check />}
 				</Button>
 			}
 			title={t("Data Sources")}
