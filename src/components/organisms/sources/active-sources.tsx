@@ -1,4 +1,4 @@
-import { ChevronUp, Pencil, Trash2 } from "lucide-react";
+import { Check, Pencil, Trash2, X } from "lucide-react";
 import { SourceSpecification } from "maplibre-gl";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -78,13 +78,23 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 					</div>
 
 					<div className="flex gap-1">
+						{isExpanded && (
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => toggleEdition()}
+								title={t("Cancel")}
+							>
+								<X />
+							</Button>
+						)}
 						<Button
 							size="sm"
-							variant="outline"
+							variant={isExpanded ? "default" : "outline"}
 							onClick={() => toggleEdition()}
 							title={isExpanded ? t("Leave changes") : t("Edit source")}
 						>
-							{isExpanded ? <ChevronUp /> : <Pencil />}
+							{isExpanded ? <Check /> : <Pencil />}
 						</Button>
 						<Button
 							variant="destructive"
