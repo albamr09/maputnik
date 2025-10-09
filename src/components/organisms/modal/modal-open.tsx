@@ -1,13 +1,13 @@
 import { FileText, GalleryThumbnails } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import SectionTitle from "@/components/atoms/section-title";
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
 } from "@/components/atoms/tabs";
+import Title from "@/components/atoms/title";
 import FieldURL from "@/components/molecules/field/field-url";
 import FileDropZone from "@/components/molecules/file-dropzone";
 import Modal from "@/components/molecules/layout/modal";
@@ -117,9 +117,9 @@ const ModalOpen = () => {
 					/>
 				</TabsContent>
 
-				<TabsContent value="library" className="space-y-4">
+				<TabsContent value="library" className="space-y-5">
 					<div className="flex flex-col gap-5 items-center w-full">
-						<SectionTitle
+						<Title
 							title={t("Style Gallery")}
 							subtitle={t("Choose from pre-made styles to get started")}
 						/>

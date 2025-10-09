@@ -76,7 +76,7 @@ function FieldJSON<T>({
 							className="gap-2 text-muted-foreground"
 						>
 							<Upload className="h-4 w-4" />
-              {t("Upload File")}
+							{t("Upload File")}
 						</Button>
 					</div>
 				)}

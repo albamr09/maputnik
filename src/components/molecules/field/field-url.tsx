@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
-import SectionTitle from "@/components/atoms/section-title";
+import Title from "@/components/atoms/title";
 
 interface FieldURLProps {
 	title: string;
@@ -22,7 +22,7 @@ const FieldURL: React.FC<FieldURLProps> = ({
 
 	return (
 		<div className="flex flex-col gap-5 items-center w-full">
-			<SectionTitle title={title} subtitle={subtitle} />
+			<Title title={title} subtitle={subtitle} />
 			<form
 				onSubmit={(e) => e.preventDefault()}
 				className="flex gap-2 w-full items-center"

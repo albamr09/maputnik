@@ -30,6 +30,7 @@ interface ModalProps {
 		| "ghost"
 		| "link";
 	maxHeight?: React.CSSProperties["maxHeight"];
+	footerButtons?: React.ReactNode[] | React.ReactNode;
 }
 
 const sizeClasses = {
@@ -52,6 +53,7 @@ export const Modal: React.FC<ModalProps> = ({
 	className = "",
 	confirmVariant = "default",
 	maxHeight = "70vh",
+	footerButtons = [],
 }) => {
 	const handleConfirm = () => {
 		onConfirm?.();
@@ -88,6 +90,7 @@ export const Modal: React.FC<ModalProps> = ({
 								{confirmText}
 							</Button>
 						)}
+						{footerButtons}
 					</DialogFooter>
 				)}
 			</DialogContent>

@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/atoms/card";
-import SectionTitle from "@/components/atoms/section-title";
+import Title from "@/components/atoms/title";
 import { cn } from "@/libs/shadcn-utils";
 
 interface FileDropZoneProps {
@@ -54,7 +54,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
 
 	return (
 		<div className="flex flex-col gap-5">
-			{title && <SectionTitle title={title} subtitle={subtitle} />}
+			{title && <Title title={title} subtitle={subtitle} />}
 			<Card
 				onClick={handleClick}
 				onDrop={handleDrop}

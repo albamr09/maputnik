@@ -10,7 +10,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/atoms/card";
-import SectionTitle from "@/components/atoms/section-title";
 import Scrollable from "@/components/molecules/layout/scrollable";
 import SourceEditor from "@/components/organisms/sources/editor";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
@@ -117,7 +116,6 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 
 const ActiveSources = () => {
 	const mapStyleSources = useAppSelector(selectStyleSources);
-	const { t } = useTranslation();
 
 	const [expandedSourceId, setExpandedSourceId] = useState<string | undefined>(
 		undefined,
@@ -125,7 +123,6 @@ const ActiveSources = () => {
 
 	return (
 		<div className="flex flex-col gap-5">
-			<SectionTitle title={t("Active Sources")} />
 			{Object.entries(mapStyleSources).map(([id, source]) => (
 				<ActiveSource
 					key={id}
