@@ -1,6 +1,9 @@
 import { SourceSpecification } from "maplibre-gl";
 import { useCallback } from "react";
-import { mergeAndRemoveNulls } from "@/libs/style-edition";
+import {
+	mergeAndRemoveNulls,
+	mergeWithReplacementAndRemoveNulls,
+} from "@/libs/style-edition";
 import { SourceTypeMap, SourceTypeRelationship } from "@/store/types";
 import { DeepPartial } from "@/types";
 import useStyleEdition from "./useStyleEdition";
@@ -131,7 +134,26 @@ const useSourceEdition = () => {
 		[],
 	);
 
-	return { deleteSource, createDefaultSource, patchLocalSource, updateSource };
+	const putLocalSource = useCallback(
+		<T extends SourceSpecification>({
+			source,
+			diffSource,
+		}: {
+			source: T;
+			diffSource: DeepPartial<T>;
+		}) => {
+			return mergeWithReplacementAndRemoveNulls(source, diffSource) as T;
+		},
+		[],
+	);
+
+	return {
+		deleteSource,
+		createDefaultSource,
+		patchLocalSource,
+		putLocalSource,
+		updateSource,
+	};
 };
 
 export default useSourceEdition;

@@ -61,7 +61,7 @@ const SourceEditor = forwardRef(
 
 		// Hooks
 		const { t } = useTranslation();
-		const { createDefaultSource, patchLocalSource, updateSource } =
+		const { createDefaultSource, putLocalSource, updateSource } =
 			useSourceEdition();
 
 		useImperativeHandle(
@@ -102,16 +102,16 @@ const SourceEditor = forwardRef(
 				key: K,
 				value: SourceSpecification[K],
 			) => {
-				if (!localSource) return;
+				setLocalSource((prevLocalSource) => {
+					if (!prevLocalSource) return prevLocalSource;
 
-				const newSource = patchLocalSource({
-					source: localSource,
-					diffSource: { [key]: value },
+					return putLocalSource({
+						source: prevLocalSource!,
+						diffSource: { [key]: value },
+					});
 				});
-
-				setLocalSource(newSource);
 			},
-			[localSource],
+			[],
 		);
 
 		const specificSourceFields = useMemo(() => {

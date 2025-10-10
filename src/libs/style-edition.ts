@@ -2,7 +2,7 @@ import {
 	ValidationError,
 	validateStyleMin,
 } from "@maplibre/maplibre-gl-style-spec";
-import { merge } from "lodash";
+import { isObject, merge, mergeWith } from "lodash";
 import unset from "lodash/unset";
 import hash from "string-hash";
 import style from "@/libs/style";
@@ -166,6 +166,26 @@ export const getUpdatedRootSpec = (
 			},
 		},
 	};
+};
+
+export const mergeWithReplacementAndRemoveNulls = <TObject, TSource>(
+	target: TObject,
+	put: TSource,
+): TObject => {
+	const merged = mergeWith(
+		{},
+		target,
+		put,
+		(_objValue, srcValue, key, _object, source) => {
+			// If the key exists in the source (put), we're in "replacement mode"
+			if (key in source) {
+				return srcValue;
+			}
+			// Let lodash handle the deep merge for nested objects
+			return undefined;
+		},
+	);
+	return removeNullsOnMerge(merged, put);
 };
 
 export const mergeAndRemoveNulls = <TObject, TSource>(
