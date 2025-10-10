@@ -121,19 +121,6 @@ const useSourceEdition = () => {
 		[],
 	);
 
-	const patchLocalSource = useCallback(
-		<T extends SourceSpecification>({
-			source,
-			diffSource,
-		}: {
-			source: T;
-			diffSource: DeepPartial<T>;
-		}) => {
-			return mergeAndRemoveNulls(source, diffSource) as T;
-		},
-		[],
-	);
-
 	const putLocalSource = useCallback(
 		<T extends SourceSpecification>({
 			source,
@@ -150,7 +137,6 @@ const useSourceEdition = () => {
 	return {
 		deleteSource,
 		createDefaultSource,
-		patchLocalSource,
 		putLocalSource,
 		updateSource,
 	};

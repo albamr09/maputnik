@@ -105,6 +105,7 @@ const SourceEditor = forwardRef(
 				setLocalSource((prevLocalSource) => {
 					if (!prevLocalSource) return prevLocalSource;
 
+					// Use put for changes without nesting
 					return putLocalSource({
 						source: prevLocalSource!,
 						diffSource: { [key]: value },
