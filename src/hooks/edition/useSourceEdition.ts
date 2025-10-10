@@ -1,9 +1,6 @@
 import { SourceSpecification } from "maplibre-gl";
 import { useCallback } from "react";
-import {
-	mergeAndRemoveNulls,
-	mergeWithReplacementAndRemoveNulls,
-} from "@/libs/style-edition";
+import { mergeWithReplacementAndRemoveNulls } from "@/libs/style-edition";
 import { SourceTypeMap, SourceTypeRelationship } from "@/store/types";
 import { DeepPartial } from "@/types";
 import useStyleEdition from "./useStyleEdition";

@@ -2,7 +2,7 @@ import {
 	ValidationError,
 	validateStyleMin,
 } from "@maplibre/maplibre-gl-style-spec";
-import { isObject, merge, mergeWith } from "lodash";
+import { merge, mergeWith } from "lodash";
 import unset from "lodash/unset";
 import hash from "string-hash";
 import style from "@/libs/style";
