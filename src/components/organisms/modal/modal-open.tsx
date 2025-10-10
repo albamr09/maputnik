@@ -34,12 +34,12 @@ const ModalOpen = () => {
 				setMapStyle(parsedStyle);
 				dispatch(closeModal());
 				showSuccess({
-					title: t("Style loaded successfully"),
+					title: t(`Style ${file.name} loaded successfully`),
 				});
 			})
 			.catch((e) => {
 				showError({
-					title: t("Could not load style"),
+					title: t(`Could not load style ${file.name}`),
 					description: `${t("There was an error:")} ${e.message}`,
 				});
 			});
@@ -62,7 +62,7 @@ const ModalOpen = () => {
 					setMapStyle(parsedStyle);
 					dispatch(closeModal());
 					showSuccess({
-						title: t("Style loaded successfully"),
+						title: t(`Style ${parsedStyle.name ?? ""} loaded successfully`),
 					});
 				})
 				.catch((e) => {
