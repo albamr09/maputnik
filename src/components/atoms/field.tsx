@@ -58,6 +58,7 @@ export interface FieldProps {
 	rowDistribution?: keyof typeof rowDistributionClasses;
 	labelVariant?: keyof typeof labelVariantClasses;
 	layoutVariant?: "row" | "column";
+	trailingButtons?: React.ReactNode[] | React.ReactNode;
 }
 
 export const Field: React.FC<FieldProps> = ({
@@ -71,6 +72,7 @@ export const Field: React.FC<FieldProps> = ({
 	labelAlignment = "center",
 	labelVariant = "default",
 	layoutVariant = "row",
+	trailingButtons = undefined,
 }) => {
 	const isRow = layoutVariant === "row";
 
@@ -78,15 +80,15 @@ export const Field: React.FC<FieldProps> = ({
 		<div
 			className={cn("flex gap-2", isRow ? "flex-row" : "flex-col", className)}
 		>
-			<Label
+			<div
 				className={cn(
-					"flex text-sm font-medium h-auto gap-1",
+					"flex h-auto gap-1 justify-between items-center",
 					isRow ? rowDistributionClasses[rowDistribution]["label"] : "w-full",
 					labelAligmentClasses[labelAlignment],
 				)}
 			>
-				{required && <span className="text-destructive">*</span>}
-				<div className="flex gap-1 items-center">
+				<Label className="flex text-sm font-medium gap-1">
+					{required && <span className="text-destructive">*</span>}
 					{label && (
 						<span className={cn(labelVariantClasses[labelVariant])}>
 							{label}
@@ -96,7 +98,7 @@ export const Field: React.FC<FieldProps> = ({
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<Info className="h-3 w-3 text-slate-400 hover:cursor-help" />
+									<Info className="h-2.5 w-2.5 text-slate-400 hover:cursor-help" />
 								</TooltipTrigger>
 								<TooltipContent className="max-w-xs">
 									{description}
@@ -104,8 +106,9 @@ export const Field: React.FC<FieldProps> = ({
 							</Tooltip>
 						</TooltipProvider>
 					)}
-				</div>
-			</Label>
+				</Label>
+				{trailingButtons}
+			</div>
 			<div
 				className={cn(
 					"flex flex-col gap-2",

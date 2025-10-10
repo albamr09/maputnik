@@ -1,6 +1,6 @@
 import { Check, Pencil, Trash2, X } from "lucide-react";
 import { SourceSpecification } from "maplibre-gl";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/atoms/badge";
 import { Button } from "@/components/atoms/button";
@@ -11,7 +11,9 @@ import {
 	CardTitle,
 } from "@/components/atoms/card";
 import Scrollable from "@/components/molecules/layout/scrollable";
-import SourceEditor from "@/components/organisms/sources/editor";
+import SourceEditor, {
+	SourceEditorRef,
+} from "@/components/organisms/sources/editor/editor";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { getSourceType } from "@/libs/source";
 import { useAppSelector } from "@/store/hooks";
@@ -32,39 +34,28 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 	onSourceExpanded = () => {},
 	onSourceCollapsed = () => {},
 }) => {
-	const [localSource, setLocalSource] = useState(source);
+	const activeSourceRef = useRef<SourceEditorRef>(null);
 
+	// Hooks
 	const { t } = useTranslation();
-	const { deleteSource, patchLocalSource } = useSourceEdition();
-
-	const toggleEdition = useCallback(() => {
-		if (!isExpanded) {
-			onSourceExpanded(id);
-		} else {
-			onSourceCollapsed(id);
-		}
-	}, [isExpanded]);
-
-	const onChange = useCallback(
-		<K extends keyof SourceSpecification>(
-			key: K,
-			value: SourceSpecification[K],
-		) => {
-			if (!source) return;
-
-			const newSource = patchLocalSource({
-				source,
-				diffSource: { [key]: value },
-			});
-
-			setLocalSource(newSource);
-		},
-		[source],
-	);
+	const { deleteSource } = useSourceEdition();
 
 	const sourceType = useMemo(() => {
-		return getSourceType(localSource);
-	}, [localSource]);
+		return getSourceType(source);
+	}, [source]);
+
+	// Callbacks
+	const startEdition = useCallback(() => {
+		onSourceExpanded(id);
+	}, []);
+
+	const cancelEdition = useCallback(() => {
+		onSourceCollapsed(id);
+	}, []);
+
+	const onSourceSaved = useCallback(() => {
+		onSourceCollapsed(id);
+	}, []);
 
 	if (!sourceType) return;
 
@@ -74,7 +65,7 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<CardTitle className="text-base"># {id}</CardTitle>
-						<Badge variant="secondary">{localSource.type}</Badge>
+						<Badge variant="secondary">{source.type}</Badge>
 					</div>
 
 					<div className="flex gap-1">
@@ -82,7 +73,7 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 							<Button
 								size="sm"
 								variant="outline"
-								onClick={() => toggleEdition()}
+								onClick={() => cancelEdition()}
 								title={t("Cancel")}
 							>
 								<X />
@@ -91,8 +82,14 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 						<Button
 							size="sm"
 							variant={isExpanded ? "default" : "outline"}
-							onClick={() => toggleEdition()}
-							title={isExpanded ? t("Leave changes") : t("Edit source")}
+							onClick={() => {
+								if (isExpanded) {
+									activeSourceRef.current?.saveSource();
+								} else {
+									startEdition();
+								}
+							}}
+							title={isExpanded ? t("Save changes") : t("Edit source")}
 						>
 							{isExpanded ? <Check /> : <Pencil />}
 						</Button>
@@ -112,9 +109,11 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 					<Scrollable maxHeight="300px">
 						<div className="p-3 flex flex-col gap-5">
 							<SourceEditor
+								ref={activeSourceRef}
+								sourceId={id}
 								sourceType={sourceType}
-								source={localSource}
-								onChange={onChange}
+								source={source}
+								onSourceSaved={onSourceSaved}
 							/>
 						</div>
 					</Scrollable>

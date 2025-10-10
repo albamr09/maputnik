@@ -6,20 +6,9 @@ import { BaseFieldProps, Field, FieldProps } from "@/components/atoms/field";
 import JSONTextArea from "@/components/atoms/text-area-json";
 import { showError, showSuccess } from "@/libs/toast";
 
-export interface FieldJSONProps<T>
-	extends Omit<FieldProps, "children">,
-		BaseFieldProps<T> {
-	placeholder?: string;
-	allowUpload?: boolean;
-}
+type UploadButtonProps<T> = Pick<BaseFieldProps<T>, "onChange">;
 
-function FieldJSON<T>({
-	value,
-	onChange = () => {},
-	placeholder,
-	allowUpload = true,
-	...fieldProps
-}: FieldJSONProps<T>) {
+function UploadButton<T>({ onChange = () => {} }: UploadButtonProps<T>) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const { t } = useTranslation();
@@ -50,37 +39,57 @@ function FieldJSON<T>({
 	);
 
 	return (
-		<Field labelAlignment="start" layoutVariant="column" {...fieldProps}>
-			<>
-				<JSONTextArea<T>
+		<>
+			<Button
+				type="button"
+				variant="outline"
+				size="sm"
+				onClick={() => fileInputRef.current?.click()}
+				className="gap-2 text-muted-foreground"
+			>
+				<Upload className="h-4 w-4" />
+				{t("Upload File")}
+			</Button>
+			<input
+				ref={fileInputRef}
+				type="file"
+				accept=".json,.geojson"
+				onChange={handleFileUpload}
+				className="hidden"
+			/>
+		</>
+	);
+}
+
+export interface FieldJSONProps<T>
+	extends Omit<FieldProps, "children">,
+		BaseFieldProps<T> {
+	placeholder?: string;
+	allowUpload?: boolean;
+}
+
+function FieldJSON<T>({
+	value,
+	onChange = () => {},
+	placeholder,
+	allowUpload = true,
+	...fieldProps
+}: FieldJSONProps<T>) {
+	return (
+		<Field
+			labelAlignment="start"
+			layoutVariant="column"
+			{...fieldProps}
+			trailingButtons={allowUpload && <UploadButton onChange={onChange} />}
+		>
+			<div className="flex flex-col gap-5">
+				<JSONTextArea
 					value={value}
 					placeHoder={placeholder}
 					onChange={onChange}
+					maxHeight="450px"
 				/>
-
-				{allowUpload && (
-					<div className="flex justify-end">
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept=".json,.geojson"
-							onChange={handleFileUpload}
-							className="hidden"
-							id="json-file-upload"
-						/>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => fileInputRef.current?.click()}
-							className="gap-2 text-muted-foreground"
-						>
-							<Upload className="h-4 w-4" />
-							{t("Upload File")}
-						</Button>
-					</div>
-				)}
-			</>
+			</div>
 		</Field>
 	);
 }

@@ -10,11 +10,10 @@ import {
 } from "@/components/atoms/tabs";
 import Modal from "@/components/molecules/layout/modal";
 import ActiveSources from "@/components/organisms/sources/active-sources";
-import NewSource, {
-	NewSourceRef,
-} from "@/components/organisms/sources/new-source";
+import NewSource from "@/components/organisms/sources/new-source";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeModal, selectModalOpenName } from "@/store/slices/uiSlice";
+import { SourceEditorRef } from "../sources/editor/editor";
 
 const ModalDatasources = () => {
 	const dispatch = useAppDispatch();
@@ -24,7 +23,7 @@ const ModalDatasources = () => {
 		"active-sources" | "new-source"
 	>("active-sources");
 
-	const newSourceRef = useRef<NewSourceRef>(null);
+	const newSourceRef = useRef<SourceEditorRef>(null);
 
 	const { t } = useTranslation();
 
@@ -34,7 +33,7 @@ const ModalDatasources = () => {
 		if (isActiveTab) {
 			setTabSelected("new-source");
 		} else {
-			newSourceRef.current?.addSource();
+			newSourceRef.current?.saveSource();
 		}
 	}, [isActiveTab]);
 
