@@ -51,7 +51,7 @@ class ModalProcessesInternal extends React.Component<ModalProcessesInternalProps
         const filteredSitumLayers = (this.props.mapStyle?.layers || []).filter(
           // @ts-ignore
           (layer) => {
-            return !layer.id.includes("situm-geojson");
+            return !layer.id.includes(`situm-${this.state.sourceId}`);
           },
         );
         const newStyle = {
