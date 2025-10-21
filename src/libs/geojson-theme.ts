@@ -18,6 +18,8 @@ interface ThemeEntryProperties {
 	poiId?: string;
 }
 
+export const DEFAULT_GEOJSON_SOURCE_ID = "geojson";
+
 export interface Theme {
 	default?: ThemeEntryProperties;
 	[categoryName: string]: ThemeEntryProperties | undefined;
@@ -358,6 +360,7 @@ const createExtrusionLayer = (
 	theme: Theme,
 	defaultProps: ThemeEntryProperties,
 	opacityLevel: number,
+	sourceId: string,
 	selectedFloorId = 0,
 ): FillExtrusionLayerSpecification => {
 	// Get categories that have this opacity
@@ -409,12 +412,12 @@ const createExtrusionLayer = (
 
 	// Create layer ID with opacity
 	const opacityStr = opacityLevel.toFixed(1).replace(".", "_");
-	const layerId = `situm-geojson-extrude-opacity-${opacityStr}`;
+	const layerId = `situm-${sourceId}-extrude-opacity-${opacityStr}`;
 
 	return {
 		id: layerId,
 		type: "fill-extrusion",
-		source: "geojson",
+		source: sourceId,
 		"source-layer": "geojson",
 		filter: layerFilter,
 		paint,
@@ -504,6 +507,7 @@ const createLayer = (
 	layerType: "flat" | "stroke" | "line",
 	theme: Theme,
 	defaultProps: ThemeEntryProperties,
+	sourceId: string,
 	selectedFloorId = 0,
 ): LayerSpecification => {
 	let layerFilter: FilterSpecification;
@@ -616,9 +620,9 @@ const createLayer = (
 	};
 
 	return {
-		id: `situm-geojson-${layerType}`,
+		id: `situm-${sourceId}-${layerType}`,
 		type: layerTypeMap[layerType],
-		source: "geojson",
+		source: sourceId,
 		"source-layer": "geojson",
 		filter: layerFilter,
 		paint,
@@ -628,6 +632,7 @@ const createLayer = (
 // Main function to generate all layers
 export function generateMapLibreLayers(
 	themeJson: Theme,
+	sourceId: string,
 	selectedFloorId = 0,
 ): LayerSpecification[] {
 	const defaultProps = themeJson.default || {};
@@ -640,6 +645,7 @@ export function generateMapLibreLayers(
 			layerType,
 			themeJson,
 			defaultProps,
+			sourceId,
 			selectedFloorId,
 		);
 		layers.push(layer);
@@ -656,6 +662,7 @@ export function generateMapLibreLayers(
 			themeJson,
 			defaultProps,
 			opacityLevel,
+			sourceId,
 			selectedFloorId,
 		);
 		layers.push(layer);

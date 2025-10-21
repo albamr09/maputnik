@@ -1,10 +1,15 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import FileDropZone from "@/components/molecules/file-dropzone";
 import Modal from "@/components/molecules/layout/modal";
+import FieldString from "@/components/molecules/field/field-string";
 import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import { readFileAsJSON } from "@/libs/file";
-import { generateMapLibreLayers, Theme } from "@/libs/geojson-theme";
+import {
+	DEFAULT_GEOJSON_SOURCE_ID,
+	generateMapLibreLayers,
+	Theme,
+} from "@/libs/geojson-theme";
 import { showError, showSuccess } from "@/libs/toast";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -24,6 +29,8 @@ const ModalGeoJSONTheme = () => {
 	const mapStyle = useAppSelector(selectMapStyle);
 	const selectedFloorId = useAppSelector(selectSelectedFloorId);
 
+	const [sourceId, setSourceId] = useState(DEFAULT_GEOJSON_SOURCE_ID);
+
 	const { t } = useTranslation();
 	const { patchMapStyle } = useStyleEdition();
 
@@ -34,6 +41,7 @@ const ModalGeoJSONTheme = () => {
 					// Generate layers from theme
 					const generatedLayers = generateMapLibreLayers(
 						parsedTheme,
+						sourceId,
 						selectedFloorId,
 					);
 
@@ -60,7 +68,7 @@ const ModalGeoJSONTheme = () => {
 					});
 				});
 		},
-		[mapStyle, mapStyleLayers, selectedFloorId],
+		[mapStyle, mapStyleLayers, selectedFloorId, sourceId],
 	);
 
 	return (
@@ -74,13 +82,26 @@ const ModalGeoJSONTheme = () => {
 			cancelText={t("Close")}
 			size="xl"
 		>
-			<FileDropZone
-				accept=".json"
-				onFilesUploaded={(files) => {
-					if (files.length == 0) return;
-					onGeoJSONThemeImported(files[0]);
-				}}
-			/>
+			<div className="flex gap-5 flex-col">
+				<FieldString
+					label={t("Source Id")}
+					placeholder={t("Enter source id")}
+					description={t(
+						"ID of the source these layers should use. The layers generated will style and reference this source on the map.",
+					)}
+					value={sourceId}
+					onChange={(value) => {
+						setSourceId(value);
+					}}
+				/>
+				<FileDropZone
+					accept=".json"
+					onFilesUploaded={(files) => {
+						if (files.length == 0) return;
+						onGeoJSONThemeImported(files[0]);
+					}}
+				/>
+			</div>
 		</Modal>
 	);
 };
