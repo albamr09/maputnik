@@ -7,21 +7,26 @@ import {
 	SelectValue,
 } from "@/components/atoms/select";
 
-export interface FieldSelectProps
+export interface Option<Value extends string> {
+	value: Value;
+	label: string;
+}
+
+export interface FieldSelectProps<Value extends string>
 	extends Omit<FieldProps, "children">,
-		BaseFieldProps<string> {
-	options: { value: string; label: string }[];
+		BaseFieldProps<Value> {
+	options: Option<Value>[];
 	placeholder?: string;
 }
 
-const FieldSelect: React.FC<FieldSelectProps> = ({
+const FieldSelect = <Value extends string>({
 	value,
 	options,
 	onChange = () => {},
 	onBlur = () => {},
 	placeholder,
 	...fieldProps
-}) => {
+}: FieldSelectProps<Value>) => {
 	return (
 		<Field {...fieldProps}>
 			<Select value={value} onValueChange={onChange}>
@@ -29,8 +34,8 @@ const FieldSelect: React.FC<FieldSelectProps> = ({
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>
-					{options.map(({ value, label }) => (
-						<SelectItem key={value} value={value}>
+					{options.map(({ value: optValue, label }) => (
+						<SelectItem key={optValue} value={optValue}>
 							<span className="capitalize">{label}</span>
 						</SelectItem>
 					))}

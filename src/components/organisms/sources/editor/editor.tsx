@@ -8,13 +8,8 @@ import {
 } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
-} from "@/components/atoms/form";
+import { Form } from "@/components/atoms/form";
+import FieldForm from "@/components/molecules/field/field-form";
 import FieldSelect from "@/components/molecules/field/field-select";
 import FieldString from "@/components/molecules/field/field-string";
 import Scrollable from "@/components/molecules/layout/scrollable";
@@ -160,9 +155,9 @@ const SourceEditor = forwardRef(
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 							{showSourceId && (
-								<FormField
-									control={form.control}
+								<FieldForm
 									name="sourceId"
+									control={form.control}
 									rules={{
 										required: t("Source id required"),
 										validate: (v) => {
@@ -171,61 +166,53 @@ const SourceEditor = forwardRef(
 												: t("Source id already exists");
 										},
 									}}
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<FieldString
-													label={t("Source ID")}
-													required
-													description={t(
-														"Unique ID that identifies the source and is used in the layer to reference the source.",
-													)}
-													value={field.value}
-													onChange={field.onChange}
-													onBlur={field.onBlur}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+								>
+									{({ value, onChange, onBlur }) => (
+										<FieldString
+											label={t("Source ID")}
+											required
+											description={t(
+												"Unique ID that identifies the source and is used in the layer to reference the source.",
+											)}
+											value={value}
+											onChange={onChange}
+											onBlur={onBlur}
+										/>
 									)}
-								/>
+								</FieldForm>
 							)}
 							{showSourceType && (
-								<FormField
-									control={form.control}
+								<FieldForm
 									name="sourceType"
+									control={form.control}
 									rules={{
 										required: t("Source type required"),
 										validate: (v) => {
-											return SourceTypes.includes(v)
+											return SourceTypes.includes(v as SourceTypesType)
 												? true
 												: t("Source type not supported");
 										},
 									}}
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<FieldSelect
-													label={t("Source Type")}
-													required
-													description={t("The type of the source.")}
-													options={SourceTypes.map((type) => ({
-														value: type,
-														label: type,
-													}))}
-													value={field.value}
-													onChange={(value) => {
-														field.onChange(value);
-														setLocalSourceType(value as SourceTypesType);
-														_createDefaultSource(value as SourceTypesType);
-													}}
-													onBlur={field.onBlur}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+								>
+									{({ value, onChange, onBlur }) => (
+										<FieldSelect
+											label={t("Source Type")}
+											required
+											description={t("The type of the source.")}
+											value={value}
+											onChange={(v) => {
+												onChange(v);
+												setLocalSourceType(v);
+												_createDefaultSource(v);
+											}}
+											onBlur={onBlur}
+											options={SourceTypes.map((type) => ({
+												value: type,
+												label: type,
+											}))}
+										/>
 									)}
-								/>
+								</FieldForm>
 							)}
 							{specificSourceFields}
 						</form>
