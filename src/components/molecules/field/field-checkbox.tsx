@@ -8,11 +8,12 @@ export interface FieldCheckBoxProps
 const FieldCheckbox: React.FC<FieldCheckBoxProps> = ({
 	value,
 	onChange = () => {},
+	onBlur = () => {},
 	...fieldProps
 }) => {
 	return (
 		<Field {...fieldProps}>
-			<Checkbox checked={value} onCheckedChange={onChange} />
+			<Checkbox checked={value} onCheckedChange={onChange} onBlur={onBlur} />
 		</Field>
 	);
 };

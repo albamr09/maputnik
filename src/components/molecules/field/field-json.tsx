@@ -71,6 +71,7 @@ export interface FieldJSONProps<T>
 function FieldJSON<T>({
 	value,
 	onChange = () => {},
+	onBlur = () => {},
 	placeholder,
 	allowUpload = true,
 	...fieldProps
@@ -87,6 +88,7 @@ function FieldJSON<T>({
 					value={value}
 					placeHoder={placeholder}
 					onChange={onChange}
+					onBlur={onBlur}
 					maxHeight="450px"
 				/>
 			</div>

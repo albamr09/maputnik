@@ -6,6 +6,7 @@ import { useCallback, useMemo } from "react";
 interface JSONTextAreaProps<T> {
 	value?: T;
 	onChange?: (value: T) => void;
+	onBlur?: () => void;
 	placeHoder?: string;
 	height?: string;
 	maxHeight?: string;
@@ -15,6 +16,7 @@ function JSONTextArea<T>({
 	value,
 	placeHoder,
 	onChange = () => {},
+	onBlur = () => {},
 	height = "fit-content",
 	maxHeight = "fit-content",
 }: JSONTextAreaProps<T>) {
@@ -47,6 +49,7 @@ function JSONTextArea<T>({
 			theme="light"
 			extensions={[json(), lintGutter(), linter(jsonParseLinter())]}
 			onChange={onRawValueChange}
+			onBlur={onBlur}
 		/>
 	);
 }

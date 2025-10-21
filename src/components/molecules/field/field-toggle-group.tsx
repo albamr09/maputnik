@@ -11,6 +11,7 @@ export interface FieldToggleGroupProps
 const FieldToggleGroup: React.FC<FieldToggleGroupProps> = ({
 	value,
 	onChange = () => {},
+	onBlur = () => {},
 	options,
 	orientation = "horizontal",
 	...fieldProps
@@ -23,6 +24,7 @@ const FieldToggleGroup: React.FC<FieldToggleGroupProps> = ({
 				onValueChange={(newValue) => {
 					if (newValue) onChange(newValue);
 				}}
+				onBlur={onBlur}
 				orientation={orientation}
 			>
 				{options.map(({ value, label, icon }) => (

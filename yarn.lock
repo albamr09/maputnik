@@ -6555,6 +6555,11 @@ react-file-reader-input@^2.0.0:
   resolved "https://registry.yarnpkg.com/react-file-reader-input/-/react-file-reader-input-2.0.0.tgz#44d2a466731d2cc3f51dee9970f204585742243b"
   integrity sha512-1XgkCpwMnNQsuOIy938UCntz8Xzwt9ECwHaH3cCfIQK1SPpH+y7gCYtqEcb6Rm0hAUq7Lp9+Ljoti9zGMswYrQ==
 
+react-hook-form@^7.65.0:
+  version "7.65.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.65.0.tgz#6139dac77ed1081d0178b6830dc6f5ff6ff86361"
+  integrity sha512-xtOzDz063WcXvGWaHgLNrNzlsdFgtUWcb32E6WFaGTd7kPZG3EeDusjdZfUsPwKCKVXy1ZlntifaHZ4l8pAsmw==
+
 react-hot-loader@^4.13.1:
   version "4.13.1"
   resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.13.1.tgz#979fd7598e27338b3faffae6ed01c65374dace5e"

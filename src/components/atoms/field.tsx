@@ -11,6 +11,7 @@ import { cn } from "@/libs/shadcn-utils";
 export interface BaseFieldProps<T> {
 	value?: T;
 	onChange?: (value: T) => void;
+	onBlur?: () => void;
 }
 
 const labelVariantClasses = {

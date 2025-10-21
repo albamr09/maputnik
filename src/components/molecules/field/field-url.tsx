@@ -9,6 +9,7 @@ interface FieldURLProps {
 	subtitle?: string;
 	placeHolder?: string;
 	onClick?: (value: string | undefined) => void;
+	onBlur?: () => void;
 }
 
 const FieldURL: React.FC<FieldURLProps> = ({
@@ -17,11 +18,12 @@ const FieldURL: React.FC<FieldURLProps> = ({
 	buttonText,
 	placeHolder,
 	onClick = () => {},
+	onBlur = () => {},
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	return (
-		<div className="flex flex-col gap-5 items-center w-full">
+		<div className="flex flex-col gap-5 items-center w-full" onBlur={onBlur}>
 			<Title title={title} subtitle={subtitle} />
 			<form
 				onSubmit={(e) => e.preventDefault()}

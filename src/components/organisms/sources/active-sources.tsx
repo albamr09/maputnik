@@ -105,7 +105,7 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 				</div>
 			</CardHeader>
 			{isExpanded && (
-				<CardContent>
+				<CardContent className="p-0">
 					<Scrollable maxHeight="300px">
 						<div className="p-3 flex flex-col gap-5">
 							<SourceEditor

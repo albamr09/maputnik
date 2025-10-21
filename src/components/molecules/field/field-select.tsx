@@ -18,13 +18,14 @@ const FieldSelect: React.FC<FieldSelectProps> = ({
 	value,
 	options,
 	onChange = () => {},
+	onBlur = () => {},
 	placeholder,
 	...fieldProps
 }) => {
 	return (
 		<Field {...fieldProps}>
 			<Select value={value} onValueChange={onChange}>
-				<SelectTrigger className="w-[180px]">
+				<SelectTrigger className="w-[180px]" onBlur={onBlur}>
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>

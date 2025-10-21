@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import FieldString from "@/components/molecules/field/field-string";
 import FileDropZone from "@/components/molecules/file-dropzone";
 import Modal from "@/components/molecules/layout/modal";
-import FieldString from "@/components/molecules/field/field-string";
 import useStyleEdition from "@/hooks/edition/useStyleEdition";
 import { readFileAsJSON } from "@/libs/file";
 import {

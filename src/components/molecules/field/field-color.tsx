@@ -9,6 +9,7 @@ export interface FieldColorProps
 const FieldColor: React.FC<FieldColorProps> = ({
 	value,
 	onChange = () => {},
+	onBlur = () => {},
 	...fieldProps
 }) => {
 	const handleColorChange = (color: string) => {
@@ -17,7 +18,7 @@ const FieldColor: React.FC<FieldColorProps> = ({
 
 	return (
 		<Field {...fieldProps}>
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-2" onBlur={onBlur}>
 				<div className="relative">
 					<Button
 						variant="outline"

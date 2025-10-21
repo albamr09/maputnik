@@ -12,6 +12,7 @@ export interface FieldNumberProps
 const FieldNumber: React.FC<FieldNumberProps> = ({
 	value,
 	onChange = () => {},
+	onBlur = () => {},
 	min,
 	max,
 	step,
@@ -23,6 +24,7 @@ const FieldNumber: React.FC<FieldNumberProps> = ({
 				type="number"
 				value={value}
 				onChange={(e) => onChange(Number(e.target.value))}
+				onBlur={onBlur}
 				min={min}
 				max={max}
 				step={step}

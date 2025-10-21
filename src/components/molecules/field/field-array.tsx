@@ -18,6 +18,7 @@ interface FieldArrayProps<T extends SupportedFieldProps = SupportedFieldProps>
 	value?: T["value"][];
 	itemLabels?: string[];
 	onChange?: (value: T["value"][]) => void;
+	onBlur?: () => void;
 	minItems?: number;
 	maxItems?: number;
 	canAdd?: boolean;
@@ -31,6 +32,7 @@ function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
 	itemLabels,
 	value = [],
 	onChange = () => {},
+	onBlur = () => {},
 	minItems = 0,
 	maxItems = Infinity,
 	canAdd = true,
@@ -81,6 +83,7 @@ function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
 								onChange={(value: T["value"]) => {
 									updateItem(index, value);
 								}}
+								onBlur={onBlur}
 							/>
 						</div>
 						{canAdd && (

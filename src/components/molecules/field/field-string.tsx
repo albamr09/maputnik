@@ -10,6 +10,7 @@ export interface FieldStringProps
 const FieldString: React.FC<FieldStringProps> = ({
 	value,
 	onChange = () => {},
+	onBlur = () => {},
 	placeholder,
 	...fieldProps
 }) => {
@@ -18,6 +19,7 @@ const FieldString: React.FC<FieldStringProps> = ({
 			<Input
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
+				onBlur={onBlur}
 				placeholder={placeholder}
 				className={fieldProps.error ? "border-destructive" : ""}
 			/>
