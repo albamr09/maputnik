@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import {
 	Control,
-	ControllerRenderProps,
 	FieldValues,
 	Path,
 	PathValue,
