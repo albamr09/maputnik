@@ -34,3 +34,40 @@ export const getSourceType = (
 
 	return null;
 };
+
+export const getTypeFromSourceType = (
+	sourceType: SourceTypesType,
+): SourceSpecification["type"] | null => {
+	if (sourceType == "tile_raster" || sourceType == "tilejson_raster") {
+		return "raster";
+	}
+
+	if (
+		sourceType == "tilexyz_raster-dem" ||
+		sourceType == "tilejson_raster-dem"
+	) {
+		return "raster-dem";
+	}
+
+	if (
+		sourceType == "tile_vector" ||
+		sourceType == "pmtiles_vector" ||
+		sourceType == "tilejson_vector"
+	) {
+		return "vector";
+	}
+
+	if (sourceType == "geojson_url" || sourceType == "geojson_json") {
+		return "geojson";
+	}
+
+	if (sourceType == "image") {
+		return "image";
+	}
+
+	if (sourceType == "video") {
+		return "video";
+	}
+
+	return null;
+};

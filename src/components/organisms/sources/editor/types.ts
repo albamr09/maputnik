@@ -1,11 +1,13 @@
-import { SourceTypesType } from "@/store/types";
+import { SourceTypeMap } from "@/store/types";
 
 export type SourceOnChange<T> = <K extends keyof T>(
 	key: K,
 	value: T[K],
 ) => void;
 
-export interface SourceEditorForm {
-	sourceId: string;
-	sourceType: SourceTypesType;
-}
+export type SourceEditorForm = {
+	[K in keyof SourceTypeMap]: {
+		sourceId: string;
+		sourceType: K;
+	} & SourceTypeMap[K];
+}[keyof SourceTypeMap];

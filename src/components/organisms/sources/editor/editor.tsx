@@ -21,7 +21,7 @@ import { selectStyleSourceIds } from "@/store/slices/styleSlice";
 import { SourceTypeMap, SourceTypes, SourceTypesType } from "@/store/types";
 import GeoJSONSourceEditor from "./geojson-source";
 import GeoJSONURLEditor from "./geojson-url-source";
-import { SourceEditorForm, SourceOnChange } from "./types";
+import { SourceEditorForm } from "./types";
 
 interface SourceEditorProps<K extends SourceTypesType> {
 	sourceId?: string;
@@ -52,17 +52,13 @@ const SourceEditor = forwardRef(
 		const mapStyleSourcesIds = useAppSelector(selectStyleSourceIds);
 
 		// State
-		const [localSource, setLocalSource] = useState<
-			SourceSpecification | undefined
-		>(source);
 		const [localSourceType, setLocalSourceType] = useState<SourceTypesType>(
 			sourceType ?? SourceTypes[0],
 		);
 
 		// Hooks
 		const { t } = useTranslation();
-		const { createDefaultSource, putLocalSource, updateSource } =
-			useSourceEdition();
+		const { createDefaultSource, updateSource } = useSourceEdition();
 
 		const form = useForm<SourceEditorForm>({
 			defaultValues: {
@@ -80,74 +76,60 @@ const SourceEditor = forwardRef(
 					form.handleSubmit(onSubmit)();
 				},
 			}),
-			[localSource, onSourceSaved],
+			[onSourceSaved],
 		);
 
-		// Callbacks
-		const _createDefaultSource = useCallback((sourceType: SourceTypesType) => {
-			setLocalSource(
-				createDefaultSource({
-					sourceType,
-					source: {},
-				}),
-			);
+		const onSubmit = useCallback((values: SourceEditorForm) => {
+			const { sourceId, sourceType, ...newSource } = values;
+
+			try {
+				updateSource({ id: values.sourceId, source: newSource });
+				onSourceSaved();
+				showSuccess({
+					title: t(`Source ${values.sourceId} added successfully`),
+				});
+			} catch (e) {
+				showError({
+					title: t(`Could not add source ${values.sourceId}`),
+					description: `There was an error: ${e}`,
+				});
+			}
 		}, []);
 
-		const onChange = useCallback(
-			<K extends keyof SourceSpecification>(
-				key: K,
-				value: SourceSpecification[K],
-			) => {
-				setLocalSource((prevLocalSource) => {
-					if (!prevLocalSource) return prevLocalSource;
-
-					// Use put for changes without nesting
-					return putLocalSource({
-						source: prevLocalSource!,
-						diffSource: { [key]: value },
-					});
+		const resetFormValues = useCallback(
+			(defaultSource: SourceSpecification) => {
+				// Set default values for form
+				const sourceId = form.getValues("sourceId");
+				const sourceType = form.getValues("sourceType");
+				form.reset();
+				form.setValue("sourceId", sourceId);
+				form.setValue("sourceType", sourceType);
+				Object.entries(defaultSource).forEach(([key, value]) => {
+					// @ts-ignore
+					form.setValue(key, value);
 				});
 			},
 			[],
 		);
 
-		const onSubmit = useCallback(
-			(values: SourceEditorForm) => {
-				try {
-					updateSource({ id: values.sourceId, source: localSource! });
-					onSourceSaved();
-					showSuccess({
-						title: t(`Source ${values.sourceId} added successfully`),
-					});
-				} catch (e) {
-					showError({
-						title: t(`Could not add source ${values.sourceId}`),
-						description: `There was an error: ${e}`,
-					});
-				}
-			},
-			[localSource],
-		);
-
 		const specificSourceFields = useMemo(() => {
+			const sourceData =
+				source ??
+				createDefaultSource({
+					sourceType: localSourceType,
+					source: {},
+				});
+
+			resetFormValues(sourceData);
+
 			if (localSourceType === "geojson_url") {
-				return (
-					<GeoJSONURLEditor
-						source={localSource as SourceTypeMap["geojson_url"]}
-						onChange={onChange as SourceOnChange<SourceTypeMap["geojson_url"]>}
-					/>
-				);
+				return <GeoJSONURLEditor control={form.control} />;
 			}
 
 			if (localSourceType === "geojson_json") {
-				return (
-					<GeoJSONSourceEditor
-						source={localSource as SourceTypeMap["geojson_json"]}
-						onChange={onChange as SourceOnChange<SourceTypeMap["geojson_json"]>}
-					/>
-				);
+				return <GeoJSONSourceEditor control={form.control} />;
 			}
-		}, [localSourceType, localSource]);
+		}, [localSourceType, source]);
 
 		return (
 			<Scrollable maxHeight="300px">
@@ -203,7 +185,6 @@ const SourceEditor = forwardRef(
 											onChange={(v) => {
 												onChange(v);
 												setLocalSourceType(v);
-												_createDefaultSource(v);
 											}}
 											onBlur={onBlur}
 											options={SourceTypes.map((type) => ({

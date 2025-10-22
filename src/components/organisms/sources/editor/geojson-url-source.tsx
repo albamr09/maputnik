@@ -1,29 +1,37 @@
+import { Control } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import FieldForm from "@/components/molecules/field/field-form";
 import FieldString from "@/components/molecules/field/field-string";
-import { SourceTypeMap } from "@/store/types";
-import { SourceOnChange } from "./types";
+import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
+import { validateURL } from "@/libs/form";
 
 interface GeoJSONURLEditorProps {
-	source: SourceTypeMap["geojson_url"];
-	onChange?: SourceOnChange<SourceTypeMap["geojson_url"]>;
+	control: Control<SourceEditorForm>;
 }
 
-const GeoJSONURLEditor: React.FC<GeoJSONURLEditorProps> = ({
-	source,
-	onChange = () => {},
-}) => {
+const GeoJSONURLEditor: React.FC<GeoJSONURLEditorProps> = ({ control }) => {
 	const { t } = useTranslation();
 
 	return (
-		<FieldString
-			label={t("GeoJSON URL")}
-			required
-			placeholder={t("Enter here the URL")}
-			value={source.data as string}
-			onChange={(value) => {
-				onChange("data", value);
+		<FieldForm
+			name="data"
+			control={control}
+			rules={{
+				required: t("URL required"),
+				validate: (v) => validateURL(v),
 			}}
-		/>
+		>
+			{({ value, onChange, onBlur }) => (
+				<FieldString
+					label={t("GeoJSON URL")}
+					required
+					placeholder={t("Enter here the URL")}
+					value={value as string}
+					onChange={onChange}
+					onBlur={onBlur}
+				/>
+			)}
+		</FieldForm>
 	);
 };
 
