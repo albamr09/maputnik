@@ -121,7 +121,10 @@ const SourceEditor = forwardRef(
 				source: {},
 			});
 
-			const sourceData = putLocalSource({source: defaultSource, diffSource: source});
+			const sourceData = putLocalSource({
+				source: defaultSource,
+				diffSource: source,
+			});
 
 			resetFormValues(sourceData);
 
@@ -200,7 +203,7 @@ const SourceEditor = forwardRef(
 											onBlur={onBlur}
 											options={SourceTypes.map((type) => ({
 												value: type,
-												label: type,
+												label: type.replace("_", " "),
 											}))}
 										/>
 									)}
