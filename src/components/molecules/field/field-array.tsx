@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
-import { ComponentType, useCallback } from "react";
+import { ComponentType, useCallback, useMemo } from "react";
 import { Button } from "@/components/atoms/button";
 import { Field, FieldProps } from "@/components/atoms/field";
 import { FieldColorProps } from "@/components/molecules/field/field-color";
@@ -41,21 +41,29 @@ function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
 	getDefaultValue,
 	...fieldProps
 }: FieldArrayProps<T>) {
+	const allowRemove = useMemo(() => {
+		return value.length > minItems;
+	}, [value, minItems]);
+
+	const allowAdd = useMemo(() => {
+		return value.length < maxItems;
+	}, [value, minItems]);
+
 	const addItem = useCallback(() => {
-		if (value.length < maxItems) {
+		if (allowAdd) {
 			const newItem = getDefaultValue();
 			onChange([...value, newItem]);
 		}
-	}, [value, onChange, getDefaultValue]);
+	}, [value, onChange, getDefaultValue, allowAdd]);
 
 	const removeItem = useCallback(
 		(index: number) => {
-			if (value.length > minItems) {
+			if (allowRemove) {
 				const newValue = value.filter((_, i) => i !== index);
 				onChange(newValue);
 			}
 		},
-		[value, onChange],
+		[value, onChange, allowRemove],
 	);
 
 	const updateItem = useCallback(
@@ -90,6 +98,7 @@ function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
 							<Button
 								type="button"
 								variant="destructive"
+								disabled={!allowRemove}
 								size="sm"
 								onClick={() => removeItem(index)}
 							>
@@ -102,8 +111,8 @@ function FieldArray<T extends SupportedFieldProps = SupportedFieldProps>({
 					<Button
 						type="button"
 						size="sm"
+						disabled={!allowAdd}
 						onClick={addItem}
-						disabled={value.length >= maxItems}
 						className="flex"
 					>
 						<Plus className="h-3 w-3" />

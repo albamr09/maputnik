@@ -23,6 +23,7 @@ import GeoJSONSourceEditor from "./geojson-source";
 import GeoJSONURLEditor from "./geojson-url-source";
 import { SourceEditorForm } from "./types";
 import VectorTileJSONSourceEditor from "./vector-tile-json";
+import VectorTilesSourceEditor from "./vector-tiles";
 
 interface SourceEditorProps<K extends SourceTypesType> {
 	sourceId?: string;
@@ -134,10 +135,14 @@ const SourceEditor = forwardRef(
 			if (localSourceType === "tilejson_vector") {
 				return <VectorTileJSONSourceEditor control={form.control} />;
 			}
+
+			if (localSourceType === "tile_vector") {
+				return <VectorTilesSourceEditor control={form.control} />;
+			}
 		}, [localSourceType, source]);
 
 		return (
-			<Scrollable maxHeight="300px">
+			<Scrollable maxHeight="50vh">
 				<div className="flex flex-col gap-5">
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
