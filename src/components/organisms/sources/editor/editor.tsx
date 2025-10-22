@@ -60,7 +60,8 @@ const SourceEditor = forwardRef(
 
 		// Hooks
 		const { t } = useTranslation();
-		const { createDefaultSource, updateSource } = useSourceEdition();
+		const { createDefaultSource, updateSource, putLocalSource } =
+			useSourceEdition();
 
 		const form = useForm<SourceEditorForm>({
 			defaultValues: {
@@ -115,12 +116,12 @@ const SourceEditor = forwardRef(
 		);
 
 		const specificSourceFields = useMemo(() => {
-			const sourceData =
-				source ??
-				createDefaultSource({
-					sourceType: localSourceType,
-					source: {},
-				});
+			const defaultSource = createDefaultSource({
+				sourceType: localSourceType,
+				source: {},
+			});
+
+			const sourceData = putLocalSource({source: defaultSource, diffSource: source});
 
 			resetFormValues(sourceData);
 
