@@ -22,6 +22,7 @@ import { SourceTypeMap, SourceTypes, SourceTypesType } from "@/store/types";
 import GeoJSONSourceEditor from "./geojson-source";
 import GeoJSONURLEditor from "./geojson-url-source";
 import { SourceEditorForm } from "./types";
+import VectorTileJSONSourceEditor from "./vector-tile-json";
 
 interface SourceEditorProps<K extends SourceTypesType> {
 	sourceId?: string;
@@ -128,6 +129,10 @@ const SourceEditor = forwardRef(
 
 			if (localSourceType === "geojson_json") {
 				return <GeoJSONSourceEditor control={form.control} />;
+			}
+
+			if (localSourceType === "tilejson_vector") {
+				return <VectorTileJSONSourceEditor control={form.control} />;
 			}
 		}, [localSourceType, source]);
 

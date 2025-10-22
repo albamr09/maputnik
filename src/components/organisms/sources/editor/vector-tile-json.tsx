@@ -6,16 +6,18 @@ import FieldString from "@/components/molecules/field/field-string";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
 import { validateURL } from "@/libs/form";
 
-interface GeoJSONURLEditorProps {
+interface VectorTileJSONSourceEditorProps {
 	control: Control<SourceEditorForm>;
 }
 
-const GeoJSONURLEditor: React.FC<GeoJSONURLEditorProps> = ({ control }) => {
+const VectorTileJSONSourceEditor: React.FC<VectorTileJSONSourceEditorProps> = ({
+	control,
+}) => {
 	const { t } = useTranslation();
 
 	return (
 		<FieldForm
-			name="data"
+			name="url"
 			control={control}
 			rules={{
 				required: t("URL required"),
@@ -24,10 +26,10 @@ const GeoJSONURLEditor: React.FC<GeoJSONURLEditorProps> = ({ control }) => {
 		>
 			{({ value, onChange, onBlur }) => (
 				<FieldString
-					label={t("GeoJSON URL")}
+					label={t("TileJSON URL")}
+					description={latest.source_vector.url.doc}
 					required
 					placeholder={t("Enter here the URL")}
-					description={latest.source_geojson.data.doc}
 					value={value as string}
 					onChange={onChange}
 					onBlur={onBlur}
@@ -37,4 +39,4 @@ const GeoJSONURLEditor: React.FC<GeoJSONURLEditorProps> = ({ control }) => {
 	);
 };
 
-export default GeoJSONURLEditor;
+export default VectorTileJSONSourceEditor;
