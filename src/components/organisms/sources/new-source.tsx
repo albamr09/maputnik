@@ -12,6 +12,7 @@ const NewSource = forwardRef<SourceEditorRef, NewSourceProps>(
 		return (
 			<SourceEditor
 				ref={ref}
+        maxHeight={"50vh"}
 				showSourceId
 				showSourceType
 				onSourceSaved={onNewSourceAdded}

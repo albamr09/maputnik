@@ -106,17 +106,16 @@ const ActiveSource: React.FC<ActiveSourceProps> = ({
 			</CardHeader>
 			{isExpanded && (
 				<CardContent className="p-0">
-					<Scrollable maxHeight="300px">
-						<div className="p-3 flex flex-col gap-5">
-							<SourceEditor
-								ref={activeSourceRef}
-								sourceId={id}
-								sourceType={sourceType}
-								source={source}
-								onSourceSaved={onSourceSaved}
-							/>
-						</div>
-					</Scrollable>
+					<div className="p-3 flex flex-col gap-5">
+						<SourceEditor
+							ref={activeSourceRef}
+							maxHeight={"30vh"}
+							sourceId={id}
+							sourceType={sourceType}
+							source={source}
+							onSourceSaved={onSourceSaved}
+						/>
+					</div>
 				</CardContent>
 			)}
 		</Card>

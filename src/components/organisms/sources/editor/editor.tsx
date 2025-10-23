@@ -30,6 +30,7 @@ import { SourceTypeMap, SourceTypes, SourceTypesType } from "@/store/types";
 import TilesDEMSourceEditor from "./dem/tiles-dem";
 
 interface SourceEditorProps<K extends SourceTypesType> {
+  maxHeight: React.CSSProperties["maxHeight"];
 	sourceId?: string;
 	sourceType?: K;
 	source?: SourceTypeMap[K];
@@ -45,6 +46,7 @@ export interface SourceEditorRef {
 const SourceEditor = forwardRef(
 	<K extends SourceTypesType>(
 		{
+      maxHeight,
 			sourceId,
 			source,
 			sourceType,
@@ -176,7 +178,7 @@ const SourceEditor = forwardRef(
 		}, [localSourceType, source]);
 
 		return (
-			<Scrollable maxHeight="50vh">
+			<Scrollable maxHeight={maxHeight}>
 				<div className="flex flex-col gap-5 py-2">
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
