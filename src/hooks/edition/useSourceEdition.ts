@@ -26,7 +26,6 @@ const useSourceEdition = () => {
 			// Inject situm auth
 			if ("situmAccessToken" in source) {
 				source["x_accessToken"] = getSitumJWT();
-				delete source["situmAccessToken"];
 			}
 			patchMapStyle({ sources: { [id]: source } });
 		},
