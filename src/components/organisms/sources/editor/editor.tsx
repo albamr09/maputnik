@@ -20,6 +20,7 @@ import TilesSourceEditor from "@/components/organisms/sources/editor/tile/tiles"
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { generateAndCheckRandomString } from "@/libs/random";
+import { getSourceTypeDisplayName } from "@/libs/source";
 import { showError, showSuccess } from "@/libs/toast";
 import { useAppSelector } from "@/store/hooks";
 import { selectStyleSourceIds } from "@/store/slices/styleSlice";
@@ -211,7 +212,9 @@ const SourceEditor = forwardRef(
 											onBlur={onBlur}
 											options={SourceTypes.map((type) => ({
 												value: type,
-												label: type.replace("_", " "),
+												label: getSourceTypeDisplayName(
+													type as SourceTypesType,
+												),
 											}))}
 										/>
 									)}

@@ -71,3 +71,41 @@ export const getTypeFromSourceType = (
 
 	return null;
 };
+
+export const getSourceTypeDisplayName = (sourceType: SourceTypesType) => {
+	if (sourceType == "tile_raster") {
+		return "Raster (Tile URLs)";
+	}
+	if (sourceType == "tilejson_raster") {
+		return "Raster (TileJSON URL)";
+	}
+	if (sourceType == "tilexyz_raster-dem") {
+		return "Raster DEM (Tile URLs)";
+	}
+	if (sourceType == "tilejson_raster-dem") {
+		return "Raster DEM (XYZ URLs)";
+	}
+	if (sourceType == "tile_vector") {
+		return "Vector (Tile URLs)";
+	}
+	if (sourceType == "tilejson_vector") {
+		return "Vector (TileJSON URL)";
+	}
+	if (sourceType == "pmtiles_vector") {
+		return "Vector (PMTiles)";
+	}
+	if (sourceType == "geojson_url") {
+		return "GeoJSON (URL)";
+	}
+	if (sourceType == "geojson_json") {
+		return "GeoJSON (JSON)";
+	}
+	if (sourceType == "image") {
+		return "Image";
+	}
+	if (sourceType == "video") {
+		return "Video";
+	}
+
+	return "Generic Source";
+};
