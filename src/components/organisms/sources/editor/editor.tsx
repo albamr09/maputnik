@@ -13,17 +13,17 @@ import FieldForm from "@/components/molecules/field/field-form";
 import FieldSelect from "@/components/molecules/field/field-select";
 import FieldString from "@/components/molecules/field/field-string";
 import Scrollable from "@/components/molecules/layout/scrollable";
+import GeoJSONSourceEditor from "@/components/organisms/sources/editor/geojson/geojson-source";
+import GeoJSONURLEditor from "@/components/organisms/sources/editor/geojson/geojson-url-source";
+import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
+import VectorTileJSONSourceEditor from "@/components/organisms/sources/editor/vector/vector-tile-json";
+import VectorTilesSourceEditor from "@/components/organisms/sources/editor/vector/vector-tiles";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { generateAndCheckRandomString } from "@/libs/random";
 import { showError, showSuccess } from "@/libs/toast";
 import { useAppSelector } from "@/store/hooks";
 import { selectStyleSourceIds } from "@/store/slices/styleSlice";
 import { SourceTypeMap, SourceTypes, SourceTypesType } from "@/store/types";
-import GeoJSONSourceEditor from "./geojson-source";
-import GeoJSONURLEditor from "./geojson-url-source";
-import { SourceEditorForm } from "./types";
-import VectorTileJSONSourceEditor from "./vector-tile-json";
-import VectorTilesSourceEditor from "./vector-tiles";
 
 interface SourceEditorProps<K extends SourceTypesType> {
 	sourceId?: string;
