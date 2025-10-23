@@ -10,7 +10,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/atoms/card";
-import Scrollable from "@/components/molecules/layout/scrollable";
 import SourceEditor, {
 	SourceEditorRef,
 } from "@/components/organisms/sources/editor/editor";
