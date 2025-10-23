@@ -7,6 +7,7 @@ import FieldNumber from "@/components/molecules/field/field-number";
 import FieldSelect from "@/components/molecules/field/field-select";
 import TilesSourceEditor from "@/components/organisms/sources/editor/tile/tiles";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
+import { validateRasterDEMEncoding, validateTileSize } from "@/libs/form";
 
 interface TilesDEMSourceEditorProps {
 	control: Control<SourceEditorForm>;
@@ -23,7 +24,6 @@ const TilesDEMSourceEditor: React.FC<TilesDEMSourceEditorProps> = ({
 			label: encoding,
 		}),
 	);
-	console.log(test);
 
 	return (
 		<>
@@ -33,6 +33,11 @@ const TilesDEMSourceEditor: React.FC<TilesDEMSourceEditorProps> = ({
 				control={control}
 				rules={{
 					required: t("Tile size is required"),
+					min: {
+						value: 1,
+						message: t("Tile size must be greater than 0"),
+					},
+					validate: (v) => validateTileSize(v),
 				}}
 			>
 				{({ value, onChange, onBlur }) => (
@@ -46,7 +51,13 @@ const TilesDEMSourceEditor: React.FC<TilesDEMSourceEditorProps> = ({
 					/>
 				)}
 			</FieldForm>
-			<FieldForm name="encoding" control={control}>
+			<FieldForm
+				name="encoding"
+				control={control}
+				rules={{
+					validate: (v) => validateRasterDEMEncoding(v),
+				}}
+			>
 				{({ value, onChange, onBlur }) => (
 					<FieldSelect
 						label={t("Encoding")}
