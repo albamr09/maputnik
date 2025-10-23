@@ -4,6 +4,7 @@ import type {
 	MapOptions,
 	RasterDEMSourceSpecification,
 	RasterSourceSpecification,
+	SourceSpecification,
 	StyleSpecification,
 	VectorSourceSpecification,
 	VideoSourceSpecification,
@@ -88,6 +89,10 @@ export type MappedError = {
 export type ExtendedStyleSpecification = StyleSpecification & {
 	id: string;
 	owner?: string;
+};
+
+export type ExtendedSourceSpecification = SourceSpecification & {
+	x_accessToken?: string;
 };
 
 export interface StyleCoreState {

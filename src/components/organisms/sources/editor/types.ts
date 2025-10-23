@@ -9,5 +9,6 @@ export type SourceEditorForm = {
 	[K in keyof SourceTypeMap]: {
 		sourceId: string;
 		sourceType: K;
+		situmAccessToken?: boolean;
 	} & SourceTypeMap[K];
 }[keyof SourceTypeMap];

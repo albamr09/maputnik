@@ -1,12 +1,18 @@
 import { SourceSpecification } from "maplibre-gl";
 import { useCallback } from "react";
 import { mergeWithReplacementAndRemoveNulls } from "@/libs/style-edition";
-import { SourceTypeMap, SourceTypeRelationship } from "@/store/types";
+import { useSitumSDK } from "@/providers/SitumSDKProvider";
+import {
+	ExtendedSourceSpecification,
+	SourceTypeMap,
+	SourceTypeRelationship,
+} from "@/store/types";
 import { DeepPartial } from "@/types";
 import useStyleEdition from "./useStyleEdition";
 
 const useSourceEdition = () => {
 	const { patchMapStyle } = useStyleEdition();
+	const { getJWT: getSitumJWT } = useSitumSDK();
 
 	const deleteSource = useCallback(
 		(id: string) => {
@@ -16,9 +22,12 @@ const useSourceEdition = () => {
 	);
 
 	const updateSource = useCallback(
-		({ id, source }: { id: string; source: SourceSpecification }) => {
-			// TODO ALBA: when adding a new source we have to overwrite
-			// other ones that existed before if they have the same id
+		({ id, source }: { id: string; source: ExtendedSourceSpecification }) => {
+			// Inject situm auth
+			if ("situmAccessToken" in source) {
+				source["x_accessToken"] = getSitumJWT();
+				delete source["situmAccessToken"];
+			}
 			patchMapStyle({ sources: { [id]: source } });
 		},
 		[patchMapStyle],
