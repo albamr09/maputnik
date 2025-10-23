@@ -11,13 +11,11 @@ import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
 import { MAX_MAP_ZOOM, MIN_MAP_ZOOM } from "@/constants";
 import { validateURL } from "@/libs/form";
 
-interface VectorTilesSourceEditorProps {
+interface TilesSourceEditorProps {
 	control: Control<SourceEditorForm>;
 }
 
-const VectorTilesSourceEditor: React.FC<VectorTilesSourceEditorProps> = ({
-	control,
-}) => {
+const TilesSourceEditor: React.FC<TilesSourceEditorProps> = ({ control }) => {
 	const { t } = useTranslation();
 
 	const schemeTypeOptions = useMemo(() => {
@@ -62,6 +60,7 @@ const VectorTilesSourceEditor: React.FC<VectorTilesSourceEditorProps> = ({
 					<FieldSelect
 						label={t("Scheme Type")}
 						description={latest.source_vector.scheme.doc}
+            defaultValue={latest.source_vector.scheme.default}
 						value={value}
 						options={schemeTypeOptions}
 						// @ts-ignore
@@ -81,6 +80,7 @@ const VectorTilesSourceEditor: React.FC<VectorTilesSourceEditorProps> = ({
 					<FieldNumber
 						label={t("Min Zoom")}
 						description={latest.source_vector.minzoom.doc}
+            defaultValue={latest.source_vector.minzoom.default}
 						value={value}
 						min={MIN_MAP_ZOOM}
 						max={MAX_MAP_ZOOM}
@@ -100,6 +100,7 @@ const VectorTilesSourceEditor: React.FC<VectorTilesSourceEditorProps> = ({
 					<FieldNumber
 						label={t("Max Zoom")}
 						description={latest.source_vector.maxzoom.doc}
+            defaultValue={latest.source_vector.maxzoom.default}
 						value={value}
 						min={MIN_MAP_ZOOM}
 						max={MAX_MAP_ZOOM}
@@ -112,4 +113,4 @@ const VectorTilesSourceEditor: React.FC<VectorTilesSourceEditorProps> = ({
 	);
 };
 
-export default VectorTilesSourceEditor;
+export default TilesSourceEditor;

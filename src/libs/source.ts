@@ -80,10 +80,10 @@ export const getSourceTypeDisplayName = (sourceType: SourceTypesType) => {
 		return "Raster (TileJSON URL)";
 	}
 	if (sourceType == "tilexyz_raster-dem") {
-		return "Raster DEM (Tile URLs)";
+		return "Raster DEM (XYZ URLs)";
 	}
 	if (sourceType == "tilejson_raster-dem") {
-		return "Raster DEM (XYZ URLs)";
+		return "Raster DEM (TileJSON URL)";
 	}
 	if (sourceType == "tile_vector") {
 		return "Vector (Tile URLs)";

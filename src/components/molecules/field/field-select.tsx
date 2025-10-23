@@ -21,6 +21,7 @@ export interface FieldSelectProps<Value extends string>
 
 const FieldSelect = <Value extends string>({
 	value,
+	defaultValue,
 	options,
 	onChange = () => {},
 	onBlur = () => {},
@@ -29,7 +30,11 @@ const FieldSelect = <Value extends string>({
 }: FieldSelectProps<Value>) => {
 	return (
 		<Field {...fieldProps}>
-			<Select value={value} onValueChange={onChange}>
+			<Select
+				value={value}
+				defaultValue={defaultValue}
+				onValueChange={onChange}
+			>
 				<SelectTrigger className="w-[180px]" onBlur={onBlur}>
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>

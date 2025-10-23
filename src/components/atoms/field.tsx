@@ -10,6 +10,7 @@ import { cn } from "@/libs/shadcn-utils";
 
 export interface BaseFieldProps<T> {
 	value?: T;
+  defaultValue?: T;
 	onChange?: (value: T) => void;
 	onBlur?: () => void;
 }

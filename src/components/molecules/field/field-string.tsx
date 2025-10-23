@@ -9,6 +9,7 @@ export interface FieldStringProps
 
 const FieldString: React.FC<FieldStringProps> = ({
 	value,
+  defaultValue,
 	onChange = () => {},
 	onBlur = () => {},
 	placeholder,
@@ -18,6 +19,7 @@ const FieldString: React.FC<FieldStringProps> = ({
 		<Field {...fieldProps}>
 			<Input
 				value={value}
+        defaultValue={defaultValue}
 				onChange={(e) => onChange(e.target.value)}
 				onBlur={onBlur}
 				placeholder={placeholder}

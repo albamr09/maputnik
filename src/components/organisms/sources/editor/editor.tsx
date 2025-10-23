@@ -25,6 +25,7 @@ import { showError, showSuccess } from "@/libs/toast";
 import { useAppSelector } from "@/store/hooks";
 import { selectStyleSourceIds } from "@/store/slices/styleSlice";
 import { SourceTypeMap, SourceTypes, SourceTypesType } from "@/store/types";
+import TilesDEMSourceEditor from "./dem/tiles-dem";
 
 interface SourceEditorProps<K extends SourceTypesType> {
 	sourceId?: string;
@@ -152,11 +153,19 @@ const SourceEditor = forwardRef(
 			if (localSourceType === "tile_raster") {
 				return <TilesSourceEditor control={form.control} />;
 			}
+
+			if (localSourceType === "tilejson_raster-dem") {
+				return <TileJSONSourceEditor control={form.control} />;
+			}
+
+			if (localSourceType === "tilexyz_raster-dem") {
+				return <TilesDEMSourceEditor control={form.control} />;
+			}
 		}, [localSourceType, source]);
 
 		return (
 			<Scrollable maxHeight="50vh">
-				<div className="flex flex-col gap-5">
+				<div className="flex flex-col gap-5 py-2">
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 							{showSourceId && (

@@ -22,6 +22,7 @@ const GeoJSONSourceEditor: React.FC<GeoJSONSourceEditorProps> = ({
 					<FieldCheckbox
 						label={t("Cluster")}
 						description={latest.source_geojson.cluster.doc}
+						defaultValue={latest.source_geojson.cluster.default}
 						value={value}
 						onChange={onChange}
 						onBlur={onBlur}

@@ -8,6 +8,7 @@ export interface FieldColorProps
 
 const FieldColor: React.FC<FieldColorProps> = ({
 	value,
+	defaultValue,
 	onChange = () => {},
 	onBlur = () => {},
 	...fieldProps
@@ -36,6 +37,7 @@ const FieldColor: React.FC<FieldColorProps> = ({
 					<input
 						type="color"
 						value={value}
+						defaultValue={defaultValue}
 						onChange={(e) => handleColorChange(e.target.value)}
 						className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
 					/>
