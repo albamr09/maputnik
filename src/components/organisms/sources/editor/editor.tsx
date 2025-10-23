@@ -30,7 +30,7 @@ import { SourceTypeMap, SourceTypes, SourceTypesType } from "@/store/types";
 import TilesDEMSourceEditor from "./dem/tiles-dem";
 
 interface SourceEditorProps<K extends SourceTypesType> {
-  maxHeight: React.CSSProperties["maxHeight"];
+	maxHeight: React.CSSProperties["maxHeight"];
 	sourceId?: string;
 	sourceType?: K;
 	source?: SourceTypeMap[K];
@@ -46,7 +46,7 @@ export interface SourceEditorRef {
 const SourceEditor = forwardRef(
 	<K extends SourceTypesType>(
 		{
-      maxHeight,
+			maxHeight,
 			sourceId,
 			source,
 			sourceType,
