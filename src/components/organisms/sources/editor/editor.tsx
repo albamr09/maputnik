@@ -61,7 +61,7 @@ const SourceEditor = forwardRef(
 
 		// State
 		const [localSourceType, setLocalSourceType] = useState<SourceTypesType>(
-			sourceType ?? SourceTypes[0],
+			sourceType ?? "tilejson_vector",
 		);
 
 		// Hooks
@@ -73,7 +73,7 @@ const SourceEditor = forwardRef(
 			defaultValues: {
 				sourceId:
 					sourceId ?? generateAndCheckRandomString(8, mapStyleSourcesIds),
-				sourceType: sourceType ?? SourceTypes[0],
+				sourceType: sourceType ?? "tilejson_vector",
 			},
 			mode: "onChange",
 		});
