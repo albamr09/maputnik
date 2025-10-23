@@ -161,6 +161,10 @@ const SourceEditor = forwardRef(
 			if (localSourceType === "tilexyz_raster-dem") {
 				return <TilesDEMSourceEditor control={form.control} />;
 			}
+
+			if (localSourceType === "pmtiles_vector") {
+				return <TileJSONSourceEditor control={form.control} />;
+			}
 		}, [localSourceType, source]);
 
 		return (
