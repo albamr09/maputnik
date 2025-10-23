@@ -15,6 +15,8 @@ import FieldString from "@/components/molecules/field/field-string";
 import Scrollable from "@/components/molecules/layout/scrollable";
 import GeoJSONSourceEditor from "@/components/organisms/sources/editor/geojson/geojson-source";
 import GeoJSONURLEditor from "@/components/organisms/sources/editor/geojson/geojson-url-source";
+import ImageSourceEditor from "@/components/organisms/sources/editor/media/image-source";
+import VideoSourceEditor from "@/components/organisms/sources/editor/media/video-source";
 import TileJSONSourceEditor from "@/components/organisms/sources/editor/tile/tile-json";
 import TilesSourceEditor from "@/components/organisms/sources/editor/tile/tiles";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
@@ -164,6 +166,12 @@ const SourceEditor = forwardRef(
 
 			if (localSourceType === "pmtiles_vector") {
 				return <TileJSONSourceEditor control={form.control} />;
+			}
+			if (localSourceType === "image") {
+				return <ImageSourceEditor control={form.control} />;
+			}
+			if (localSourceType === "video") {
+				return <VideoSourceEditor control={form.control} />;
 			}
 		}, [localSourceType, source]);
 

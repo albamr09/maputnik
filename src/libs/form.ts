@@ -11,3 +11,7 @@ export const validateURL = (value: string) => {
 		return t("Invalid URL format");
 	}
 };
+
+export const validateURLs = (values: string[]) => {
+	return values?.map(validateURL).find((r) => r !== true) || true;
+};

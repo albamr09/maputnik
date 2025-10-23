@@ -9,7 +9,7 @@ import FieldSelect from "@/components/molecules/field/field-select";
 import FieldString from "@/components/molecules/field/field-string";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
 import { MAX_MAP_ZOOM, MIN_MAP_ZOOM } from "@/constants";
-import { validateURL } from "@/libs/form";
+import { validateURLs } from "@/libs/form";
 
 interface TilesSourceEditorProps {
 	control: Control<SourceEditorForm>;
@@ -32,7 +32,7 @@ const TilesSourceEditor: React.FC<TilesSourceEditorProps> = ({ control }) => {
 				control={control}
 				rules={{
 					required: t("At least one Tile URL is required"),
-					validate: (v) => validateURL(v),
+					validate: (v) => validateURLs(v),
 				}}
 			>
 				{({ value, onChange, onBlur }) => (
@@ -60,7 +60,7 @@ const TilesSourceEditor: React.FC<TilesSourceEditorProps> = ({ control }) => {
 					<FieldSelect
 						label={t("Scheme Type")}
 						description={latest.source_vector.scheme.doc}
-            defaultValue={latest.source_vector.scheme.default}
+						defaultValue={latest.source_vector.scheme.default}
 						value={value}
 						options={schemeTypeOptions}
 						// @ts-ignore
@@ -80,7 +80,7 @@ const TilesSourceEditor: React.FC<TilesSourceEditorProps> = ({ control }) => {
 					<FieldNumber
 						label={t("Min Zoom")}
 						description={latest.source_vector.minzoom.doc}
-            defaultValue={latest.source_vector.minzoom.default}
+						defaultValue={latest.source_vector.minzoom.default}
 						value={value}
 						min={MIN_MAP_ZOOM}
 						max={MAX_MAP_ZOOM}
@@ -100,7 +100,7 @@ const TilesSourceEditor: React.FC<TilesSourceEditorProps> = ({ control }) => {
 					<FieldNumber
 						label={t("Max Zoom")}
 						description={latest.source_vector.maxzoom.doc}
-            defaultValue={latest.source_vector.maxzoom.default}
+						defaultValue={latest.source_vector.maxzoom.default}
 						value={value}
 						min={MIN_MAP_ZOOM}
 						max={MAX_MAP_ZOOM}

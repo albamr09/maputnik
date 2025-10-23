@@ -16,7 +16,7 @@ const FieldCheckbox: React.FC<FieldCheckBoxProps> = ({
 		<Field {...fieldProps}>
 			<Checkbox
 				checked={value}
-        // @ts-ignore
+				// @ts-ignore
 				defaultValue={defaultValue}
 				onCheckedChange={onChange}
 				onBlur={onBlur}

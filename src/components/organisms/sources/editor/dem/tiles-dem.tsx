@@ -1,12 +1,12 @@
 import latest from "@maplibre/maplibre-gl-style-spec/dist/latest.json";
+import { RasterDEMSourceSpecification } from "maplibre-gl";
 import { Control } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import FieldForm from "@/components/molecules/field/field-form";
 import FieldNumber from "@/components/molecules/field/field-number";
+import FieldSelect from "@/components/molecules/field/field-select";
 import TilesSourceEditor from "@/components/organisms/sources/editor/tile/tiles";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
-import FieldSelect from "@/components/molecules/field/field-select";
-import { RasterDEMSourceSpecification } from "maplibre-gl";
 
 interface TilesDEMSourceEditorProps {
 	control: Control<SourceEditorForm>;
@@ -51,7 +51,7 @@ const TilesDEMSourceEditor: React.FC<TilesDEMSourceEditorProps> = ({
 					<FieldSelect
 						label={t("Encoding")}
 						description={latest.source_raster_dem.encoding.doc}
-            defaultValue={latest.source_raster_dem.encoding.default}
+						defaultValue={latest.source_raster_dem.encoding.default}
 						value={value}
 						//@ts-ignore
 						onChange={onChange}
