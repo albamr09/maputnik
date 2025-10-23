@@ -76,40 +76,43 @@ export const Field: React.FC<FieldProps> = ({
 	trailingButtons = undefined,
 }) => {
 	const isRow = layoutVariant === "row";
+	const showLabel = rowDistribution !== "no-label";
 
 	return (
 		<div
 			className={cn("flex gap-2", isRow ? "flex-row" : "flex-col", className)}
 		>
-			<div
-				className={cn(
-					"flex h-auto gap-1 justify-between items-center",
-					isRow ? rowDistributionClasses[rowDistribution]["label"] : "w-full",
-					labelAligmentClasses[labelAlignment],
-				)}
-			>
-				<Label className="flex text-sm font-medium gap-1">
-					{required && <span className="text-destructive">*</span>}
-					{label && (
-						<span className={cn(labelVariantClasses[labelVariant])}>
-							{label}
-						</span>
+			{showLabel && (
+				<div
+					className={cn(
+						"flex h-auto gap-1 justify-between items-center",
+						isRow ? rowDistributionClasses[rowDistribution]["label"] : "w-full",
+						labelAligmentClasses[labelAlignment],
 					)}
-					{description && (
-						<TooltipProvider>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Info className="h-2.5 w-2.5 text-slate-400 hover:cursor-help" />
-								</TooltipTrigger>
-								<TooltipContent className="max-w-xs">
-									{description}
-								</TooltipContent>
-							</Tooltip>
-						</TooltipProvider>
-					)}
-				</Label>
-				{trailingButtons}
-			</div>
+				>
+					<Label className="flex text-sm font-medium gap-1">
+						{required && <span className="text-destructive">*</span>}
+						{label && (
+							<span className={cn(labelVariantClasses[labelVariant])}>
+								{label}
+							</span>
+						)}
+						{description && (
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Info className="h-2.5 w-2.5 text-slate-400 hover:cursor-help" />
+									</TooltipTrigger>
+									<TooltipContent className="max-w-xs">
+										{description}
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						)}
+					</Label>
+					{trailingButtons}
+				</div>
+			)}
 			<div
 				className={cn(
 					"flex flex-col gap-2",
