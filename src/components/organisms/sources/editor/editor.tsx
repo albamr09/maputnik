@@ -15,9 +15,9 @@ import FieldString from "@/components/molecules/field/field-string";
 import Scrollable from "@/components/molecules/layout/scrollable";
 import GeoJSONSourceEditor from "@/components/organisms/sources/editor/geojson/geojson-source";
 import GeoJSONURLEditor from "@/components/organisms/sources/editor/geojson/geojson-url-source";
+import TileJSONSourceEditor from "@/components/organisms/sources/editor/tile/tile-json";
+import TilesSourceEditor from "@/components/organisms/sources/editor/tile/tiles";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
-import VectorTileJSONSourceEditor from "@/components/organisms/sources/editor/vector/vector-tile-json";
-import VectorTilesSourceEditor from "@/components/organisms/sources/editor/vector/vector-tiles";
 import useSourceEdition from "@/hooks/edition/useSourceEdition";
 import { generateAndCheckRandomString } from "@/libs/random";
 import { showError, showSuccess } from "@/libs/toast";
@@ -137,11 +137,19 @@ const SourceEditor = forwardRef(
 			}
 
 			if (localSourceType === "tilejson_vector") {
-				return <VectorTileJSONSourceEditor control={form.control} />;
+				return <TileJSONSourceEditor control={form.control} />;
 			}
 
 			if (localSourceType === "tile_vector") {
-				return <VectorTilesSourceEditor control={form.control} />;
+				return <TilesSourceEditor control={form.control} />;
+			}
+
+			if (localSourceType === "tilejson_raster") {
+				return <TileJSONSourceEditor control={form.control} />;
+			}
+
+			if (localSourceType === "tile_raster") {
+				return <TilesSourceEditor control={form.control} />;
 			}
 		}, [localSourceType, source]);
 

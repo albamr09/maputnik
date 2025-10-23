@@ -6,11 +6,11 @@ import FieldString from "@/components/molecules/field/field-string";
 import { SourceEditorForm } from "@/components/organisms/sources/editor/types";
 import { validateURL } from "@/libs/form";
 
-interface VectorTileJSONSourceEditorProps {
+interface TileJSONSourceEditorProps {
 	control: Control<SourceEditorForm>;
 }
 
-const VectorTileJSONSourceEditor: React.FC<VectorTileJSONSourceEditorProps> = ({
+const TileJSONSourceEditor: React.FC<TileJSONSourceEditorProps> = ({
 	control,
 }) => {
 	const { t } = useTranslation();
@@ -39,4 +39,4 @@ const VectorTileJSONSourceEditor: React.FC<VectorTileJSONSourceEditorProps> = ({
 	);
 };
 
-export default VectorTileJSONSourceEditor;
+export default TileJSONSourceEditor;
