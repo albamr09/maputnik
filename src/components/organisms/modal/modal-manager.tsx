@@ -1,4 +1,5 @@
 import ModalDatasources from "@/components/organisms/modal/modal-datasources";
+import ModalDebug from "@/components/organisms/modal/modal-debug";
 import ModalGeoJSONTheme from "@/components/organisms/modal/modal-geojson-theme";
 import ModalMetadata from "@/components/organisms/modal/modal-metadata";
 import ModalOpen from "@/components/organisms/modal/modal-open";
@@ -12,19 +13,13 @@ const ModalManager = () => {
 			<ModalOpen />
 			<ModalProfile />
 			<ModalGeoJSONTheme />
+			<ModalDebug />
 		</>
 	);
 };
 
 export default ModalManager;
 
-//        <ModalDebug
-//          maplibreGlDebugOptions={maplibreGlDebugOptions}
-//          onChangeMaplibreGlDebug={onChangeMaplibreGlDebug}
-//          isOpen={modalOpenName == "debug"}
-//          onOpenToggle={() => toggleModalHandler("debug")}
-//          mapView={mapView}
-//        />
 //        <ModalShortcuts
 //          isOpen={modalOpenName == "shortcuts"}
 //          onOpenToggle={() => toggleModalHandler("shortcuts")}

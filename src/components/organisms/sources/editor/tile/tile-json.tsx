@@ -45,7 +45,9 @@ const TileJSONSourceEditor: React.FC<TileJSONSourceEditorProps> = ({
 					{({ value, onChange, onBlur }) => (
 						<FieldCheckbox
 							label={t("Use Situm Auth")}
-							description={t("Configure whether or not to use")}
+							description={t(
+								"Configure whether or not to use Situm's Authentication",
+							)}
 							value={value}
 							onChange={onChange}
 							onBlur={onBlur}

@@ -81,6 +81,20 @@ const styleSlice = createSlice({
 				...action.payload,
 			};
 		},
+		disableAllMaplibreGlDebugOptions: (state) => {
+			for (const key of Object.keys(state.maplibreGlDebugOptions) as Array<
+				keyof MaplibreGlDebugOptions
+			>) {
+				state.maplibreGlDebugOptions[key] = false;
+			}
+		},
+		enableAllMaplibreGlDebugOptions: (state) => {
+			for (const key of Object.keys(state.maplibreGlDebugOptions) as Array<
+				keyof MaplibreGlDebugOptions
+			>) {
+				state.maplibreGlDebugOptions[key] = true;
+			}
+		},
 		resetDebugOptions: (state) => {
 			state.maplibreGlDebugOptions = initialState.maplibreGlDebugOptions;
 		},
@@ -190,6 +204,8 @@ export const {
 
 	// Debug actions
 	setMaplibreGlDebugOptions,
+  enableAllMaplibreGlDebugOptions,
+  disableAllMaplibreGlDebugOptions,
 	resetDebugOptions,
 } = styleSlice.actions;
 
