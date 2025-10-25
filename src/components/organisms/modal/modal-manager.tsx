@@ -29,16 +29,3 @@ export default ModalManager;
 //          isOpen={modalOpenName == "shortcuts"}
 //          onOpenToggle={() => toggleModalHandler("shortcuts")}
 //        />
-//        <ModalSettings
-//          mapStyle={mapStyle}
-//          onStyleChanged={onStyleChanged}
-//          onChangeMetadataProperty={onChangeMetadataProperty}
-//          isOpen={modalOpenName == "settings"}
-//          onOpenToggle={() => toggleModalHandler("settings")}
-//        />
-//        <ModalSources
-//          mapStyle={mapStyle}
-//          onStyleChanged={onStyleChanged}
-//          isOpen={modalOpenName == "sources"}
-//          onOpenToggle={() => toggleModalHandler("sources")}
-//        />
