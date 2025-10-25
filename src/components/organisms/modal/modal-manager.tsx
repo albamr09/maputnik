@@ -4,6 +4,7 @@ import ModalGeoJSONTheme from "@/components/organisms/modal/modal-geojson-theme"
 import ModalMetadata from "@/components/organisms/modal/modal-metadata";
 import ModalOpen from "@/components/organisms/modal/modal-open";
 import ModalProfile from "@/components/organisms/modal/modal-profile";
+import ModalShortcuts from "@/components/organisms/modal/modal-shortcuts";
 
 const ModalManager = () => {
 	return (
@@ -14,13 +15,9 @@ const ModalManager = () => {
 			<ModalProfile />
 			<ModalGeoJSONTheme />
 			<ModalDebug />
+			<ModalShortcuts />
 		</>
 	);
 };
 
 export default ModalManager;
-
-//        <ModalShortcuts
-//          isOpen={modalOpenName == "shortcuts"}
-//          onOpenToggle={() => toggleModalHandler("shortcuts")}
-//        />

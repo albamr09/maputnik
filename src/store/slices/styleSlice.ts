@@ -204,8 +204,8 @@ export const {
 
 	// Debug actions
 	setMaplibreGlDebugOptions,
-  enableAllMaplibreGlDebugOptions,
-  disableAllMaplibreGlDebugOptions,
+	enableAllMaplibreGlDebugOptions,
+	disableAllMaplibreGlDebugOptions,
 	resetDebugOptions,
 } = styleSlice.actions;
 
