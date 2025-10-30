@@ -69,7 +69,7 @@ const getDefaultSafeValue = <T>(
 const getMaplibreProperty = (
   propertyName: string,
   type: "number" | "string" | "boolean" | "color"
-) => {
+): ExpressionSpecification => {
   if (type == "number") {
     return ["to-number", ["get", propertyName]];
   } else if (type == "string") {
@@ -79,6 +79,8 @@ const getMaplibreProperty = (
   } else if (type == "color") {
     return ["to-color", ["get", propertyName]];
   }
+
+  return ["get", propertyName]
 };
 
 // Utility function to create MapLibre condition based on
