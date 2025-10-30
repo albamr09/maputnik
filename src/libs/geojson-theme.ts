@@ -68,8 +68,8 @@ const getDefaultSafeValue = <T>(
 
 const getMaplibreProperty = (
   propertyName: string,
-  type: "number" | "string" | "boolean" | "color"
-): T => {
+  type: "number" | "string" | "boolean" | "color"
+) => {
   if (type == "number") {
     return ["to-number", ["get", propertyName]];
   } else if (type == "string") {
