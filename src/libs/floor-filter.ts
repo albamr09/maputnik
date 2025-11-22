@@ -4,16 +4,36 @@ import {
 } from "maplibre-gl";
 import { FILTER_OPS } from "../components/FilterEditor";
 
-const isExpressionFloorCondition = (expresion: any) => {
-	if (Array.isArray(expresion) && expresion.length >= 3) {
-		return (
-			Array.isArray(expresion[1]) &&
-			expresion[1].length == 2 &&
-			expresion[1][0] == "get" &&
-			expresion[1][1] == "floor_id"
-		);
-	}
-	return false;
+// Recursively checks whether an expression eventually 
+// resolves to ["get", "floor_id"]
+const resolvesToGetFloorId = (expr: any): boolean => {
+  if (!Array.isArray(expr)) return false;
+
+  // Direct match: ["get", "floor_id"]
+  if (expr.length === 2 && expr[0] === "get" && expr[1] === "floor_id") {
+    return true;
+  }
+
+  // Function wrapping: ["to-number", <inner>] or any unary operator
+  if (expr.length === 2 && typeof expr[0] === "string") {
+    return resolvesToGetFloorId(expr[1]);
+  }
+
+  return false;
+};
+
+const isExpressionFloorCondition = (expression: any) => {
+  if (!Array.isArray(expression) || expression.length !== 3) {
+    return false;
+  }
+
+  const [op, lhs, rhs] = expression;
+
+  return (
+    op === "==" &&
+    resolvesToGetFloorId(lhs) &&
+    Number.isInteger(rhs)
+  );
 };
 
 // Helper function to check if filter contains floor condition
