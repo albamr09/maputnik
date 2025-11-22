@@ -4,36 +4,32 @@ import {
 } from "maplibre-gl";
 import { FILTER_OPS } from "../components/FilterEditor";
 
-// Recursively checks whether an expression eventually 
+// Recursively checks whether an expression eventually
 // resolves to ["get", "floor_id"]
 const resolvesToGetFloorId = (expr: any): boolean => {
-  if (!Array.isArray(expr)) return false;
+	if (!Array.isArray(expr)) return false;
 
-  // Direct match: ["get", "floor_id"]
-  if (expr.length === 2 && expr[0] === "get" && expr[1] === "floor_id") {
-    return true;
-  }
+	// Direct match: ["get", "floor_id"]
+	if (expr.length === 2 && expr[0] === "get" && expr[1] === "floor_id") {
+		return true;
+	}
 
-  // Function wrapping: ["to-number", <inner>] or any unary operator
-  if (expr.length === 2 && typeof expr[0] === "string") {
-    return resolvesToGetFloorId(expr[1]);
-  }
+	// Function wrapping: ["to-number", <inner>] or any unary operator
+	if (expr.length === 2 && typeof expr[0] === "string") {
+		return resolvesToGetFloorId(expr[1]);
+	}
 
-  return false;
+	return false;
 };
 
 const isExpressionFloorCondition = (expression: any) => {
-  if (!Array.isArray(expression) || expression.length !== 3) {
-    return false;
-  }
+	if (!Array.isArray(expression) || expression.length !== 3) {
+		return false;
+	}
 
-  const [op, lhs, rhs] = expression;
+	const [op, lhs, rhs] = expression;
 
-  return (
-    op === "==" &&
-    resolvesToGetFloorId(lhs) &&
-    Number.isInteger(rhs)
-  );
+	return op === "==" && resolvesToGetFloorId(lhs) && Number.isInteger(rhs);
 };
 
 // Helper function to check if filter contains floor condition

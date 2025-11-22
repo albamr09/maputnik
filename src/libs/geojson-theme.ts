@@ -27,60 +27,60 @@ export interface Theme {
 
 // Utility function to get effective value from category or default properties
 const getThemeEffectiveValue = <T>(
-  catProps: ThemeEntryProperties,
-  defProps: ThemeEntryProperties,
-  key: keyof ThemeEntryProperties,
-  fallback: T
+	catProps: ThemeEntryProperties,
+	defProps: ThemeEntryProperties,
+	key: keyof ThemeEntryProperties,
+	fallback: T,
 ): T => {
-  const val = catProps[key];
-  const defVal = defProps[key];
+	const val = catProps[key];
+	const defVal = defProps[key];
 
-  // Pick the first defined value
-  const rawValue = val ?? defVal ?? fallback;
+	// Pick the first defined value
+	const rawValue = val ?? defVal ?? fallback;
 
-  // Cast value based on the fallback
-  if (typeof fallback === 'number') return Number(rawValue) as T;
-  if (typeof fallback === 'boolean') return Boolean(rawValue) as T;
-  if (typeof fallback === 'string') return String(rawValue) as T;
+	// Cast value based on the fallback
+	if (typeof fallback === "number") return Number(rawValue) as T;
+	if (typeof fallback === "boolean") return Boolean(rawValue) as T;
+	if (typeof fallback === "string") return String(rawValue) as T;
 
-  // Default: return as-is
-  return rawValue as T;
+	// Default: return as-is
+	return rawValue as T;
 };
 
 const getDefaultSafeValue = <T>(
-  defProps: ThemeEntryProperties,
-  key: keyof ThemeEntryProperties,
-  fallback: T
+	defProps: ThemeEntryProperties,
+	key: keyof ThemeEntryProperties,
+	fallback: T,
 ): T => {
-  const defVal = defProps[key];
+	const defVal = defProps[key];
 
-  // Pick the first defined value
-  const rawValue = defVal ?? fallback;
+	// Pick the first defined value
+	const rawValue = defVal ?? fallback;
 
-  // Cast value based on the fallback
-  if (typeof fallback === 'number') return Number(rawValue) as T;
-  if (typeof fallback === 'boolean') return Boolean(rawValue) as T;
-  if (typeof fallback === 'string') return String(rawValue) as T;
+	// Cast value based on the fallback
+	if (typeof fallback === "number") return Number(rawValue) as T;
+	if (typeof fallback === "boolean") return Boolean(rawValue) as T;
+	if (typeof fallback === "string") return String(rawValue) as T;
 
-  // Default: return as-is
-  return rawValue as T;
+	// Default: return as-is
+	return rawValue as T;
 };
 
 const getMaplibreProperty = (
-  propertyName: string,
-  type: "number" | "string" | "boolean" | "color"
+	propertyName: string,
+	type: "number" | "string" | "boolean" | "color",
 ): ExpressionSpecification => {
-  if (type == "number") {
-    return ["to-number", ["get", propertyName]];
-  } else if (type == "string") {
-    return ["to-string", ["get", propertyName]];
-  } else if (type == "boolean") {
-    return ["to-boolean", ["get", propertyName]];
-  } else if (type == "color") {
-    return ["to-color", ["get", propertyName]];
-  }
+	if (type == "number") {
+		return ["to-number", ["get", propertyName]];
+	} else if (type == "string") {
+		return ["to-string", ["get", propertyName]];
+	} else if (type == "boolean") {
+		return ["to-boolean", ["get", propertyName]];
+	} else if (type == "color") {
+		return ["to-color", ["get", propertyName]];
+	}
 
-  return ["get", propertyName]
+	return ["get", propertyName];
 };
 
 // Utility function to create MapLibre condition based on
@@ -88,61 +88,61 @@ const getMaplibreProperty = (
 const createFilterForFeatureTypeAndCategory = (
 	themeEntryName: string,
 ): FilterSpecification => {
-  // Default means no feature_type or category
-  if (themeEntryName == "default") {
-    return [
-      "all",
-      [
-        // Does not have feature_type property or its value is empty
-        "any",
-        ["!", ["has", "feature_type"]],
-        ["==", getMaplibreProperty("feature_type", "string"), ""],
-      ],
-      [
-        // Does not have category property or its value is empty
-        "any",
-        ["!", ["has", "category"]],
-        ["==", getMaplibreProperty("category", "string"), ""],
-      ],
-    ];
-  }
+	// Default means no feature_type or category
+	if (themeEntryName == "default") {
+		return [
+			"all",
+			[
+				// Does not have feature_type property or its value is empty
+				"any",
+				["!", ["has", "feature_type"]],
+				["==", getMaplibreProperty("feature_type", "string"), ""],
+			],
+			[
+				// Does not have category property or its value is empty
+				"any",
+				["!", ["has", "category"]],
+				["==", getMaplibreProperty("category", "string"), ""],
+			],
+		];
+	}
 
-  if (themeEntryName.includes(".") && !themeEntryName.startsWith(".")) {
-    // Both feature_type and category are present: "foo.bar"
-    const [featureType, category] = themeEntryName.split(".", 2);
-    return [
-      "all",
-      ["==", getMaplibreProperty("feature_type", "string"), featureType],
-      ["==", getMaplibreProperty("category", "string"), category],
-    ];
-  }
+	if (themeEntryName.includes(".") && !themeEntryName.startsWith(".")) {
+		// Both feature_type and category are present: "foo.bar"
+		const [featureType, category] = themeEntryName.split(".", 2);
+		return [
+			"all",
+			["==", getMaplibreProperty("feature_type", "string"), featureType],
+			["==", getMaplibreProperty("category", "string"), category],
+		];
+	}
 
-  if (themeEntryName.startsWith(".")) {
-    // Only category is present
-    const category = themeEntryName.substring(1);
-    return [
-      "all",
-      [
-        // Does not have feature_type property or its value is empty
-        "any",
-        ["!", ["has", "feature_type"]],
-        ["==", getMaplibreProperty("feature_type", "string"), ""],
-      ],
-      ["==", getMaplibreProperty("category", "string"), category],
-    ];
-  }
+	if (themeEntryName.startsWith(".")) {
+		// Only category is present
+		const category = themeEntryName.substring(1);
+		return [
+			"all",
+			[
+				// Does not have feature_type property or its value is empty
+				"any",
+				["!", ["has", "feature_type"]],
+				["==", getMaplibreProperty("feature_type", "string"), ""],
+			],
+			["==", getMaplibreProperty("category", "string"), category],
+		];
+	}
 
-  // Only feature_type is present
-  return [
-    "all",
-    [
-      // Does not have category property or its value is empty
-      "any",
-      ["!", ["has", "category"]],
-      ["==", getMaplibreProperty("category", "string"), ""],
-    ],
-    ["==", getMaplibreProperty("feature_type", "string"), themeEntryName],
-  ];
+	// Only feature_type is present
+	return [
+		"all",
+		[
+			// Does not have category property or its value is empty
+			"any",
+			["!", ["has", "category"]],
+			["==", getMaplibreProperty("category", "string"), ""],
+		],
+		["==", getMaplibreProperty("feature_type", "string"), themeEntryName],
+	];
 };
 
 // Create MapLibre expression for mapping categories to property values
@@ -164,13 +164,13 @@ const createThemeEntryExpression = (
 			return score(a) - score(b);
 		}) as [string, ThemeEntryProperties][];
 
-  const cases = sortedEntries.reduce((acc, [catName, catProps]) => {
-    let value = getThemeEffectiveValue(
-      catProps,
-      defaultProps,
-      propertyName,
-      fallback,
-    );
+	const cases = sortedEntries.reduce((acc, [catName, catProps]) => {
+		let value = getThemeEffectiveValue(
+			catProps,
+			defaultProps,
+			propertyName,
+			fallback,
+		);
 
 		const isNumberValue = [
 			"fillOpacity",
@@ -188,9 +188,13 @@ const createThemeEntryExpression = (
 		return acc;
 	}, [] as any[]);
 
-  // Add default at the end
-  const defaultValue = getDefaultSafeValue(defaultProps, propertyName, fallback);
-  cases.push(defaultValue);
+	// Add default at the end
+	const defaultValue = getDefaultSafeValue(
+		defaultProps,
+		propertyName,
+		fallback,
+	);
+	cases.push(defaultValue);
 
 	return ["case", ...cases] as ExpressionSpecification;
 };
@@ -207,12 +211,12 @@ const getThemeEntriesForOpacity = (
 				return acc;
 			}
 
-      const effectiveOpacity = getThemeEffectiveValue(
-        themeEntryProps,
-        defaultProps,
-        "fillOpacity",
-        1.0,
-      );
+			const effectiveOpacity = getThemeEffectiveValue(
+				themeEntryProps,
+				defaultProps,
+				"fillOpacity",
+				1.0,
+			);
 
 			// Round to 1 decimal place
 			const roundedOpacity =
@@ -236,12 +240,16 @@ const createOpacityFilter = (
 ): FilterSpecification => {
 	const conditions: any[] = [];
 
-  // Condition 1: Feature has fillOpacity and matches the level
-  conditions.push([
-    "all",
-    ["has", "fillOpacity"],
-    ["==", ["round", ["*", getMaplibreProperty("fillOpacity", "number"), 10]], opacityLevel * 10],
-  ]);
+	// Condition 1: Feature has fillOpacity and matches the level
+	conditions.push([
+		"all",
+		["has", "fillOpacity"],
+		[
+			"==",
+			["round", ["*", getMaplibreProperty("fillOpacity", "number"), 10]],
+			opacityLevel * 10,
+		],
+	]);
 
 	// Condition 2: Feature doesn't have fillOpacity but its category has this opacity
 	if (themeEntryNamesForOpacity.length > 0) {
@@ -275,12 +283,12 @@ const getThemeEntriesWithExtrusion = (
 			continue;
 		}
 
-    const effectiveExtrusion = getThemeEffectiveValue(
-      themeEntryProps,
-      defaultProps,
-      "extrusionHeight",
-      0,
-    );
+		const effectiveExtrusion = getThemeEffectiveValue(
+			themeEntryProps,
+			defaultProps,
+			"extrusionHeight",
+			0,
+		);
 
 		if (
 			effectiveExtrusion !== null &&
@@ -306,12 +314,12 @@ const getThemeEntriesWithoutExtrusion = (
 			continue;
 		}
 
-    const effectiveExtrusion = getThemeEffectiveValue(
-      themeEntryProps,
-      defaultProps,
-      "extrusionHeight",
-      0,
-    );
+		const effectiveExtrusion = getThemeEffectiveValue(
+			themeEntryProps,
+			defaultProps,
+			"extrusionHeight",
+			0,
+		);
 
 		if (
 			effectiveExtrusion == null ||
@@ -338,12 +346,12 @@ const getThemeEntriesThatShouldBeShown = (
 			continue;
 		}
 
-    const effectiveExtrusion = getThemeEffectiveValue(
-      themeEntryProps,
-      defaultProps,
-      "show",
-      true,
-    );
+		const effectiveExtrusion = getThemeEffectiveValue(
+			themeEntryProps,
+			defaultProps,
+			"show",
+			true,
+		);
 
 		if (
 			effectiveExtrusion == null ||
@@ -371,12 +379,12 @@ const createExtrusionFilter = (
 
 	const conditions = [];
 
-  // Condition 1: Feature has extrusionHeight > 0 defined
-  conditions.push([
-    "all",
-    ["has", "extrusionHeight"],
-    [">", getMaplibreProperty("extrusionHeight", "number"), 0],
-  ]);
+	// Condition 1: Feature has extrusionHeight > 0 defined
+	conditions.push([
+		"all",
+		["has", "extrusionHeight"],
+		[">", getMaplibreProperty("extrusionHeight", "number"), 0],
+	]);
 
 	// Condition 2: Feature doesn't have extrusionHeight but its theme entry has extrusion defined
 	if (themeEntriesWithExtrusion.length > 0) {
@@ -425,33 +433,33 @@ const createExtrusionLayer = (
 	// Create show filter
 	const showFilter = createShowFilter(theme, defaultProps);
 
-  // Complete filter for extrusion: must meet geometry, opacity AND extrusion
-  const layerFilter = [
-    "all",
-    ["==", ["geometry-type"], "Polygon"],
-    showFilter,
-    opacityFilter,
-    extrusionFilter,
-    // Initialize floor id selection
-    ["==", getMaplibreProperty("floor_id", "number"), selectedFloorId],
-  ] as FilterSpecification;
+	// Complete filter for extrusion: must meet geometry, opacity AND extrusion
+	const layerFilter = [
+		"all",
+		["==", ["geometry-type"], "Polygon"],
+		showFilter,
+		opacityFilter,
+		extrusionFilter,
+		// Initialize floor id selection
+		["==", getMaplibreProperty("floor_id", "number"), selectedFloorId],
+	] as FilterSpecification;
 
-  // Paint properties for extrusion
-  const paint = {
-    "fill-extrusion-color": [
-      "case",
-      ["has", "fillColor"],
-      getMaplibreProperty("fillColor", "color"),
-      createThemeEntryExpression(theme, defaultProps, "fillColor", "#000000"),
-    ] as ExpressionSpecification,
-    "fill-extrusion-height": [
-      "case",
-      ["has", "extrusionHeight"],
-      getMaplibreProperty("extrusionHeight", "number"),
-      createThemeEntryExpression(theme, defaultProps, "extrusionHeight", 0),
-    ] as ExpressionSpecification,
-    "fill-extrusion-opacity": opacityLevel,
-  };
+	// Paint properties for extrusion
+	const paint = {
+		"fill-extrusion-color": [
+			"case",
+			["has", "fillColor"],
+			getMaplibreProperty("fillColor", "color"),
+			createThemeEntryExpression(theme, defaultProps, "fillColor", "#000000"),
+		] as ExpressionSpecification,
+		"fill-extrusion-height": [
+			"case",
+			["has", "extrusionHeight"],
+			getMaplibreProperty("extrusionHeight", "number"),
+			createThemeEntryExpression(theme, defaultProps, "extrusionHeight", 0),
+		] as ExpressionSpecification,
+		"fill-extrusion-opacity": opacityLevel,
+	};
 
 	// Create layer ID with opacity
 	const opacityStr = opacityLevel.toFixed(1).replace(".", "_");
@@ -479,12 +487,12 @@ const createFlatOrStrokeLayerFilter = (
 
 	const conditions = [];
 
-  // Condition 1: Feature has extrusion height defined and is zero
-  conditions.push([
-    "all",
-    ["has", "extrusionHeight"],
-    ["==", getMaplibreProperty("extrusionHeight", "number"), 0],
-  ]);
+	// Condition 1: Feature has extrusion height defined and is zero
+	conditions.push([
+		"all",
+		["has", "extrusionHeight"],
+		["==", getMaplibreProperty("extrusionHeight", "number"), 0],
+	]);
 
 	// Condition 2: Feature doesn't have extrusion defined and extrusion is also not defined or zero on the theme
 	if (themeEntriesWithoutExtrusion.length > 0) {
@@ -518,12 +526,12 @@ const createShowFilter = (
 		defaultProps,
 	);
 
-  // Condition 1: Feature has show defined and is true
-  conditions.push([
-    "all",
-    ["has", "show"],
-    ["==", getMaplibreProperty("show", "boolean"), true],
-  ]);
+	// Condition 1: Feature has show defined and is true
+	conditions.push([
+		"all",
+		["has", "show"],
+		["==", getMaplibreProperty("show", "boolean"), true],
+	]);
 
 	// Condition 2: Feature doesn't have show defined or is not defined on the theme
 	if (themeEntriesThatShouldBeShown.length > 0) {
@@ -557,104 +565,104 @@ const createLayer = (
 
 	const showFilter = createShowFilter(theme, defaultProps);
 
-  // Base filter according to layer type
-  if (layerType === "flat" || layerType === "stroke") {
-    // For flat/stroke: polygons without extrusion or with extrusion = 0
-    // Here also check for categories that have the extrusion height defined
-    layerFilter = [
-      "all",
-      ["==", ["geometry-type"], "Polygon"],
-      showFilter,
-      createFlatOrStrokeLayerFilter(theme, defaultProps),
-      // Initialize floor id selection
-      ["==", getMaplibreProperty("floor_id", "number"), selectedFloorId],
-    ] as FilterSpecification;
-  } else if (layerType === "line") {
-    // For line: LineString geometries
-    layerFilter = [
-      "all",
-      ["==", ["geometry-type"], "LineString"],
-      showFilter,
-      // Initialize floor id selection
-      ["==", getMaplibreProperty("floor_id", "number"), selectedFloorId],
-    ] as FilterSpecification;
-  } else {
-    throw new Error(
-      `layer_type '${layerType}' not supported in createLayer. Use createExtrusionLayer for extrusion.`,
-    );
-  }
+	// Base filter according to layer type
+	if (layerType === "flat" || layerType === "stroke") {
+		// For flat/stroke: polygons without extrusion or with extrusion = 0
+		// Here also check for categories that have the extrusion height defined
+		layerFilter = [
+			"all",
+			["==", ["geometry-type"], "Polygon"],
+			showFilter,
+			createFlatOrStrokeLayerFilter(theme, defaultProps),
+			// Initialize floor id selection
+			["==", getMaplibreProperty("floor_id", "number"), selectedFloorId],
+		] as FilterSpecification;
+	} else if (layerType === "line") {
+		// For line: LineString geometries
+		layerFilter = [
+			"all",
+			["==", ["geometry-type"], "LineString"],
+			showFilter,
+			// Initialize floor id selection
+			["==", getMaplibreProperty("floor_id", "number"), selectedFloorId],
+		] as FilterSpecification;
+	} else {
+		throw new Error(
+			`layer_type '${layerType}' not supported in createLayer. Use createExtrusionLayer for extrusion.`,
+		);
+	}
 
 	// Create paint properties using expressions that handle multiple categories
 	let paint: any = {};
 
-  if (layerType === "flat") {
-    paint = {
-      "fill-color": [
-        "case",
-        ["has", "fillColor"],
-        getMaplibreProperty("fillColor", "color"),
-        createThemeEntryExpression(theme, defaultProps, "fillColor", "#000000"),
-      ] as ExpressionSpecification,
-      "fill-opacity": [
-        "case",
-        ["has", "fillOpacity"],
-        getMaplibreProperty("fillOpacity", "number"),
-        createThemeEntryExpression(theme, defaultProps, "fillOpacity", 1),
-      ] as ExpressionSpecification,
-    };
-  } else if (layerType === "stroke") {
-    paint = {
-      "line-color": [
-        "case",
-        ["has", "strokeColor"],
-        getMaplibreProperty("strokeColor", "color"),
-        createThemeEntryExpression(
-          theme,
-          defaultProps,
-          "strokeColor",
-          "#000000",
-        ),
-      ] as ExpressionSpecification,
-      "line-width": [
-        "case",
-        ["has", "strokeWidth"],
-        getMaplibreProperty("strokeWidth", "number"),
-        createThemeEntryExpression(theme, defaultProps, "strokeWidth", 1),
-      ] as ExpressionSpecification,
-      "line-opacity": [
-        "case",
-        ["has", "fillOpacity"],
-        getMaplibreProperty("fillOpacity", "number"),
-        createThemeEntryExpression(theme, defaultProps, "fillOpacity", 1),
-      ] as ExpressionSpecification,
-    };
-  } else if (layerType === "line") {
-    paint = {
-      "line-color": [
-        "case",
-        ["has", "strokeColor"],
-        getMaplibreProperty("strokeColor", "color"),
-        createThemeEntryExpression(
-          theme,
-          defaultProps,
-          "strokeColor",
-          "#000000",
-        ),
-      ] as ExpressionSpecification,
-      "line-width": [
-        "case",
-        ["has", "strokeWidth"],
-        getMaplibreProperty("strokeWidth", "number"),
-        createThemeEntryExpression(theme, defaultProps, "strokeWidth", 1),
-      ] as ExpressionSpecification,
-      "line-opacity": [
-        "case",
-        ["has", "strokeOpacity"],
-        getMaplibreProperty("strokeOpacity", "number"),
-        createThemeEntryExpression(theme, defaultProps, "strokeOpacity", 1),
-      ] as ExpressionSpecification,
-    };
-  }
+	if (layerType === "flat") {
+		paint = {
+			"fill-color": [
+				"case",
+				["has", "fillColor"],
+				getMaplibreProperty("fillColor", "color"),
+				createThemeEntryExpression(theme, defaultProps, "fillColor", "#000000"),
+			] as ExpressionSpecification,
+			"fill-opacity": [
+				"case",
+				["has", "fillOpacity"],
+				getMaplibreProperty("fillOpacity", "number"),
+				createThemeEntryExpression(theme, defaultProps, "fillOpacity", 1),
+			] as ExpressionSpecification,
+		};
+	} else if (layerType === "stroke") {
+		paint = {
+			"line-color": [
+				"case",
+				["has", "strokeColor"],
+				getMaplibreProperty("strokeColor", "color"),
+				createThemeEntryExpression(
+					theme,
+					defaultProps,
+					"strokeColor",
+					"#000000",
+				),
+			] as ExpressionSpecification,
+			"line-width": [
+				"case",
+				["has", "strokeWidth"],
+				getMaplibreProperty("strokeWidth", "number"),
+				createThemeEntryExpression(theme, defaultProps, "strokeWidth", 1),
+			] as ExpressionSpecification,
+			"line-opacity": [
+				"case",
+				["has", "fillOpacity"],
+				getMaplibreProperty("fillOpacity", "number"),
+				createThemeEntryExpression(theme, defaultProps, "fillOpacity", 1),
+			] as ExpressionSpecification,
+		};
+	} else if (layerType === "line") {
+		paint = {
+			"line-color": [
+				"case",
+				["has", "strokeColor"],
+				getMaplibreProperty("strokeColor", "color"),
+				createThemeEntryExpression(
+					theme,
+					defaultProps,
+					"strokeColor",
+					"#000000",
+				),
+			] as ExpressionSpecification,
+			"line-width": [
+				"case",
+				["has", "strokeWidth"],
+				getMaplibreProperty("strokeWidth", "number"),
+				createThemeEntryExpression(theme, defaultProps, "strokeWidth", 1),
+			] as ExpressionSpecification,
+			"line-opacity": [
+				"case",
+				["has", "strokeOpacity"],
+				getMaplibreProperty("strokeOpacity", "number"),
+				createThemeEntryExpression(theme, defaultProps, "strokeOpacity", 1),
+			] as ExpressionSpecification,
+		};
+	}
 
 	const layerTypeMap = {
 		flat: "fill" as const,
