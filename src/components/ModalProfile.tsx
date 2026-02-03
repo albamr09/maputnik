@@ -5,6 +5,7 @@ import Modal from "./Modal";
 
 import FieldString from "./FieldString";
 import FieldEnum from "./FieldEnum";
+import InputButton from "./InputButton";
 
 type ModalProfileInternalProps = {
   isOpen: boolean;
@@ -15,13 +16,37 @@ type ModalProfileInternalProps = {
   onChangeProperty(...args: unknown[]): unknown;
 } & WithTranslation;
 
-class ModalProfileInternal extends React.Component<ModalProfileInternalProps> {
+type ModalProfileInternalState = {
+  apikey?: string;
+  buildingId?: string;
+  env?: string;
+}
+
+class ModalProfileInternal extends React.Component<ModalProfileInternalProps, ModalProfileInternalState> {
   constructor(props: ModalProfileInternalProps) {
     super(props);
+    this.state = {
+      apikey: props.situmApiKey,
+      buildingId: props.situmBuildingId,
+      env: props.situmEnvironment
+    }
   }
 
   onOpenToggle() {
     this.props.onOpenToggle();
+  }
+
+  disableSave() {
+    return this.state.apikey == null || this.state.apikey == undefined || this.state.apikey == "" ||
+      this.state.buildingId == null || this.state.buildingId == undefined || this.state.buildingId == "" ||
+      this.state.env == null || this.state.env == undefined || this.state.env == ""
+  }
+
+  onSave() {
+    this.props.onChangeProperty("apikey", this.state.apikey);
+    this.props.onChangeProperty("building-id", this.state.buildingId);
+    this.props.onChangeProperty("environment", this.state.env);
+    this.onOpenToggle();
   }
 
   render() {
@@ -45,8 +70,8 @@ class ModalProfileInternal extends React.Component<ModalProfileInternalProps> {
                 ),
               }}
               data-wd-key="modal:settings.maputnik:situm-apikey"
-              value={this.props.situmApiKey}
-              onChange={this.props.onChangeProperty.bind(this, "apikey")}
+              value={this.state.apikey}
+              onChange={(value) => this.setState({ apikey: value })}
             />
             <FieldString
               label={t("Situm Building ID")}
@@ -54,19 +79,24 @@ class ModalProfileInternal extends React.Component<ModalProfileInternalProps> {
               fieldSpec={{
                 doc: t("Current Situm building ID"),
               }}
-              value={this.props.situmBuildingId}
-              onChange={this.props.onChangeProperty.bind(this, "building-id")}
+              value={this.state.buildingId}
+              onChange={(value) => this.setState({ buildingId: value })}
             />
             <FieldEnum
               label={t("Environment")}
               fieldSpec={{
                 doc: t("Select Situm API environment"),
               }}
-              value={this.props.situmEnvironment}
+              value={this.state.env}
               options={["des", "pre", "pro"]}
               default={"pro"}
-              onChange={this.props.onChangeProperty.bind(this, "environment")}
+              onChange={(value: string) => this.setState({ env: value })}
             />
+            <InputButton 
+              disabled={this.disableSave()}
+              onClick={this.onSave.bind(this)}>
+              {t("OK")}
+            </InputButton>
           </div>
         </Modal>
       </div>
