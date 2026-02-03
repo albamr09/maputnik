@@ -60,6 +60,7 @@ class ModalProcessesInternal extends React.Component<ModalProcessesInternalProps
         };
         const mapStyle = style.ensureStyleValidity(newStyle);
         this.props.onStyleChanged(mapStyle);
+        this.onOpenToggle();
       } catch (err) {
         console.error(err);
         return;
