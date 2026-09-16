@@ -357,28 +357,11 @@ class PMTilesSourceEditor extends React.Component<PMTilesSourceEditorProps> {
 
 type ModalSourcesTypeEditorInternalProps = {
   mode: EditorMode;
-  situmJWT?: string | null;
   source: any;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
 
 class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEditorInternalProps> {
-  constructor(props: ModalSourcesTypeEditorInternalProps) {
-    super(props);
-    this.handleToggleUseSitumAuth = this.handleToggleUseSitumAuth.bind(this);
-  }
-
-  handleToggleUseSitumAuth = (checked: boolean) => {
-    if (checked) {
-      this.props.onChange({
-        ...this.props.source,
-        x_accessToken: this.props.situmJWT,
-      });
-    } else {
-      this.props.onChange({ ...this.props.source, x_accessToken: "" });
-    }
-  };
-
   render() {
     const t = this.props.t;
     const commonProps = {
@@ -389,49 +372,35 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
       tReady: this.props.tReady,
     };
 
-    const accessTokenField = this.props.situmJWT && (
-      <FieldCheckbox
-        label={t("Use Situm Auth")}
-        value={this.props.source.x_accessToken || ""}
-        onChange={this.handleToggleUseSitumAuth}
-        data-wd-key="modal:sources.add.access_token"
-      />
-    );
-
     switch (this.props.mode) {
     case "geojson_url":
       return (
         <div>
           <GeoJSONSourceUrlEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "geojson_json":
       return (
         <div>
           <GeoJSONSourceFieldJsonEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "tilejson_vector":
       return (
         <div>
           <TileJSONSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "tile_vector":
       return (
         <div>
           <TileURLSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "tilejson_raster":
       return (
         <div>
           <TileJSONSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "tile_raster":
@@ -454,14 +423,12 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
               data-wd-key="modal:sources.add.tile_size"
             />
           </TileURLSourceEditor>
-          {accessTokenField}
         </div>
       );
     case "tilejson_raster-dem":
       return (
         <div>
           <TileJSONSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "tilexyz_raster-dem":
@@ -499,32 +466,28 @@ class ModalSourcesTypeEditorInternal extends React.Component<ModalSourcesTypeEdi
               }
             />
           </TileURLSourceEditor>
-          {accessTokenField}
         </div>
       );
     case "pmtiles_vector":
       return (
         <div>
           <PMTilesSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "image":
       return (
         <div>
           <ImageSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     case "video":
       return (
         <div>
           <VideoSourceEditor {...commonProps} />
-          {accessTokenField}
         </div>
       );
     default:
-      return accessTokenField;
+      return null;
     }
   }
 }

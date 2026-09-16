@@ -65,6 +65,7 @@ import {
 import SitumSDK from "@situm/sdk-js";
 import ModalProfile from "./ModalProfile";
 import ModalProcesses from "./ModalProcesses";
+import { situmFetchInit } from "../libs/situm-auth";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -381,8 +382,6 @@ export default class App extends React.Component<any, AppState> {
   }
 
   async componentDidUpdate(_prevProps: any, prevState: AppState) {
-    const prevMetadataMapStyle = prevState.mapStyle.metadata;
-    const metadataMapStyle = this.state.mapStyle.metadata;
     const prevSelectedFloorId = prevState.selectedFloorId;
     const newSelectedFloorId = this.state.selectedFloorId;
     const prevFloorIds = prevState.floorIds;
@@ -423,44 +422,6 @@ export default class App extends React.Component<any, AppState> {
         });
     };
 
-    const loadSitumAuthData = (metadata: any) => {
-      // On first load, load profile information
-      const situmApiKey =
-        // @ts-ignore
-        metadata?.["maputnik:situm-apikey"];
-      const situmBuildingId =
-        // @ts-ignore
-        metadata?.["maputnik:situm-building-id"];
-      const situmEnvironment =
-        // @ts-ignore
-        metadata?.["maputnik:situm-env"];
-
-      this.setState({
-        situmApiKey,
-        situmBuildingId,
-        situmEnvironment: situmEnvironment ?? "pro",
-      });
-    };
-
-    if (newApiKey !== prevApiKey) {
-      this.onChangeMetadataProperty("maputnik:situm-apikey", newApiKey);
-    }
-
-    if (newBuildingID !== prevBuildingID) {
-      this.onChangeMetadataProperty(
-        "maputnik:situm-building-id",
-        newBuildingID,
-      );
-    }
-
-    if (newEnvironment !== prevEnvironment) {
-      this.onChangeMetadataProperty("maputnik:situm-env", newEnvironment);
-    }
-
-    if (!isEqual(prevMetadataMapStyle, metadataMapStyle)) {
-      loadSitumAuthData(metadataMapStyle);
-    }
-
     if (
       newApiKey &&
       ((prevApiKey !== newApiKey && (newApiKey as string).trim().length > 0) ||
@@ -498,6 +459,13 @@ export default class App extends React.Component<any, AppState> {
     ) {
       this.setState({ floorIds: [] });
     }
+
+    if (
+      this.state.situmJWT &&
+      prevState.situmJWT !== this.state.situmJWT
+    ) {
+      this.setState({ sources: {} }, () => this.fetchSources());
+    }
   }
 
   updateLayersForNewFloorId = (floorId?: number) => {
@@ -529,7 +497,10 @@ export default class App extends React.Component<any, AppState> {
   };
 
   saveStyle(snapshotStyle: StyleSpecification & { id: string }) {
-    this.styleStore.save(snapshotStyle);
+    this.styleStore.save({
+      ...style.stripSitumMetadata(snapshotStyle),
+      id: snapshotStyle.id,
+    });
   }
 
   updateFonts(urlTemplate: string) {
@@ -585,6 +556,10 @@ export default class App extends React.Component<any, AppState> {
       addRevision: true,
       initialLoad: false,
       ...opts,
+    };
+
+    newStyle = style.stripSitumMetadata(newStyle) as StyleSpecification & {
+      id: string;
     };
 
     // For the style object, find the urls that has "{key}" and insert the correct API keys
@@ -945,9 +920,7 @@ export default class App extends React.Component<any, AppState> {
               console.error("Failed to process sources for '%s'", url, err);
             });
         } else {
-          fetch(url!, {
-            mode: "cors",
-          })
+          fetch(url!, situmFetchInit(this.state.situmJWT, url!))
             .then((response) => response.json())
             .then((json) => setVectorLayers(json))
             .catch((err) => {
@@ -1020,6 +993,7 @@ export default class App extends React.Component<any, AppState> {
       mapElement = (
         <MapMaplibreGl
           {...mapProps}
+          situmJWT={this.state.situmJWT}
           onChange={this.onMapChange}
           options={this.state.maplibreGlDebugOptions}
           inspectModeEnabled={this.state.mapState === "inspect"}
@@ -1320,7 +1294,6 @@ export default class App extends React.Component<any, AppState> {
         />
         <ModalSources
           mapStyle={this.state.mapStyle}
-          situmJWT={this.state.situmJWT}
           onStyleChanged={this.onStyleChanged}
           isOpen={this.state.isOpen.sources}
           onOpenToggle={this.toggleModal.bind(this, "sources")}

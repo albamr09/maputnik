@@ -89,42 +89,32 @@ function replaceSourceAccessToken(
   if (!source) return mapStyle;
   if (!("url" in source) || !source.url) return mapStyle;
 
-  // Check for x_accessToken on the source
-  const accessToken = (source as any).x_accessToken;
+  let authSourceName = sourceName;
+  if (
+    sourceName === "thunderforest_transport" ||
+    sourceName === "thunderforest_outdoors"
+  ) {
+    authSourceName = "thunderforest";
+  } else if ("url" in source && source.url?.match(/\.stadiamaps\.com/)) {
+    // The code currently usually assumes openmaptiles == MapTiler,
+    // so we need to check the source URL.
+    authSourceName = "stadia";
+  }
+
+  const fallbackToken = getAccessToken(authSourceName, mapStyle, opts);
+
+  if (!fallbackToken) {
+    return mapStyle;
+  }
+
   let sourceUrl: string = source.url;
-  if (accessToken) {
-    // Append as query param (handle ? or &)
-    const sep = sourceUrl.includes("?") ? "&" : "?";
-    sourceUrl = `${sourceUrl}${sep}access_token=${encodeURIComponent(accessToken)}`;
+  if (authSourceName == "stadia") {
+    // Stadia Maps does not always require an API key,
+    // so there is no placeholder in our styles.
+    // We append it at the end of the URL when exporting if necessary.
+    sourceUrl = `${source.url}?api_key=${fallbackToken}`;
   } else {
-    // Fallback to old logic
-    let authSourceName = sourceName;
-    if (
-      sourceName === "thunderforest_transport" ||
-      sourceName === "thunderforest_outdoors"
-    ) {
-      authSourceName = "thunderforest";
-    } else if ("url" in source && source.url?.match(/\.stadiamaps\.com/)) {
-      // The code currently usually assumes openmaptiles == MapTiler,
-      // so we need to check the source URL.
-      authSourceName = "stadia";
-    }
-
-    const fallbackToken = getAccessToken(authSourceName, mapStyle, opts);
-
-    if (!fallbackToken) {
-      // Early exit.
-      return mapStyle;
-    }
-
-    if (authSourceName == "stadia") {
-      // Stadia Maps does not always require an API key,
-      // so there is no placeholder in our styles.
-      // We append it at the end of the URL when exporting if necessary.
-      sourceUrl = `${source.url}?api_key=${fallbackToken}`;
-    } else {
-      sourceUrl = source.url.replace("{key}", fallbackToken);
-    }
+    sourceUrl = source.url.replace("{key}", fallbackToken);
   }
 
   const changedSources = {
@@ -200,6 +190,21 @@ function stripFloorFilter(mapStyle: StyleSpecification) {
   };
 }
 
+function stripAccessTokenFromUrl(url: string): string {
+  try {
+    const urlObj = new URL(url, "http://dummy");
+    urlObj.searchParams.delete("access_token");
+    urlObj.searchParams.delete("api_key");
+    let newUrl = urlObj.pathname + (urlObj.search ? urlObj.search : "");
+    if (/^https?:\/\//.test(url)) {
+      newUrl = urlObj.origin + newUrl;
+    }
+    return newUrl;
+  } catch (_e) {
+    return url;
+  }
+}
+
 function stripAccessTokens(mapStyle: StyleSpecification) {
   const changedMetadata = {
     ...(mapStyle.metadata as any),
@@ -208,30 +213,21 @@ function stripAccessTokens(mapStyle: StyleSpecification) {
   delete changedMetadata["maputnik:thunderforest_access_token"];
   delete changedMetadata["maputnik:stadia_access_token"];
 
-  // Remove x_accessToken and access_token/api_key query params from each source
   const changedSources = Object.fromEntries(
     Object.entries(mapStyle.sources || {}).map(([sourceName, source]) => {
       if (source && typeof source === "object") {
-        // Remove x_accessToken
-        const { x_accessToken, ...rest } = source as any;
-        // Remove access_token and api_key from url if present
+        const { x_accessToken: _accessToken, ...rest } = source as any;
         let newUrl = rest.url;
         if (typeof newUrl === "string") {
-          try {
-            const urlObj = new URL(newUrl, "http://dummy"); // base for relative URLs
-            urlObj.searchParams.delete("access_token");
-            urlObj.searchParams.delete("api_key");
-            // Remove trailing ? if no params left
-            newUrl = urlObj.pathname + (urlObj.search ? urlObj.search : "");
-            // If original url had protocol, keep it
-            if (/^https?:\/\//.test(rest.url)) {
-              newUrl = urlObj.origin + newUrl;
-            }
-          } catch (e) {
-            // If URL parsing fails, leave as is
-          }
+          newUrl = stripAccessTokenFromUrl(newUrl);
         }
-        return [sourceName, { ...rest, url: newUrl }];
+        let newTiles = rest.tiles;
+        if (Array.isArray(newTiles)) {
+          newTiles = newTiles.map((tileUrl: string) =>
+            stripAccessTokenFromUrl(tileUrl),
+          );
+        }
+        return [sourceName, { ...rest, url: newUrl, tiles: newTiles }];
       }
       return [sourceName, source];
     }),
