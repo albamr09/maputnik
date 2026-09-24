@@ -82,7 +82,6 @@ function editorMode(source: SourceSpecification) {
 type ActiveModalSourcesTypeEditorProps = {
   sourceId: string;
   source: SourceSpecification;
-  situmJWT?: string | null;
   onDelete(...args: unknown[]): unknown;
   onChange(...args: unknown[]): unknown;
 } & WithTranslation;
@@ -113,7 +112,6 @@ class ActiveModalSourcesTypeEditor extends React.Component<ActiveModalSourcesTyp
             onChange={this.props.onChange}
             mode={editorMode(this.props.source)}
             source={this.props.source}
-            situmJWT={this.props.situmJWT}
           />
         </div>
       </div>
@@ -122,7 +120,6 @@ class ActiveModalSourcesTypeEditor extends React.Component<ActiveModalSourcesTyp
 }
 
 type AddSourceProps = {
-  situmJWT?: string | null;
   onAdd(...args: unknown[]): unknown;
 } & WithTranslation;
 
@@ -306,7 +303,6 @@ class AddSource extends React.Component<AddSourceProps, AddSourceState> {
           onChange={this.onChangeSource}
           mode={this.state.mode}
           source={this.state.source}
-          situmJWT={this.props.situmJWT}
         />
         <InputButton
           className="maputnik-add-source-button"
@@ -322,7 +318,6 @@ class AddSource extends React.Component<AddSourceProps, AddSourceState> {
 
 type ModalSourcesInternalProps = {
   mapStyle: StyleSpecification;
-  situmJWT?: string | null;
   isOpen: boolean;
   onOpenToggle(...args: unknown[]): unknown;
   onStyleChanged(...args: unknown[]): unknown;
@@ -347,7 +342,6 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
           key={sourceId}
           sourceId={sourceId}
           source={source}
-          situmJWT={this.props.situmJWT}
           onChange={(src: SourceSpecification) =>
             this.props.onStyleChanged(changeSource(mapStyle, sourceId, src))
           }
@@ -411,7 +405,6 @@ class ModalSourcesInternal extends React.Component<ModalSourcesInternalProps> {
             onAdd={(sourceId: string, source: SourceSpecification) =>
               this.props.onStyleChanged(addSource(mapStyle, sourceId, source))
             }
-            situmJWT={this.props.situmJWT}
             {...i18nProps}
           />
         </section>

@@ -16,6 +16,7 @@ import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
 import { withTranslation, WithTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { Protocol } from "pmtiles";
+import { createSitumTransformRequest } from '../libs/situm-auth';
 
 function renderPopup(popup: JSX.Element, mountNode: ReactDOM.Container): HTMLElement {
   ReactDOM.render(popup, mountNode);
@@ -65,6 +66,7 @@ type MapMaplibreGlInternalProps = {
     showOverdrawInspector?: boolean
   }
   replaceAccessTokens(mapStyle: StyleSpecification): StyleSpecification
+  situmJWT?: string | null
   onChange(value: {center: LngLat, zoom: number}): unknown
 } & WithTranslation;
 
@@ -110,15 +112,21 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
     return should;
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: MapMaplibreGlInternalProps) {
     const map = this.state.map;
 
     const styleWithTokens = this.props.replaceAccessTokens(this.props.mapStyle);
     if (map) {
-      // Maplibre GL now does diffing natively so we don't need to calculate
-      // the necessary operations ourselves!
+      if (prevProps.situmJWT !== this.props.situmJWT) {
+        map.setTransformRequest(createSitumTransformRequest(this.props.situmJWT ?? null));
+        // Reload the full style so tile requests retry with the new auth header.
+        map.setStyle(styleWithTokens, { diff: false });
+      } else {
+        // Maplibre GL now does diffing natively so we don't need to calculate
+        // the necessary operations ourselves
+        map.setStyle(styleWithTokens, { diff: true });
+      }
       // We also need to update the style for inspect to work properly
-      map.setStyle(styleWithTokens, {diff: true});
       map.showTileBoundaries = this.props.options?.showTileBoundaries!;
       map.showCollisionBoxes = this.props.options?.showCollisionBoxes!;
       map.showOverdrawInspector = this.props.options?.showOverdrawInspector!;
@@ -146,7 +154,8 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
       maxZoom: 24,
       // setting to always load glyphs of CJK fonts from server
       // https://maplibre.org/maplibre-gl-js/docs/examples/local-ideographs/
-      localIdeographFontFamily: false
+      localIdeographFontFamily: false,
+      transformRequest: createSitumTransformRequest(this.props.situmJWT ?? null),
     } satisfies MapOptions;
 
     const protocol = new Protocol({metadata: true});

@@ -89,7 +89,7 @@ export class StyleStore {
 
   // Save current style replacing previous version
   save(mapStyle: StyleSpecification & { id: string }) {
-    mapStyle = style.ensureStyleValidity(mapStyle)
+    mapStyle = style.ensureStyleValidity(style.stripSitumMetadata(mapStyle))
     const key = styleKey(mapStyle.id)
 
     const saveFn = () => {
